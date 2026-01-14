@@ -1,0 +1,39 @@
+generate_questions_task:
+  description: >
+    Analise o tema solicitado: "{pergunta}".
+    
+    Crie um ROTEIRO DE DEBATE com 3 a 5 perguntas estratégicas.
+    Não faça perguntas de "sim ou não". Faça perguntas que gerem discussão sobre:
+    - Percepção de valor
+    - Barreiras de adoção
+    - Comparação com concorrentes
+    - Momentos de consumo
+  expected_output: "Uma lista estruturada de 3-5 perguntas estratégicas para serem usadas no Focus Group."
+
+focus_group_task:
+  description: >
+    Utilizando as perguntas geradas na tarefa anterior, conduza a SIMULAÇÃO DO FOCUS GROUP.
+    
+    Faça com que as 3 personas (Cético, Brand Lover, Pragmático) respondam e debatam entre si sobre cada pergunta.
+    Use linguagem natural, gírias quando apropriado, e mostre conflito de opiniões.
+    
+    Se o usuário forneceu contexto adicional: "{contexto}", certifique-se de que o debate considere isso.
+  expected_output: "Transcrição completa do debate simulado, separada por tópicos/perguntas."
+
+analyze_insights_task:
+  description: >
+    Analise profundamente a transcrição do Focus Group Simulado.
+    
+    Gere um Relatório Estratégico contendo:
+    0. **Questões Estratégicas do Debate**: Liste explicitamente as 3-5 perguntas estratégicas que guiaram a discussão.
+    1. **Resumo Executivo**: O veredicto geral do grupo.
+    2. **Análise de Sentimento**: Quem amou e quem odiou (e por quê).
+    3. **Principais Barreiras**: O que impede a compra da persona Cética/Pragmática?
+    4. **Drivers de Valor**: O que motivou o Brand Lover?
+    5. **Recomendações Táticas**: Sugestões para a marca baseadas no debate.
+    6. **Transcrição dos Destaques do Debate**:
+       - Selecione e transcreva os melhores diálogos entre as personas (Cético vs Brand Lover).
+       - Mantenha a linguagem natural e o formato de script (Ex: "Cético: Eu não compraria porque...").
+    
+    Formate em Markdown profissional.
+  expected_output: "Relatório MD completo incluindo Questões, Análise e Destaques do Debate."

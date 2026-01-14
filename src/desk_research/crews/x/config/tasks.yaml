@@ -1,0 +1,67 @@
+plan_research_task:
+  description: >
+    Receba o tema de negócio: '{topic}' e produza um PLANO DE PESQUISA para X.
+    - Liste palavras-chave principais e variações.
+    - Sugira hashtags relevantes.
+    - Sugira janelas de tempo (em dias) e filtros de engajamento para as buscas.
+    - O output deve ser um JSON com campos: queries, hashtags, days_window_sugerido, min_engagement_sugerido.
+  expected_output: "Plano de pesquisa em formato JSON estruturado."
+
+collect_tweets_task:
+  description: >
+    Usando o research_plan gerado anteriormente, chame a ferramenta 
+    twitter_search_tool para cada query/hashtag.
+    - Respeite, sempre que fizer sentido, os valores de days_window_sugerido 
+    e min_engagement_sugerido.
+    - Consolide todos os tweets em uma lista única JSON, sem duplicar IDs.
+    - Não invente dados; use apenas o retorno da ferramenta.
+  expected_output: "Lista JSON de tweets padronizados."
+
+analyze_insights_task:
+  description: >
+    A partir de tweets_raw, produza um JSON de insights estruturado com o formato:
+    {{
+      "themes": [
+        {{
+          "name": "Tema X",
+          "volume_percent": 35,
+          "sentiment": {{"positive": 40, "neutral": 30, "negative": 30}},
+          "main_ideas": ["...", "..."],
+          "example_tweets_ids": ["123", "456"]
+        }}
+      ],
+      "tribes": [
+         {{"name": "Early Adopters", "stance": "Apoiam X", "sentiment": 80}},
+         {{"name": "Críticos/Haters", "stance": "Reclamam de Y", "sentiment": 20}}
+      ],
+      "overall_sentiment": {{"positive": 40, "neutral": 35, "negative": 25}},
+      "key_trends": ["tendência 1", "tendência 2"],
+      "risks": ["risco 1", "risco 2"],
+      "opportunities": ["oportunidade 1", "oportunidade 2"]
+    }}
+  expected_output: "JSON de insights sobre o tema com análise de tribos."
+
+write_report_task:
+  description: >
+    A partir de insights_json, escreva um RELATÓRIO EXECUTIVO em Markdown 
+    sobre o tema: {topic}.
+
+    DATA DO RELATÓRIO: {date}
+
+    **REGRAS DE FORMATAÇÃO**:
+    **REGRAS DE CONTEÚDO (DIDÁTICO & ESPECÍFICO)**:
+    1. **Conexão Direta**: Todo insight deve responder à pergunta principal: '{topic}'. Evite temas genéricos como 'Flavor Preferences' se não houver dados reais disso. Use os dados que você tem.
+    2. **Explique o 'Porquê'**: Não diga apenas '40% positivo'. Ex: '40% positivo PORQUE os usuários citam o sabor da nova cerveja sem álcool'. Seja didático.
+    3. **Análise de Sentimento Explicada**: Detalhe as emoções por trás dos números. O que causa a raiva? O que causa a alegria?
+
+    Estrutura:
+    1. Resumo Executivo (Respondendo à pergunta '{topic}')
+    2. Metodologia
+    3. Principais Temas Identificados (Com explicações profundas)
+    4. Análise de Tribos/Grupos de Opinião (Quem fala o quê?)
+    5. Análise de Sentimento Detalhada (O 'Porquê' dos sentimentos)
+    6. Tendências e Sinais de Mercado
+    7. Riscos e Oportunidades
+    8. Exemplos Representativos de Conversas
+    9. Recomendações Iniciais para Marketing/Insights
+  expected_output: "Relatório em Markdown limpo (sem blocos de código), com data e título."

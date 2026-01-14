@@ -1,0 +1,70 @@
+search_web:
+  description: >
+    Buscar informações sobre {query} usando Google Search.
+    Encontrar pelo menos {max_results} fontes relevantes e confiáveis.
+    
+    **CRITÉRIOS OBRIGATÓRIOS**:
+    1. **RECÊNCIA**: Priorize notícias e artigos publicados nos **ÚLTIMOS 12 MESES**.
+    2. **FONTES**: Priorize portais de notícias reconhecidos, sites oficiais e relatórios de indústria.
+    3. **LINKS**: Guarde a URL de TODAS as fontes encontradas para citação.
+  expected_output: >
+    - Snippet/Resumo
+    - Data de publicação (se disponível)
+    - Avaliação de credibilidade
+
+    **ESTRATÉGIA ITERATIVA (DEEP LOOP)**:
+    - O agente deve realizar pelo menos **2 RODADAS** de busca.
+    - **NAVEGAÇÃO PROFUNDA**: Se cair em uma "Home Page" genérica, você OBRIGATORIAMENTE deve buscar links internos relevantes (ex: "/reports", "/about", "/cases") e fazer scrape deles para ter dados concretos. Não aceite "marketing fluff".
+    - Se os primeiros resultados forem superficiais, refine a query (ex: busque dados estatísticos, PDFs, relatórios oficiais).
+    - Tente cruzar fontes para evitar viés de um único portal.
+
+analyze_content:
+  description: >
+    Analisar o conteúdo das páginas encontradas sobre: {query}.
+    - Extrair informações principais
+    - Verificar credibilidade das fontes
+    - Identificar padrões e tendências
+    - Detectar informações conflitantes
+    - Validar dados importantes
+  expected_output: >
+    Análise detalhada contendo:
+    - Resumo de cada fonte com URL
+    - Principais informações encontradas
+    - Avaliação de credibilidade
+    - Informações verificadas vs não verificadas
+    - Insights e conclusões
+
+create_web_report:
+  description: >
+    Criar um relatório completo e EXAUSTIVO sobre "{query}" com as informações coletadas da web.
+    O relatório deve ser DENSO (mínimo 1000 palavras), objetivo e citar todas as fontes.
+    
+    **REGRAS DE ESCRITA**:
+    1. INICIE O RELATÓRIO COM: Título e Data ({current_date}).
+    2. NÃO USE PLACEHOLDERS como "[Insira texto aqui]".
+    3. NÃO CRIE APENAS LISTAS de tópicos. Escreva texto corrido e analítico.
+    4. Para cada seção, escreva pelo menos 3-4 parágrafos substanciais.
+    5. CITE AS FONTES no texto e na lista final.
+    
+    **REGRAS DE IDIOMA**:
+    1. O RELATÓRIO DEVE SER 100% EM PORTUGUÊS (PT-BR).
+    2. Títulos de artigos originais podem ser mantidos em inglês, mas todo o resto deve ser traduzido.
+
+    **ESTRUTURA OBRIGATÓRIA**:
+    1. Resumo Executivo (Resumo de alto nível)
+    2. Introdução ao Tópico (Contexto e importância)
+    3. Principais Descobertas (Com dados quantitativos se houver)
+    4. Análise Detalhada (Aprofundamento nos temas)
+    5. Tendências Identificadas (O que há de mais novo nos últimos 12 meses)
+    6. Conclusões (O que isso significa para o futuro?)
+    7. **FONTES E REFERÊNCIAS BIBLIOGRÁFICAS**: Lista OBRIGATÓRIA com Título e URL linkada.
+  expected_output: >
+    Relatório web em formato markdown com:
+    - Resumo Executivo
+    - Introdução ao Tópico
+    - Principais Descobertas
+    - Análise Detalhada
+    - Tendências Identificadas
+    - Conclusões
+    - Fontes e Referências (Links clicáveis)
+    - Recomendações (Se houver)

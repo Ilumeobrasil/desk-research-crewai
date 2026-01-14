@@ -1,0 +1,6 @@
+{
+  "input_dir": "D:\\Ilumeo\\AMBEV\\AGENTEIA_V1\\ai-augmented-desk-research-flow\\data\\input_raw\\Brand_Audit",
+  "output_dir": "D:\\Ilumeo\\AMBEV\\AGENTEIA_V1\\ai-augmented-desk-research-flow\\data\\output_ingestor",
+  "result": "- input_dir efetivo: D:\\Ilumeo\\AMBEV\\AGENTEIA_V1\\ai-augmented-desk-research-flow\\data\\input_raw\\Brand_Audit\n- output_dir efetivo: D:\\Ilumeo\\AMBEV\\AGENTEIA_V1\\ai-augmented-desk-research-flow\\data\\output_ingestor\n- quantidade de docx lidos: 22\n- quantidade de json escritos: 22\n- avisos: asimov_skipped:disabled_or_not_configured",
+  "asimov_upload": "error: TypeError(\"AsimovClient.__init__() got an unexpected keyword argument 'api_key'\")"
+}

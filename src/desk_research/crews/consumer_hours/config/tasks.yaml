@@ -1,0 +1,12 @@
+ingest:
+  description: >
+    Leia os arquivos .docx em {input_dir}, extraia o texto integral e escreva
+    arquivos .json em {output_dir}. Use a ferramenta ingest_folder_tool.
+    Retorne um resumo com contagem de arquivos processados e avisos.
+  expected_output: >
+    Um resumo textual contendo:
+    - input_dir e output_dir efetivos
+    - quantidade de docx lidos
+    - quantidade de json escritos
+    - lista curta de avisos (se houver)
+  agent: ingestor

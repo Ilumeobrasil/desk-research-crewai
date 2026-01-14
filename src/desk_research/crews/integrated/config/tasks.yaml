@@ -1,0 +1,61 @@
+synthesis_task:
+  description: >
+    Você recebeu relatórios brutos de diferentes frentes de pesquisa sobre o tema: '{topic}'.
+    
+    {instruction}
+
+    CONTEXTO DOS RELATÓRIOS:
+    {reports_context}
+
+    SUA MISSÃO:
+    1. Analise todos os relatórios fornecidos.
+    2. Identifique pontos de convergência (onde todos concordam) e divergência.
+    3. Destaque insights únicos que só apareceram em um canal específico (ex: algo que só o Twitter viu).
+    4. Produza um RELATÓRIO MASTER INTEGRADO em Markdown.
+
+    DIRETRIZES DE IDIOMA E FORMATAÇÃO (CRÍTICO):
+    - O RELATÓRIO DEVE SER ESCRITO 100% EM PORTUGUÊS (PT-BR).
+    - TODOS os títulos e subtítulos de seções DEVEM estar em Português (ex: 'Resumo Executivo', 'Conclusão').
+    - EXCESSÃO: Títulos de papers, artigos, vídeos ou nomes de marcas devem ser mantidos no IDIOMA ORIGINAL (Inglês, etc). NÃO traduza títulos de obras.
+
+    ESTRUTURA DO RELATÓRIO MASTER:
+    # Relatório Master Integrado: [Tema]
+    **Data: {date}**
+
+    ## 1. Resumo Executivo
+    ## 2. Visão 360º (Cruzamento de Fontes)
+       - O que a Academia diz vs. O que a Rua diz (Social)
+    ## 3. Principais Insights por Canal
+       - Acadêmico
+       - Web/Notícias
+       - YouTube/Mídia
+       - Social Listening (X)
+       - Consumer Hours (Brand Audit)
+       - Genie (IA)
+    ## 4. Análise de Sentimento Consolidada
+       - Adicione um breve parágrafo EXPLICANDO que o gráfico abaixo representa o **Índice Estimado de Sentimento Positivo (0-100%)** identificado em cada canal.
+       - Crie um GRÁFICO ASCII (usando blocos █) comparando o sentimento preponderante entre os canais.
+       - **OBRIGATÓRIO**: Ao lado de cada barra, escreva uma BREVE justificativa de 1 frase explicando o porquê da nota.
+       Exemplo:
+       Twitter:  [██████....] 60% -> (Viralização de memes positivos)
+       Academia: [██........] 20% -> (Foco em riscos à saúde)
+    ## 5. Recomendações Estratégicas Finais
+
+  expected_output: "Relatório Master Integrado em Markdown (sem emojis no título)."
+
+evaluation_task:
+  description: >
+    Avalie o relatório de pesquisa fornecido abaixo com rigor extremo.
+
+    Critérios de Avaliação:
+    1. Profundidade (Tem dados concretos ou só lero-lero?)
+    2. Integração (Usa todas as fontes ou ignora alguma?)
+    3. Estratégia (As recomendações são acionáveis?)
+    4. Formatação (Markdown limpo e estruturado?)
+
+    RELATÓRIO PARA AVALIAR:
+    {report_content}
+
+    IMPORTANTE: Se a nota for < 80, forneça feedback claro do que deve mudar.
+    Output MUST be a JSON object with 'score', 'feedback', and 'approved' fields.
+  expected_output: "Objeto QualityReview com score, feedback e veredicto."

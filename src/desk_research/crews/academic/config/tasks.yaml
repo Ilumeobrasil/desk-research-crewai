@@ -1,0 +1,136 @@
+﻿search_papers_task:
+  description: >
+    Realizar busca abrangente e persistente de papers acadêmicos sobre {topic}.
+
+    **REGRA CRÍTICA - QUALIDADE E RECÊNCIA**:
+    1. **MÍNIMO DE 3 PAPERS**: Você DEVE encontrar pelo menos 3 artigos relevantes.
+    2. **RECÊNCIA**: Priorize fortemente papers publicados nos **ÚLTIMOS 5 ANOS (>= 2020)**. Se não houver, justifique.
+    3. **QUALIDADE**: Busque revistas e conferências de alto impacto (ex: Nature, Science, IEEE, ACM, Elsevier, Scielo Top Tier).
+
+    **Estratégia de busca em cascata**:
+    1. Serper Scholar (Google Scholar) - Filtrar por ano se possível na query (ex: "topic 2024", "topic 2023")
+    2. OpenAlex (Papers com PDF Open Access) - Filtrar year >= 2020
+    3. arXiv (preprints técnicos)
+    4. Semantic Scholar (SE FALHAR, PULE)
+
+    **CITATION GRAPH (GENEALOGIA DO CONHECIMENTO)**:
+    - Se encontrar um paper MUITO relevante/seminal (>100 citações), não pare nele.
+    - Realize uma NOVA BUSCA por "papers citing [Titulo do Paper]" ou "related to [Titulo]" para encontrar evoluções recentes dessa ideia.
+    - Construa uma linha do tempo (quem citou quem).
+
+    **OBJETIVO**: Encontrar 3+ papers recentes e relevantes.
+    **CRÍTICO**: Se uma ferramenta der erro (Rate Limit/Erro), NÃO FAÇA RETRIES INFINITOS. Mude para a próxima estratégia imediatamente.
+    **CRÍTICO**: Se uma ferramenta der erro (Rate Limit/Erro), NÃO FAÇA RETRIES INFINITOS. Mude para a próxima estratégia imediatamente.
+
+  expected_output: >
+    Lista dividida em dois grupos:
+    1. PAPERS COM METADADOS COMPLETOS (mínimo 3): título, AUTORES REAIS (obrigatório), ANO (obrigatório), URL, resumo
+    2. PAPERS COM METADADOS INCOMPLETOS: descartar se possível
+
+analyze_literature_task:
+  description: >
+    Analisar PROFUNDAMENTE cada paper sobre {topic} de forma INDIVIDUAL, CRÍTICA e EXAUSTIVA usando a ferramenta pdf_analyzer.
+
+    **INSTRUÇÕES CRÍTICAS**:
+    1. SEMPRE use a ferramenta pdf_analyzer para cada paper recebido
+    2. Use as URLs REAIS fornecidas pelo Pesquisador (exemplo: https://arxiv.org/pdf/XXXX.XXXXX)
+    3. NÃO invente URLs de exemplo (example.com)
+    4. Leia TODO o conteúdo extraído pelo pdf_analyzer com MÁXIMA ATENÇÃO
+    5. Extraia TODOS os detalhes técnicos, números, nomes, citações relevantes
+    6. **GERE REFERÊNCIA ABNT** para cada paper.
+    
+    **CRITÉRIO DE REJEIÇÃO ( ZERO TOLERÂNCIA):**
+    - Se você entregar qualquer texto terminando com "..." ou reticências, o relatório será REJEITADO.
+    - É PROIBIDO usar "..." para resumir. Escreva TUDO.
+    - Se o texto for longo, escreva múltiplos parágrafos. NÃO TRUNQUE.
+    
+    **IMPORTANTE - REFERÊNCIA ABNT**:
+    Para cada paper, a PRIMEIRA coisa que você deve gerar é a referência ABNT completa.
+    Formato: SOBRENOME, Nome. Título. Revista, Ano. Disponível em: URL.
+    
+    **PARA CADA PAPER INDIVIDUALMENTE - ANÁLISE PROFUNDA OBRIGATÓRIA**:
+    
+    Execute: pdf_analyzer(url=URL_REAL_DO_PAPER)
+    
+    Depois, para CADA paper, extraia e documente de forma EXAUSTIVA (Mín. 1500 palavras):
+
+    0. **REFERÊNCIA ABNT COMPLETA** (Obrigatório)
+
+    1. **INTRODUÇÃO E CONTEXTO** (4-6 parágrafos DENSOS):
+       - Qual o problema ESPECÍFICO?
+       - NÃO RESUMA. Explique a motivação completa.
+    
+    2. **FUNDAMENTAÇÃO TEÓRICA** (4-5 parágrafos TÉCNICOS):
+       - Cite teorias, fórmulas, autores relacionados.
+    
+    3. **METODOLOGIA DETALHADA** (6-8 parágrafos EXTREMAMENTE TÉCNICOS):
+       - Descreva o passo a passo exato. 
+       - Se for IA: arquitetura, hiperparâmetros, dataset (tamanho, fonte).
+       - Se for Survey: N, demografia, perguntas.
+       
+    4. **RESULTADOS QUANTITATIVOS E QUALITATIVOS** (5-7 parágrafos COM NÚMEROS):
+       - Traz todos os números chave? P-values?
+       - NÃO diga "os resultados foram bons". Diga "A precisão aumentou de 85% para 92% (p<0.05)".
+       
+    5. **DISCUSSÃO E INTERPRETAÇÃO** (4-5 parágrafos CRÍTICOS):
+       - O que isso significa para a área?
+       
+    6. **CONTRIBUIÇÕES ORIGINAIS** (3-4 parágrafos ESPECÍFICOS)
+    
+    7. **LIMITAÇÕES E TRABALHOS FUTUROS** (3-4 parágrafos HONESTOS)
+    
+    8. **AVALIAÇÃO CRÍTICA DO ANALISTA** (2-3 parágrafos SEUS)
+       - O paper é confiável? Onde falhou?
+
+    **FORMATO DE SAÍDA OBRIGATÓRIO**:
+    Use Markdown. Separe claramente os papers.
+    NÃO USE TEXTO CURTO. SEJA PROLIXO.
+
+    **Se não conseguir acessar um paper**:
+    - Documente o erro específico (404, paywall, timeout)
+    - Continue com os próximos papers disponíveis
+    - Liste papers inacessíveis na análise final
+
+  expected_output: >
+    Para CADA paper analisado, forneça uma análise PROFUNDA e ESTRUTURADA contendo:
+    
+    1. Título Completo e Referência ABNT
+    2. Introdução e Contexto (4-6 parágrafos)
+    3. Fundamentação Teórica (4-5 parágrafos)
+    4. Metodologia Detalhada (6-8 parágrafos técnicos)
+    5. Resultados Quantitativos e Qualitativos (5-7 parágrafos com números)
+    6. Discussão e Interpretação (4-5 parágrafos)
+    7. Contribuições Originais (3-4 parágrafos)
+    8. Limitações e Trabalhos Futuros (3-4 parágrafos)
+    9. Qualidade e Rigor Científico (2-3 parágrafos)
+
+    RESUMO GERAL:
+    - Total de papers analisados com sucesso
+    - Indicação de papers inacessíveis
+
+synthesize_report_task:
+  description: >
+    Sintetizar um relatório acadêmico completo a partir das análises individuais.
+    
+    **INSTRUÇÕES CRÍTICAS**:
+    - Se você escrever apenas 1 frase, o sistema retornará ERRO DE VALIDAÇÃO e sua tarefa falhará.
+    - **COPIE INTEGRALMENTE** os textos longos gerados pelo Analista de Literatura. NÃO RESUMA.
+
+    **OUTROS CAMPOS**:
+    3. **tema**: O tópico da pesquisa. (USE O TEXTO EXATO DA PERGUNTA/TEMA FORNECIDO. NÃO RESUMA, NÃO ALTERE).
+    4. **papers**: Lista COMPLETA de papers analisados, com TODOS os metadados (incluindo as análises profundas de cada um).
+    5. **insights**: Extraia insights chave categorizados.
+    6. **tendencias_identificadas**: Liste tendências claras.
+    7. **gaps_pesquisa**: O que a literatura ainda não respondeu?
+    8. **metodologias_predominantes**: Quais métodos são mais usados?
+    9. **conclusoes**: Conclusões robustas baseadas nos papers.
+    10. **recomendacoes**: Ações práticas recomendadas.
+    11. **limitacoes**: OBRIGATÓRIO. Liste dificuldades de acesso, metadados faltantes, etc.
+
+    **IMPORTANTE**:
+    - Garanta que a lista de papers tenha pelo menos 3 itens.
+    - Se faltar dado para algum campo opcional, deixe vazio ou null.
+    
+  expected_output: >
+    Objeto AcademicReport totalmente preenchido, incluindo introdução e análise comparativa extensas.
+    CRÍTICO: Inclua ao final uma seção "## Referências Bibliográficas" listando Título e URL de todos os papers.

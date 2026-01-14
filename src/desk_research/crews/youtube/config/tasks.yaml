@@ -1,0 +1,44 @@
+search_videos_task:
+  description: >
+    1. Use a ferramenta 'YouTube Video Search Scraper' para buscar vídeos sobre: {topic}.
+    2. A ferramenta retornará uma lista de URLs e IDs.
+    3. Selecione os 3 vídeos mais promissores.
+    4. Extraia o ID de cada vídeo.
+    
+    Retorne uma lista JSON válida com Título (Use o título exato retornado pela ferramenta) e Video_ID.
+  expected_output: "Lista JSON com Títulos e IDs dos vídeos selecionados."
+
+analyze_videos_task:
+  description: >
+    USANDO EXCLUSIVAMENTE OS VÍDEOS ENCONTRADOS NA TAREFA ANTERIOR (ver Contexto):
+    
+    1. Para CADA vídeo listado pelo Pesquisador:
+       - Pegue o ID do vídeo.
+       - Use a ferramenta 'YouTubeTranscriptTool' enviando APENAS o ID.
+    
+    2. Analise o conteúdo com profundidade:
+       - Quais os pontos chave abordados?
+       - **Sentimento predominante:** (positivo/neutro/negativo) + justificativa.
+       - **Trechos-chave:** Cite frases exatas ou timestamps aproximados se houver.
+       - **Narrativas recorrentes:** O que está sendo repetido?
+    
+    Consolide tudo em um relatório único.
+  expected_output: >
+    Relatório em markdown detalhado contendo:
+    ## Vídeos analisados
+    ### Vídeo X — [Título do Vídeo - NÃO USE O ID AQUI]
+    - **Fonte/ID:** ...
+    - **Resumo do conteúdo (3–6 frases):** ...
+    - **Principais tópicos abordados:** bullets.
+    - **Sentimento predominante:** ...
+    - **Trechos-chave:** ...
+    
+    ## Síntese geral do tema
+    - Narrativas recorrentes
+    - Oportunidades e riscos
+    - Conclusão Prática
+    
+    ## Referências
+    Lista com links diretos para todos os vídeos analisados:
+    - [Título do Vídeo 1](https://www.youtube.com/watch?v=XXXXXX)
+    - [Título do Vídeo 2](https://www.youtube.com/watch?v=XXXXXX)
