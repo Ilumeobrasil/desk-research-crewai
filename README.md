@@ -29,8 +29,24 @@ Pré-requisitos: Python 3.10+ e [Chaves de API](CONFIGURAR_ENV.md).
 1.  **Clone e Instale:**
     ```bash
     git clone <repo-url>
+    ```
+    ```bash
     cd ai-augmented-desk-research-flow
+    ```
+    ```bash
     pip install -e .
+    ```
+    Ou caso esteja utilizando o UV
+    ```bash
+    uv pip install -e .
+    ```
+
+    **IMPORTANTE: Em alguns casos na primeira inicialização, será necessário a configuração de ambiente virtual**
+    ```bash
+    uv venv
+    ```
+    ```bash
+    source .venv/bin/activate
     ```
 
 2.  **Configure o Ambiente:**
