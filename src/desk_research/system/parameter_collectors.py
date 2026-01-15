@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from desk_research.constants import PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS, MODE_SELECTION_MAP
+from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS, MODE_SELECTION_MAP
 
 
 class ParameterCollector:
@@ -148,13 +148,10 @@ class IntegratedParameterCollector(ParameterCollector):
     @staticmethod
     def _select_modes() -> list | None:
         print("\n🤖 Selecione os agentes para ativar:")
+        
         print("   [0] Todos os agentes")
-        print("   [1] Genie (IA)")
-        print("   [2] Academic (Papers)")
-        print("   [3] YouTube (Vídeo)")
-        print("   [4] Web (Busca)")
-        print("   [5] X (Twitter)")
-        print("   [6] Consumer Hours (Brand Audit)")
+        for i, p in enumerate(MODE_SELECTION_MAP.values(), 1):
+            print(f"   [{i}] {MODE_CONFIG[p]['emoji']} {MODE_CONFIG[p]['nome']}")
         
         selection = input("\n👉 Digite os números separados por vírgula (ex: 1,2,5): ").strip()
         
