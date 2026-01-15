@@ -185,7 +185,7 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
 
     # Exportar Relatório Master Completo (PDF + MD)
     from desk_research.utils.reporting import export_report
-    export_report(full_dossier, topic, prefix="integrated_master")
+    export_report(full_dossier, topic, prefix="integrated_master", crew_name="integrated_analysis")
     
     return {
         "topic": topic,

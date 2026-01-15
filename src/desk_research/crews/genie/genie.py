@@ -87,7 +87,7 @@ def run_genie_analysis(pergunta: str, contexto: str = ""):
     result = crew.crew().kickoff(inputs=inputs)
     
     # Exportar relatório
-    report_path = export_report(result, pergunta, prefix="genie_hybrid_report")
+    report_path = export_report(result, pergunta, prefix="genie_hybrid_report", crew_name="genie")
     
     return result
 

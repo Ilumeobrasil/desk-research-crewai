@@ -16,6 +16,7 @@ dependencies = [
     "trafilatura>=1.6.0",
     "markdown2>=2.4.0",
     "weasyprint>=60.0.0",
+    "litellm>=1.75.3",
 ]
 
 [project.scripts]

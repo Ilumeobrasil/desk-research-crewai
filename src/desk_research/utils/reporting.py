@@ -7,9 +7,11 @@ import logging
 import unicodedata
 from pathlib import Path
 from fpdf import FPDF
+from typing import Literal
 
-# Configurar logging
 logger = logging.getLogger(__name__)
+
+CrewName = Literal["genie", "youtube", "academic", "web", "x", "integrated_analysis", "consumer_hours"]
 
 class AcademicPDF(FPDF):
     """Classe customizada para PDF com cabeçalho e rodapé AMBEV"""
@@ -100,19 +102,12 @@ def slugify(value):
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return re.sub(r'[-\s]+', '_', value)
 
-def export_report(result: any, topic: str, prefix: str = "report") -> dict:
-    """
-    Exporta o relatório em Markdown e PDF.
-    
-    Args:
-        result: O conteúdo do relatório (str ou objeto com .raw)
-        topic: O tópico/pergunta da pesquisa (usado no nome do arquivo)
-        prefix: Prefixo do nome do arquivo
-        
-    Returns:
-        Dicionário com os caminhos dos arquivos gerados
-    """
-    output_dir = Path('outputs')
+def export_report(result: any, topic: str, prefix: str = "report", crew_name: CrewName | None = None) -> dict:
+    if crew_name:
+        output_dir = Path('outputs') / slugify(crew_name)
+    else:
+        output_dir = Path('outputs')
+
     output_dir.mkdir(exist_ok=True)
     
     # Preparar nome do arquivo

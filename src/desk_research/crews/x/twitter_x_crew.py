@@ -148,7 +148,7 @@ def run_twitter_social_listening(topic: str) -> Dict[str, Any]:
     result = crew.kickoff(inputs=inputs)
     
     # Exportar relatório
-    export_report(result, topic, prefix="x_social_listening")
+    export_report(result, topic, prefix="x_social_listening", crew_name="x")
     
     return {
         "topic": topic,
