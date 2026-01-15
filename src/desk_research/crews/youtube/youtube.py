@@ -81,6 +81,6 @@ def run_youtube_analysis(topic: str):
         result = header + str(result)
     
     # Exportar relatório em PDF e MD
-    export_report(result, topic, prefix="youtube_report")
+    export_report(result, topic, prefix="youtube_report", crew_name="youtube")
     
     return result

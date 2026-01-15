@@ -227,7 +227,7 @@ class AcademicResearchCrew:
                 except:
                     content = str(result)
 
-            shared_export_report(content, topic, prefix="academic_report")
+            shared_export_report(content, topic, prefix="academic_report", crew_name="academic")
             
         except Exception as e:
             logger.error(f"Error exporting report: {e}")

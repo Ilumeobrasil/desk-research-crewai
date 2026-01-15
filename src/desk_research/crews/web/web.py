@@ -82,6 +82,6 @@ def run_web_research(query: str, max_results: int = 10):
     crew = WebCrew()
     result = crew.crew().kickoff(inputs=inputs)
     
-    export_report(result, query, prefix="web_report")
+    export_report(result, query, prefix="web_report", crew_name="web")
     
     return result

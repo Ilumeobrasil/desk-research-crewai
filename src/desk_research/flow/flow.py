@@ -215,7 +215,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             anexos_text = self._build_annexes()
             full_dossier = master_report + anexos_text
 
-            export_report(full_dossier, self.state.topic, prefix="integrated_master")
+            export_report(full_dossier, self.state.topic, prefix="integrated_master", crew_name="integrated_analysis")
             safe_print("\n✅ FLOW FINALIZADO COM SUCESSO! (Dossiê Exportado)")
             return full_dossier
 
