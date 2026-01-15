@@ -19,6 +19,7 @@ urllib3>=2.0.0
 # Data Processing
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
+email-validator>=2.0.0
 
 # PDF Processing
 PyPDF2>=3.0.0
@@ -36,3 +37,6 @@ typing-extensions>=4.8.0
 # Optional (para melhor performance)
 numpy>=1.24.0
 pandas>=2.0.0
+
+# Litellm
+litellm[proxy]==1.75.3
