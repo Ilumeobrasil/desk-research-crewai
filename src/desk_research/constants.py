@@ -38,7 +38,7 @@ MODE_CONFIG = {
         "descricao": "Análise profunda de auditoria de marca (Consumer Hours Flow)"
     },
     "integrated": {
-        "nome": "PESQUISA INTEGRADA (Multi-Agente)",
+        "nome": "Pesquisa Integrada (Multi-Agente)",
         "emoji": "🧠",
         "descricao": "Executa múltiplos agentes e gera relatório master consolidado"
     }
@@ -54,14 +54,14 @@ PERGUNTAS_PADRAO = {
     ]
 }
 
+# USADO PARA SELECIONAR OS MODOS PARA PESQUISA INTEGRADA
 MODE_SELECTION_MAP = {
     '1': 'genie',
     '2': 'academic',
     '3': 'youtube',
     '4': 'web',
     '5': 'x',
-    '6': 'consumer_hours',
-    '7': 'integrated'
+    '6': 'consumer_hours'
 }
 
 
