@@ -130,7 +130,7 @@ class DeskResearchSystem:
                 continue
 
             start_time = time.time()
-            # result = executor(**params)
+            result = executor(**params)
             result = 'teste'
             end_time = time.time()
 
