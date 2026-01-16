@@ -1,7 +1,10 @@
+import logging
 import os
 import sys
 from desk_research.system.research_system import DeskResearchSystem
 from desk_research.utils.logging_utils import safe_print
+
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 
 os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
 os.environ["ANONYMIZED_TELEMETRY"] = "False"

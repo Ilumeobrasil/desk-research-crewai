@@ -1,35 +1,26 @@
-# twitter_x_crew.py
-from __future__ import annotations
-
-from typing import Any, Dict
+from typing import Any, Dict, List
 from datetime import datetime
 
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
 
-
+from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.x_tools import twitter_search_tool
 from desk_research.utils.reporting import export_report
 
+import logging
 
+logger = logging.getLogger(__name__)
 @CrewBase
 class TwitterSocialListeningCrew:
-    """
-    Crew de social listening em X (Twitter) para temas/marcas da Ambev.
-    """
-    agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
-
-
-    # AGENTES
-    # =========================
+    agents: List[Agent]
+    tasks: List[Task]
 
     @agent
     def planner_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['planner_agent'],
-
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
         )
 
     @agent
@@ -37,29 +28,23 @@ class TwitterSocialListeningCrew:
         return Agent(
             config=self.agents_config['researcher_agent'],
             tools=[twitter_search_tool],
-
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
         )
 
     @agent
     def analyst_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['analyst_agent'],
-
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
         )
 
     @agent
     def writer_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['writer_agent'],
-
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
+            allow_delegation=False,
         )
-
-    # =========================
-    # TASKS
-    # =========================
 
     @task
     def plan_research_task(self) -> Task:
@@ -67,6 +52,7 @@ class TwitterSocialListeningCrew:
             config=self.tasks_config['plan_research_task'],
             agent=self.planner_agent(),
             output_key="research_plan",
+            verbose=True,
         )
 
     @task
@@ -96,61 +82,34 @@ class TwitterSocialListeningCrew:
             context=[self.analyze_insights_task()]
         )
 
-    # =========================
-    # CREW
-    # =========================
-
     @crew
     def crew(self) -> Crew:
-        """
-        Monta e devolve a Crew configurada para um tema.
-        """
         return Crew(
-            agents=[
-                self.planner_agent(),
-                self.researcher_agent(),
-                self.analyst_agent(),
-                self.writer_agent(),
-            ],
-            tasks=[
-                self.plan_research_task(),
-                self.collect_tweets_task(),
-                self.analyze_insights_task(),
-                self.write_report_task()
-            ],
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
-            verbose=True,
+            verbose=VERBOSE_CREW,
         )
 
-
-# =========================
-# Função de alto nível
-# =========================
-
 def run_twitter_social_listening(topic: str) -> Dict[str, Any]:
-    """
-    Função de entrada única para usar essa crew via main_interativo
-    ou via outros módulos (ex.: main_interativo do Desk Research).
+    try:
+        crew_instance = TwitterSocialListeningCrew()
 
-    Retorna um dicionário com:
-      - "topic"
-      - "report_markdown"
-    """
-    crew_instance = TwitterSocialListeningCrew()
-    # Crew agora é instanciada sem argumentos de tarefa, inputs vão no kickoff
-    crew = crew_instance.crew()
+        crew = crew_instance.crew()
 
-    inputs = {
-        "topic": topic,
-        "date": datetime.now().strftime("%d/%m/%Y")
-    }
+        inputs = {
+            "topic": topic,
+            "date": datetime.now().strftime("%d/%m/%Y")
+        }
 
-    result = crew.kickoff(inputs=inputs)
-    
-    # Exportar relatório
-    export_report(result, topic, prefix="x_social_listening", crew_name="x")
-    
-    return {
-        "topic": topic,
-        "report_markdown": result,
-    }
+        result = crew.kickoff(inputs=inputs)
+        
+        export_report(result, topic, prefix="x_social_listening", crew_name="x")
+        
+        return {
+            "topic": topic,
+            "report_markdown": result,
+        }
+    except Exception as e:
+        logger.error(f"Erro ao executar social listening: {e}", exc_info=True)
+        raise

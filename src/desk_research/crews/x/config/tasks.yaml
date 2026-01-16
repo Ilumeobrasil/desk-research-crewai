@@ -5,7 +5,12 @@ plan_research_task:
     - Sugira hashtags relevantes.
     - Sugira janelas de tempo (em dias) e filtros de engajamento para as buscas.
     - O output deve ser um JSON com campos: queries, hashtags, days_window_sugerido, min_engagement_sugerido.
-  expected_output: "Plano de pesquisa em formato JSON estruturado."
+  expected_output: >
+    Retorne o Plano de pesquisa APENAS em um JSON válido com as chaves:
+    - queries: array de strings
+    - hashtags: array de strings
+    - days_window_sugerido: inteiro
+    - min_engagement_sugerido: inteiro
 
 collect_tweets_task:
   description: >
