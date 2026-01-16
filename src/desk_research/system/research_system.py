@@ -17,7 +17,6 @@ from desk_research.crews.web.web import run_web_research
 from desk_research.crews.x.twitter_x_crew import run_twitter_social_listening
 from desk_research.crews.consumer_hours.consumer_hours import run_consumer_hours_analysis
 
-
 class DeskResearchSystem:
     def __init__(self):
         self.modos_disponiveis = MODE_CONFIG
@@ -41,24 +40,27 @@ class DeskResearchSystem:
         }
 
     def listar_modos(self):
-        print("\n" + "=" * 70)
-        print("📋 MODOS DE PESQUISA DISPONÍVEIS")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "📋 MODOS DE PESQUISA DISPONÍVEIS".center(70) + "|")
+        print("=" * 73)
 
         for i, (modo_id, info) in enumerate(self.modos_disponiveis.items(), 1):
-            print(f"\n  [{i}] {info['emoji']} {info['nome']}")
-            print(f"      ID: {modo_id}")
-            print(f"      {info['descricao']}")
-
-        print("\n" + "=" * 70)
+            print("\n")
+            print(f"   [{i}] {info['emoji']} {info['nome']}")
+            print(f"       ID: {modo_id} - Descrição: {info['descricao']}")
 
     def selecionar_modo_interativo(self) -> str:
         self.listar_modos()
         modos_lista = list(self.modos_disponiveis.keys())
 
         while True:
-            print("\n🔹 Escolha o modo de pesquisa:")
-            escolha = input(f"   Digite o número [1-{len(modos_lista)}] ou o ID do modo: ").strip().lower()
+            print("\n")
+            print("=" * 73)
+            print("|" + "🔹 ESCOLHA O MODO DE PESQUISA".center(70) + "|")
+            print("=" * 73)    
+
+            escolha = input(f"• Digite o número [1-{len(modos_lista)}] ou o ID do modo: ").strip()
 
             if escolha.isdigit():
                 idx = int(escolha) - 1
@@ -72,7 +74,10 @@ class DeskResearchSystem:
             print("   ❌ Opção inválida! Tente novamente.")
 
         info = self.modos_disponiveis[modo_selecionado]
-        print(f"\n✅ Modo selecionado: {info['emoji']} {info['nome']}")
+        print("\n")
+        print(f"✅ Modo selecionado: {info['emoji']} {info['nome']}")
+        print("\n")
+        
         return modo_selecionado
 
     def executar_interativo(self) -> Any:
@@ -81,7 +86,7 @@ class DeskResearchSystem:
             
             collector = self._parameter_collectors.get(modo)
             if not collector:
-                print(f"❌ Modo '{modo}' não suportado.")
+                print(f"❌ Modo '{modo}' não suportado.\n")
                 continue
 
             params = collector.collect()
