@@ -1,5 +1,8 @@
 from typing import Literal
 
+VERBOSE_AGENTS = False
+VERBOSE_CREW = False
+
 MIN_APPROVAL_SCORE = 80
 MAX_RETRY_COUNT = 2
 DEFAULT_MAX_PAPERS = 5
