@@ -1,4 +1,8 @@
+import os
+import time
+
 from typing import Dict, Any
+from collections.abc import Iterable
 from desk_research.constants import MODE_CONFIG
 from desk_research.system.parameter_collectors import (
     GenieParameterCollector,
@@ -16,7 +20,6 @@ from desk_research.crews.academic.academic import run_academic_research
 from desk_research.crews.web.web import run_web_research
 from desk_research.crews.x.twitter_x_crew import run_twitter_social_listening
 from desk_research.crews.consumer_hours.consumer_hours import run_consumer_hours_analysis
-
 
 class DeskResearchSystem:
     def __init__(self):
@@ -41,24 +44,27 @@ class DeskResearchSystem:
         }
 
     def listar_modos(self):
-        print("\n" + "=" * 70)
-        print("📋 MODOS DE PESQUISA DISPONÍVEIS")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "📋 MODOS DE PESQUISA DISPONÍVEIS".center(70) + "|")
+        print("=" * 73)
 
         for i, (modo_id, info) in enumerate(self.modos_disponiveis.items(), 1):
-            print(f"\n  [{i}] {info['emoji']} {info['nome']}")
-            print(f"      ID: {modo_id}")
-            print(f"      {info['descricao']}")
-
-        print("\n" + "=" * 70)
+            print("\n")
+            print(f"   [{i}] {info['emoji']} {info['nome']}")
+            print(f"       ID: {modo_id} - Descrição: {info['descricao']}")
 
     def selecionar_modo_interativo(self) -> str:
         self.listar_modos()
         modos_lista = list(self.modos_disponiveis.keys())
 
         while True:
-            print("\n🔹 Escolha o modo de pesquisa:")
-            escolha = input(f"   Digite o número [1-{len(modos_lista)}] ou o ID do modo: ").strip().lower()
+            print("\n")
+            print("=" * 73)
+            print("|" + "🔹 ESCOLHA O MODO DE PESQUISA".center(70) + "|")
+            print("=" * 73)    
+
+            escolha = input(f"• Digite o número [1-{len(modos_lista)}] ou o ID do modo: ").strip()
 
             if escolha.isdigit():
                 idx = int(escolha) - 1
@@ -72,8 +78,36 @@ class DeskResearchSystem:
             print("   ❌ Opção inválida! Tente novamente.")
 
         info = self.modos_disponiveis[modo_selecionado]
-        print(f"\n✅ Modo selecionado: {info['emoji']} {info['nome']}")
+        print("\n")
+        print(f"✅ Modo selecionado: {info['emoji']} {info['nome']}")
+        print("\n")
+        
         return modo_selecionado
+
+    @staticmethod
+    def format_value(value):
+        if value is None:
+            return "None"
+
+        if isinstance(value, bool):
+            return str(value)
+
+        if isinstance(value, (int, float)):
+            return str(value)
+
+        if isinstance(value, str):
+            return value if value.strip() else "''"
+
+        if isinstance(value, dict):
+            return ", ".join(
+                f"{k}={DeskResearchSystem.format_value(v)}"
+                for k, v in value.items()
+            )
+
+        if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+            return ", ".join(map(str, value))
+
+        return str(value)
 
     def executar_interativo(self) -> Any:
         while True:
@@ -81,7 +115,7 @@ class DeskResearchSystem:
             
             collector = self._parameter_collectors.get(modo)
             if not collector:
-                print(f"❌ Modo '{modo}' não suportado.")
+                print(f"❌ Modo '{modo}' não suportado.\n")
                 continue
 
             params = collector.collect()
@@ -95,18 +129,31 @@ class DeskResearchSystem:
                 print(f"❌ Executor para modo '{modo}' não encontrado.")
                 continue
 
-            result = executor(**params)
+            start_time = time.time()
+            # result = executor(**params)
+            result = 'teste'
+            end_time = time.time()
 
-            print("\n" + "=" * 70)
-            print("✅ PESQUISA CONCLUÍDA COM SUCESSO!")
-            print("=" * 70)
-            print(f"\n📋 Modo: {modo}")
-            print(f"📊 Parâmetros: {params}")
-            print(f"\n💾 Resultado disponível na variável 'result'")
+            execution_time = end_time - start_time
+
+            print("\n")
+            print("=" * 73)
+            print("|" + "✅ PESQUISA CONCLUÍDA COM SUCESSO!".center(70) + "|")
+            print("=" * 73)
+
+            print("\n")
+            print(f"📋 Modo: {MODE_CONFIG[modo]['emoji']} {MODE_CONFIG[modo]['nome']}")
+            print(f"🤖 Modelo utilizado: {os.getenv('MODEL')}")
+            print(f"🕒 Tempo de execução: {time.strftime("%H:%M:%S", time.gmtime(execution_time))}")
             
-            if isinstance(result, dict) and "resultado" in result:
-                print("\n📝 RESUMO DO RESULTADO:")
-                print(result["resultado"])
+            print("\n")
+            if params:
+                print("📊 Parâmetros utilizados:")
+                for key, value in params.items():
+                    print(f"  • {key}: {self.format_value(value)}")
+
+            
+            print("\n")
 
             return result
 

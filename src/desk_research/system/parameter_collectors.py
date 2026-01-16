@@ -5,17 +5,16 @@ from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_P
 class ParameterCollector:
     @staticmethod
     def selecionar_pergunta_padrao() -> str | None:
-        print("\n" + "-" * 50)
-        print("❓ SELEÇÃO DE PERGUNTA")
-        print("-" * 50)
+        print("🔹 Selecione uma pergunta padrão ou digite uma nova: ")
+        print("\n")
         
         perguntas = PERGUNTAS_PADRAO.get("geral", [])
         
-        print(f"  [0] ⬅️  Voltar para opção anterior")
         for i, p in enumerate(perguntas, 1):
             print(f"  [{i}] {p}")
         
         print(f"  [{len(perguntas) + 1}] ✍️  Digitar nova pergunta")
+        print(f"  [0] ⬅️  Voltar para opção anterior")
         
         while True:
             escolha = input("\n👉 Escolha uma opção: ").strip()
@@ -35,17 +34,17 @@ class ParameterCollector:
 class GenieParameterCollector(ParameterCollector):
     @staticmethod
     def collect() -> Dict[str, Any] | None:
-        print("\n" + "=" * 70)
-        print("🧞 CONFIGURAÇÃO - ANÁLISE GENIE")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "🧞 CONFIGURAÇÃO - ANÁLISE GENIE".center(70) + "|")
+        print("=" * 73)
 
         pergunta = ParameterCollector.selecionar_pergunta_padrao()
         if pergunta is None:
             return None
         
-        print("\n📝 Contexto Adicional (Opcional)")
-        print("   Ex: 'Público alvo são jovens de 18-24 anos', 'Focar em concorrentes diretos'")
-        contexto = input("   Digite o contexto (ou ENTER para pular): ").strip()
+        print("\n📝 Contexto Adicional (Opcional) - (Ex: 'Público alvo são jovens de 18-24 anos', 'Focar em concorrentes diretos')")
+        contexto = input("   Digite o contexto adicional (ou ENTER para pular): ").strip()
 
         return {"pergunta": pergunta, "contexto": contexto}
 
@@ -53,9 +52,10 @@ class GenieParameterCollector(ParameterCollector):
 class YouTubeParameterCollector(ParameterCollector):
     @staticmethod
     def collect() -> Dict[str, Any] | None:
-        print("\n" + "=" * 70)
-        print("📺 CONFIGURAÇÃO - ANÁLISE YOUTUBE")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "📺 CONFIGURAÇÃO - ANÁLISE YOUTUBE".center(70) + "|")
+        print("=" * 73)
 
         topic = ParameterCollector.selecionar_pergunta_padrao()
         if topic is None:
@@ -66,15 +66,17 @@ class YouTubeParameterCollector(ParameterCollector):
 class AcademicParameterCollector(ParameterCollector):
     @staticmethod
     def collect() -> Dict[str, Any] | None:
-        print("\n" + "=" * 70)
-        print("🎓 CONFIGURAÇÃO - PESQUISA ACADÊMICA")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "🎓 CONFIGURAÇÃO - PESQUISA ACADEMICA".center(70) + "|")
+        print("=" * 73)
 
         topic = ParameterCollector.selecionar_pergunta_padrao()
         if topic is None:
             return None
         
-        max_papers_input = input(f"\n📊 Número máximo de papers [padrão: {DEFAULT_MAX_PAPERS}]: ").strip()
+        print(f"\n📊 Número máximo de papers [padrão: {DEFAULT_MAX_PAPERS}]:")
+        max_papers_input = input("   Digite o número máximo de papers (ou ENTER para pular): ").strip()
         max_papers = int(max_papers_input) if max_papers_input.isdigit() else DEFAULT_MAX_PAPERS
 
         return {"topic": topic, "max_papers": max_papers}
@@ -91,7 +93,8 @@ class WebParameterCollector(ParameterCollector):
         if query is None:
             return None
         
-        max_results_input = input(f"\n📊 Número máximo de resultados [padrão: {DEFAULT_MAX_WEB_RESULTS}]: ").strip()
+        print(f"\n📊 Número máximo de resultados [padrão: {DEFAULT_MAX_WEB_RESULTS}]:")
+        max_results_input = input("   Digite o número máximo de resultados (ou ENTER para pular): ").strip()
         max_results = int(max_results_input) if max_results_input.isdigit() else DEFAULT_MAX_WEB_RESULTS
 
         return {"query": query, "max_results": max_results}
@@ -100,9 +103,10 @@ class WebParameterCollector(ParameterCollector):
 class XParameterCollector(ParameterCollector):
     @staticmethod
     def collect() -> Dict[str, Any] | None:
-        print("\n" + "=" * 70)
-        print("🐦 CONFIGURAÇÃO - SOCIAL LISTENING (X)")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "🐦 CONFIGURAÇÃO - SOCIAL LISTENING (X)".center(70) + "|")
+        print("=" * 73)
 
         topic = ParameterCollector.selecionar_pergunta_padrao()
         if topic is None:
@@ -113,9 +117,11 @@ class XParameterCollector(ParameterCollector):
 class ConsumerHoursParameterCollector(ParameterCollector):
     @staticmethod
     def collect() -> Dict[str, Any]:
-        print("\n" + "=" * 70)
-        print("⏳ CONFIGURAÇÃO - CONSUMER HOURS")
-        print("=" * 70)
+        print("\n")
+        print("=" * 73)
+        print("|" + "⏳ CONFIGURAÇÃO - CONSUMER HOURS".center(70) + "|")
+        print("=" * 73)
+
         print("\nℹ️  Este modo utiliza as configurações do arquivo .env e pastas locais.")
         input("\n👉 Pressione ENTER para iniciar a execução...")
         return {}
@@ -151,7 +157,7 @@ class IntegratedParameterCollector(ParameterCollector):
         
         print("   [0] Todos os agentes")
         for i, p in enumerate(MODE_SELECTION_MAP.values(), 1):
-            print(f"   [{i}] {MODE_CONFIG[p]['emoji']} {MODE_CONFIG[p]['nome']}")
+            print(f"   [{i}] {MODE_CONFIG[p]['nome']}")
         
         selection = input("\n👉 Digite os números separados por vírgula (ex: 1,2,5): ").strip()
         

@@ -7,10 +7,11 @@ os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
 def main():
-    print("\n" + "=" * 70)
-    print("🚀 SISTEMA DESK RESEARCH - PESQUISA INTEGRADA AMBEV")
-    print("=" * 70)
-
+    print("\n")
+    print("=" * 73)
+    print("|" + "🚀 SISTEMA DESK RESEARCH - PESQUISA INTEGRADA AMBEV".center(70) + "|")
+    print("=" * 73)
+    
     system = DeskResearchSystem()
     result = system.executar_interativo()
     return result
