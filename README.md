@@ -26,38 +26,37 @@ O produto final é o **Relatório Master Integrado** (Markdown e PDF), que não 
 
 Pré-requisitos: Python 3.10+ e [Chaves de API](CONFIGURAR_ENV.md).
 
-1.  **Clone e Instale:**
+1.  **Clone o projeto:**
     ```bash
     git clone <repo-url>
     ```
-    ```bash
-    cd ai-augmented-desk-research-flow
-    ```
-    ```bash
-    pip install -e .
-    ```
-    Ou caso esteja utilizando o UV
-    ```bash
-    uv pip install -e .
-    ```
 
-    **IMPORTANTE: Em alguns casos na primeira inicialização, será necessário a configuração de ambiente virtual**
+    **Crie o ambiente virtual do projeto:**
     ```bash
     uv venv
     ```
+
+    **Faça a ativação:**
+    macOS / Linux:
     ```bash
     source .venv/bin/activate
+    ```
+    Windows:
+    ```bash
+    .venv\Scripts\activate
+    ```
+
+    **Faça o download das dependências:**
+    ```bash
+    uv pip install -r requirements.txt
     ```
 
 2.  **Configure o Ambiente:**
     Crie um arquivo `.env` na raiz com suas chaves (veja `.env.example`).
-    > **Nota:** Para YouTube, NÃO é necessário gastar créditos de APIs de busca externa. O sistema é autossuficiente.
 
 3.  **Execute:**
     ```bash
     crewai run
-    # OU
-    python src/desk_research/main.py
     ```
 
 ## 🛠️ Modos de Uso
