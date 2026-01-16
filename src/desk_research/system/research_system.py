@@ -62,7 +62,7 @@ class DeskResearchSystem:
             print("\n")
             print("=" * 73)
             print("|" + "🔹 ESCOLHA O MODO DE PESQUISA".center(70) + "|")
-            print("=" * 73)    
+            print("=" * 73)
 
             escolha = input(f"• Digite o número [1-{len(modos_lista)}] ou o ID do modo: ").strip()
 
@@ -131,7 +131,6 @@ class DeskResearchSystem:
 
             start_time = time.time()
             result = executor(**params)
-            result = 'teste'
             end_time = time.time()
 
             execution_time = end_time - start_time

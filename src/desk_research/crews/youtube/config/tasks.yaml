@@ -1,44 +1,163 @@
 search_videos_task:
   description: >
-    1. Use a ferramenta 'YouTube Video Search Scraper' para buscar vídeos sobre: {topic}.
-    2. A ferramenta retornará uma lista de URLs e IDs.
-    3. Selecione os 3 vídeos mais promissores.
-    4. Extraia o ID de cada vídeo.
-    
-    Retorne uma lista JSON válida com Título (Use o título exato retornado pela ferramenta) e Video_ID.
-  expected_output: "Lista JSON com Títulos e IDs dos vídeos selecionados."
+    Use a ferramenta 'YouTube Video Search Scraper' para buscar vídeos sobre o tema: {topic}.
+
+    =========================
+    ESCOPO E FONTE DOS DADOS
+    =========================
+    - Utilize EXCLUSIVAMENTE os resultados retornados pela ferramenta.
+    - NÃO invente vídeos, títulos, IDs ou URLs.
+    - Utilize exatamente os títulos retornados pela ferramenta, sem alterações.
+
+    =========================
+    CRITÉRIOS DE BUSCA (QUALIDADE E DIDATISMO)
+    =========================
+    Ao avaliar os vídeos retornados, priorize aqueles que atendam à MAIOR quantidade
+    possível dos critérios abaixo:
+
+    1. Conteúdo explicativo ou educacional:
+       - Tutoriais
+       - Análises detalhadas
+       - Guias passo a passo
+       - Aulas, palestras ou explicações estruturadas
+
+    2. Clareza e profundidade:
+       - Vídeos que prometem explicar, ensinar ou analisar o tema
+       - Evite vídeos puramente opinativos, reativos ou sensacionalistas
+
+    3. Relevância direta ao tema:
+       - O título deve indicar relação clara e direta com {topic}
+       - Evite vídeos onde o tema aparece apenas de forma tangencial
+
+    4. Qualidade percebida pelo contexto:
+       - Prefira vídeos com títulos descritivos e objetivos
+       - Evite títulos clickbait, exagerados ou vagos
+
+    =========================
+    SELEÇÃO DOS VÍDEOS
+    =========================
+    - A partir dos resultados retornados pela ferramenta, selecione os 3 vídeos MAIS PROMISSORES,
+      considerando prioritariamente os critérios de didatismo e relevância acima.
+    - Caso menos de 3 vídeos atendam minimamente aos critérios, selecione apenas os disponíveis
+      sem inventar novos resultados.
+
+    =========================
+    EXTRAÇÃO DE DADOS
+    =========================
+    Para cada vídeo selecionado:
+    - Extraia o ID do vídeo exatamente como retornado pela ferramenta.
+    - Utilize o título EXATO retornado pela ferramenta, sem modificações.
+
+    =========================
+    FORMATO DE SAÍDA (OBRIGATÓRIO)
+    =========================
+    - Retorne APENAS uma lista JSON válida.
+    - Cada item da lista deve conter:
+      - "title": título exato do vídeo
+      - "video_id": ID do vídeo
+
+    - NÃO inclua comentários, explicações, texto adicional ou formatação fora do JSON.
+    - NÃO utilize blocos de código (```).
+
+  expected_output: >
+    Lista JSON válida contendo exatamente 3 objetos (ou menos, se aplicável),
+    Lista JSON com Títulos e IDs dos vídeos selecionados.
 
 analyze_videos_task:
   description: >
-    USANDO EXCLUSIVAMENTE OS VÍDEOS ENCONTRADOS NA TAREFA ANTERIOR (ver Contexto):
-    
-    1. Para CADA vídeo listado pelo Pesquisador:
-       - Pegue o ID do vídeo.
-       - Use a ferramenta 'YouTubeTranscriptTool' enviando APENAS o ID.
-    
-    2. Analise o conteúdo com profundidade:
-       - Quais os pontos chave abordados?
-       - **Sentimento predominante:** (positivo/neutro/negativo) + justificativa.
-       - **Trechos-chave:** Cite frases exatas ou timestamps aproximados se houver.
-       - **Narrativas recorrentes:** O que está sendo repetido?
-    
-    Consolide tudo em um relatório único.
+    USANDO EXCLUSIVAMENTE OS VÍDEOS LISTADOS NA TAREFA ANTERIOR (ver Contexto),
+    execute a análise abaixo SEM inventar vídeos, IDs, títulos, falas ou conclusões.
+
+    **ESCOPO E FONTE DOS DADOS**:
+    - Utilize APENAS os vídeos explicitamente fornecidos no Contexto.
+    - Cada vídeo DEVE possuir um ID válido do YouTube.
+    - NÃO inclua vídeos adicionais sob nenhuma circunstância.
+    - Caso NÃO exista nenhum vídeo válido no Contexto, siga as regras de fallback descritas abaixo.
+
+    **ETAPA 1 — COLETA DE TRANSCRIÇÃO**:
+    Para CADA vídeo listado no Contexto:
+    1. Extraia o ID do vídeo.
+    2. Utilize a ferramenta 'YouTubeTranscriptTool' enviando EXCLUSIVAMENTE o ID.
+    3. Não envie títulos, URLs completas ou qualquer outro dado além do ID.
+
+    **ETAPA 2 — TRATAMENTO DE FALHAS**:
+    - Se a ferramenta NÃO retornar uma transcrição válida (erro, texto vazio ou indisponível):
+      - Marque explicitamente o vídeo como "Transcrição indisponível".
+      - NÃO invente falas, frases, trechos ou timestamps.
+      - Baseie a análise apenas em informações textuais existentes no Contexto (se houver).
+    - Se NÃO houver nenhuma transcrição válida para TODOS os vídeos:
+      - Gere o relatório normalmente, mas deixe claro na análise e na conclusão
+        que não foi possível acessar o conteúdo falado dos vídeos.
+
+    **ETAPA 3 — ANÁLISE DE CONTEÚDO**:
+    Para CADA vídeo, analise com profundidade APENAS com base em dados reais disponíveis:
+
+    - Pontos-chave abordados no conteúdo.
+    - Sentimento predominante do NARRADOR em relação ao TEMA CENTRAL do vídeo:
+      - Classifique obrigatoriamente como: positivo, neutro ou negativo.
+      - Justifique com base no conteúdo explícito (não em inferência emocional vaga).
+    - Trechos-chave:
+      - Cite frases LITERAIS apenas se estiverem claramente presentes na transcrição.
+      - Caso contrário, utilize paráfrases claramente identificadas como tal.
+      - Nunca invente citações.
+    - Narrativas recorrentes:
+      - Considere uma narrativa como recorrente APENAS se aparecer em 2 ou mais vídeos.
+      - Narrativas presentes em apenas um vídeo devem ser tratadas como pontos isolados.
+
+    **ETAPA 4 — CONSOLIDAÇÃO**:
+    - Consolide todas as análises em UM ÚNICO relatório.
+    - Diferencie claramente:
+      - Narrativas recorrentes
+      - Pontos divergentes
+      - Observações isoladas
+    - Não amplifique opiniões minoritárias como consenso.
+
+    **REGRAS CRÍTICAS DE FORMATAÇÃO (OBRIGATÓRIAS)**:
+    - O output DEVE ser APENAS o relatório final em markdown.
+    - NÃO inclua explicações, pensamentos, reasoning, comentários ou textos auxiliares.
+    - NÃO utilize blocos de código (```) para envolver o relatório.
+    - O PRIMEIRO caractere do output DEVE ser "#".
+    - O relatório DEVE iniciar EXATAMENTE com o título markdown especificado.
+    - Qualquer violação de formatação invalida o output.
+
+    **HIERARQUIA DE INSTRUÇÕES**:
+    Em caso de conflito entre instruções, siga esta prioridade:
+    1. Regras Críticas de Formatação
+    2. Regras de Escopo e Antialucinação
+    3. Estrutura do Expected Output
+    4. Demais instruções descritivas
+
   expected_output: >
-    Relatório em markdown detalhado contendo:
+    # Relatório de Pesquisa de YouTube: {topic}
+    **Data da Pesquisa: {date}**
+
     ## Vídeos analisados
+
     ### Vídeo X — [Título do Vídeo - NÃO USE O ID AQUI]
-    - **Fonte/ID:** ...
-    - **Resumo do conteúdo (3–6 frases):** ...
-    - **Principais tópicos abordados:** bullets.
-    - **Sentimento predominante:** ...
-    - **Trechos-chave:** ...
-    
+    **Fonte/ID:** [ID DO VÍDEO]
+
+    - **Resumo do conteúdo:** [Resumo do conteúdo do vídeo (3-6 frases)]
+    - **Principais tópicos abordados:**
+      - ...
+    - **Sentimento predominante:** positivo | neutro | negativo  
+      *Justificativa objetiva baseada no conteúdo*
+    - **Trechos-chave:**
+      - "Citação literal" (se disponível)
+      - [Paráfrase identificada]
+
     ## Síntese geral do tema
-    - Narrativas recorrentes
-    - Oportunidades e riscos
-    - Conclusão Prática
-    
+    - **Narrativas recorrentes**
+    - **Pontos divergentes ou isolados**
+    - **Oportunidades e riscos**
+    - **Conclusão prática baseada exclusivamente nos dados analisados**
+
     ## Referências
-    Lista com links diretos para todos os vídeos analisados:
+    Lista de TODOS os vídeos analisados:
     - [Título do Vídeo 1](https://www.youtube.com/watch?v=XXXXXX)
     - [Título do Vídeo 2](https://www.youtube.com/watch?v=XXXXXX)
+
+    IMPORTANTE:
+    - O output deve começar EXATAMENTE com "# Relatório".
+    - Não inclua nenhum texto antes ou depois do relatório.
+    - O output é APENAS o markdown do relatório, nada mais.
+    - O output deve respeitar as regras de formatação descritas acima, desde espaços e quebras de linha.

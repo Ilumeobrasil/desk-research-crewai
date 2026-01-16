@@ -1,35 +1,36 @@
-import sys
-from pathlib import Path
+import logging
 
+from typing import List
+from datetime import datetime
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
+from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.utils.reporting import export_report
 from desk_research.tools.youtube_tools import youtube_transcript_tool
 from desk_research.tools.youtube_search_tools import youtube_video_search_tool
 
+logger = logging.getLogger(__name__)
+
 @CrewBase
 class YouTubeCrew:
-    '''Crew YouTube - Pesquisa e Análise de Conteúdo em Vídeo'''
-    agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
+    agents: List[Agent]
+    tasks: List[Task]
 
-
+    @agent
     def video_researcher(self) -> Agent:
         return Agent(
             config=self.agents_config['video_researcher'],
-
-            verbose=True,
-            tools=[youtube_video_search_tool]
+            tools=[youtube_video_search_tool],
+            verbose=VERBOSE_AGENTS,
         )
 
     @agent
     def youtube_analyst(self) -> Agent:
         return Agent(
             config=self.agents_config['youtube_analyst'],
-
-            verbose=True,
-            tools=[youtube_transcript_tool]
+            tools=[youtube_transcript_tool],
+            verbose=VERBOSE_AGENTS,
         )
 
     @task
@@ -50,37 +51,30 @@ class YouTubeCrew:
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=[self.video_researcher(), self.youtube_analyst()],
-            tasks=[self.search_videos_task(), self.analyze_videos_task()],
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
-            verbose=True
+            verbose=VERBOSE_CREW
         )
 
 def run_youtube_analysis(topic: str):
-    '''
-    Executa análise YouTube de um tema
-    '''
-    inputs = {
-        'topic': topic
-    }
-    
-    crew = YouTubeCrew()
-    # Metodo correto de chamada no CrewAI moderno
-    result = crew.crew().kickoff(inputs=inputs)
-    
-    # Injetar Cabeçalho (Título e Data) conforme solicitado
-    from datetime import datetime
-    date_str = datetime.now().strftime("%d/%m/%Y")
-    
-    header = f"# Relatório de Análise YouTube: {topic}\n**Data da Pesquisa:** {date_str}\n\n"
-    
-    # Se result for objeto com .raw, atualizar .raw. Se for string, concatenar.
-    if hasattr(result, 'raw'):
-        result.raw = header + result.raw
-    else:
-        result = header + str(result)
-    
-    # Exportar relatório em PDF e MD
-    export_report(result, topic, prefix="youtube_report", crew_name="youtube")
-    
-    return result
+    try:
+        crew_instance = YouTubeCrew()
+        crew = crew_instance.crew()
+
+        inputs = {
+            "topic": topic,
+            "date": datetime.now().strftime("%d/%m/%Y")
+        }
+
+        result = crew.kickoff(inputs=inputs)
+            
+        export_report(result, topic, prefix="youtube_report", crew_name="youtube")
+        
+        return {
+            "topic": topic,
+            "report_markdown": result,
+        }
+    except Exception as e:
+        logger.error(f"Erro ao executar análise YouTube: {e}", exc_info=True)
+        raise
