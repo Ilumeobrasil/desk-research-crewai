@@ -1,0 +1,190 @@
+initial_research_task:
+  description: >
+    Realize a pesquisa inicial na Knowledge Bar Stravito sobre o tema: "{query}".
+    
+    Utilize a ferramenta knowledge_bar_stravito_tool para buscar informações.
+    A ferramenta retornará:
+    - Uma resposta (answer) sobre o tema
+    - Uma lista de fontes (sources) com títulos, URLs e números de página
+    - Sugestões de acompanhamento (followUps) - perguntas relacionadas que podem
+      ser exploradas para aprofundar o tema
+    
+    **INSTRUÇÕES IMPORTANTES**:
+    1. Use a ferramenta knowledge_bar_stravito_tool com a query fornecida
+    2. Documente TODOS os resultados retornados:
+       - A resposta completa (answer)
+       - TODAS as fontes com seus detalhes (título, URL, página)
+       - TODAS as sugestões de follow-ups (followUps)
+    3. Organize os resultados de forma clara para que as próximas tasks possam utilizá-los
+    
+    **FORMATO DE SAÍDA**:
+    - Resposta da Knowledge Bar
+    - Lista numerada de fontes com título, URL e página
+    - Lista numerada de follow-ups sugeridos
+  expected_output: >
+    Documento estruturado contendo:
+    - A resposta completa da Knowledge Bar sobre o tema
+    - Lista completa de fontes (título, URL, página)
+    - Lista completa de follow-ups sugeridos para pesquisa adicional
+
+follow_up_research_task:
+  description: >
+    **OBJETIVO PRINCIPAL**: Realizar pesquisas adicionais na Knowledge Bar Stravito
+    para CADA UM dos follow-ups identificados na pesquisa inicial.
+    
+    **PROCESSO OBRIGATÓRIO**:
+    1. **EXTRAIR OS FOLLOW-UPS**: Analise cuidadosamente a saída da pesquisa inicial
+       e identifique TODAS as sugestões de acompanhamento (followUps) listadas.
+       Elas aparecem na seção "SUGESTÕES DE ACOMPANHAMENTO" do resultado.
+    
+    2. **PESQUISAR CADA FOLLOW-UP**: Para CADA follow-up identificado, você DEVE:
+       - Usar a ferramenta knowledge_bar_stravito_tool com a pergunta EXATA do follow-up
+       - Aguardar a resposta completa de cada pesquisa
+       - Documentar TODOS os resultados de cada pesquisa
+    
+    3. **DOCUMENTAR CADA RESULTADO**: Para cada pesquisa de follow-up, documente:
+       - A pergunta pesquisada (o follow-up original)
+       - A resposta completa (answer) obtida
+       - TODAS as fontes (sources) com título, URL e página
+       - Novos follow-ups sugeridos (se houver)
+    
+    4. **ORGANIZAÇÃO**: Organize os resultados de forma clara, numerando cada
+       follow-up pesquisado e seus respectivos resultados.
+    
+    **IMPORTANTE**: 
+    - NÃO pule nenhum follow-up - pesquise TODOS eles
+    - Use a pergunta EXATA do follow-up como query
+    - Se não houver follow-ups na pesquisa inicial, documente isso claramente
+    - Se houver muitos follow-ups (mais de 5), priorize os mais relevantes mas
+      tente pesquisar pelo menos os 3-5 primeiros
+    
+    **OBJETIVO**:
+    Enriquecer o relatório final com múltiplas perspectivas e aprofundamento
+    em cada aspecto do tema principal, garantindo uma cobertura completa e
+    estratégica através de pesquisas complementares.
+  expected_output: >
+    Documento estruturado e numerado contendo, para CADA follow-up pesquisado:
+    - Número e pergunta do follow-up
+    - A resposta completa obtida da Knowledge Bar
+    - Lista completa de fontes encontradas (título, URL, página)
+    - Novos follow-ups identificados (se houver)
+    - Se não houver follow-ups na pesquisa inicial, documente claramente essa situação
+
+analyze_content_task:
+  description: >
+    **OBJETIVO**: Analise profundamente TODO o conteúdo coletado das pesquisas
+    realizadas (pesquisa inicial + TODAS as pesquisas de follow-ups), incluindo
+    não apenas as respostas, mas também as FONTES (sources) em detalhes.
+    
+    **ANÁLISE OBRIGATÓRIA DEVE INCLUIR**:
+    
+    1. **Síntese das Respostas**: 
+       - Identifique os principais pontos levantados em cada pesquisa (inicial e follow-ups)
+       - Extraia os insights mais importantes de cada resposta
+       - Identifique temas recorrentes e temas únicos
+    
+    2. **ANÁLISE PROFUNDA DAS FONTES** (CRÍTICO):
+       - Liste TODAS as fontes de TODAS as pesquisas (inicial + follow-ups)
+       - Identifique quais fontes aparecem em múltiplas pesquisas (convergências)
+       - Identifique quais fontes são únicas e trazem perspectivas diferentes
+       - Analise os títulos das fontes para identificar padrões temáticos
+       - Agrupe fontes por tema ou categoria quando relevante
+       - Identifique fontes mais citadas (maior relevância)
+       - Note os números de página mencionados - podem indicar seções específicas importantes
+    
+    3. **Convergências e Divergências**:
+       - Onde as diferentes pesquisas concordam? (mesmas conclusões)
+       - Onde há informações complementares? (diferentes ângulos do mesmo tema)
+       - Existem contradições ou nuances importantes entre as pesquisas?
+       - Quais informações se reforçam mutuamente?
+    
+    4. **Análise Temática**:
+       - Quais são os principais temas/áreas identificadas?
+       - Como cada pesquisa contribui para cada tema?
+       - Quais temas são mais explorados? Quais precisam de mais profundidade?
+    
+    5. **Insights Estratégicos**:
+       - Quais são os insights mais relevantes para tomada de decisão?
+       - Quais informações são mais críticas ou impactantes?
+       - Quais gaps ou oportunidades foram identificados?
+       - Quais dados quantitativos foram encontrados?
+    
+    6. **Estruturação para Relatório**:
+       - Organize o conteúdo de forma lógica e narrativa
+       - Identifique as seções principais do relatório final baseado nos temas encontrados
+       - Prepare uma estrutura que integre todas as pesquisas de forma coesa
+       - Identifique quais fontes devem ser citadas em cada seção
+    
+    **IMPORTANTE**: 
+    - Não ignore as fontes - elas são tão importantes quanto as respostas
+    - Analise os títulos das fontes para entender o contexto de cada documento
+    - Considere que fontes repetidas em múltiplas pesquisas podem indicar alta relevância
+    - Use as informações das fontes para enriquecer a análise
+  expected_output: >
+    Análise detalhada e estruturada contendo:
+    - Síntese das principais descobertas de cada pesquisa (inicial + follow-ups)
+    - Análise completa de TODAS as fontes (convergências, unicidades, padrões temáticos)
+    - Identificação de convergências e complementaridades entre pesquisas
+    - Análise temática organizada
+    - Insights estratégicos priorizados com dados quantitativos quando disponíveis
+    - Estrutura detalhada proposta para o relatório final com indicação de fontes por seção
+
+create_consolidated_report_task:
+  description: >
+    **OBJETIVO**: Crie um relatório completo, EXAUSTIVO e CONSOLIDADO sobre "{query}"
+    integrando TODAS as pesquisas realizadas (pesquisa inicial + TODAS as pesquisas
+    de follow-ups) em um único documento coeso e estratégico.
+    
+    O relatório deve ser DENSO (mínimo 2500 palavras), objetivo, estratégico e
+    citar TODAS as fontes utilizadas de forma integrada.
+    
+    **REGRAS DE ESCRITA OBRIGATÓRIAS**:
+    1. INICIE O RELATÓRIO COM: Título principal sobre o tema e Data ({current_date})
+    2. NÃO USE PLACEHOLDERS como "[Insira texto aqui]", "[Texto]", etc.
+    3. NÃO CRIE APENAS LISTAS de tópicos ou bullet points. Escreva texto corrido,
+       analítico e narrativo com parágrafos completos
+    4. Para cada seção principal, escreva pelo menos 4-5 parágrafos substanciais
+       (cada parágrafo com pelo menos 4-5 frases)
+    5. CITE AS FONTES diretamente no texto usando os títulos dos documentos
+       (ex: "Segundo o Brand Audit 2025 - Brahma...")
+    6. INTEGRE as informações de todas as pesquisas (inicial + follow-ups) de
+       forma natural e coesa, não apenas colando resultados separados
+    7. Use transições entre parágrafos e seções para criar uma narrativa fluida
+    8. Inclua dados quantitativos quando disponíveis nas pesquisas
+    
+    **REGRAS DE IDIOMA**:
+    1. O RELATÓRIO DEVE SER 100% EM PORTUGUÊS (PT-BR)
+    2. Títulos de documentos originais podem ser mantidos em inglês, mas todo
+       o resto deve ser traduzido
+    
+    **ESTRUTURA OBRIGATÓRIA**:
+    1. **Resumo Executivo**: Síntese de alto nível de todas as descobertas
+    2. **Introdução ao Tópico**: Contexto e importância do tema pesquisado
+    3. **Principais Descobertas**: 
+       - Integre os principais pontos da pesquisa inicial
+       - Destaque insights de cada follow-up pesquisado
+       - Use dados quantitativos quando disponíveis
+    4. **Análise Detalhada por Dimensão**:
+       - Organize por temas/ângulos identificados nas pesquisas
+       - Cada dimensão deve ter análise profunda com múltiplos parágrafos
+       - Integre informações de múltiplas fontes
+    5. **Convergências e Complementaridades**:
+       - Onde as diferentes pesquisas se reforçam?
+       - Quais informações se complementam?
+    6. **Insights Estratégicos e Recomendações**:
+       - Principais conclusões para tomada de decisão
+       - Oportunidades identificadas
+       - Recomendações acionáveis
+    7. **FONTES E REFERÊNCIAS BIBLIOGRÁFICAS**: 
+       - Lista OBRIGATÓRIA e COMPLETA com todas as fontes utilizadas
+       - Formato: Título, URL (clicável), Página (quando disponível)
+       - Organize por pesquisa (inicial e cada follow-up)
+  expected_output: >
+    Relatório consolidado em formato markdown com:
+    - Resumo Executivo
+    - Introdução ao Tópico
+    - Principais Descobertas (integrando todas as pesquisas)
+    - Análise Detalhada por Dimensão
+    - Convergências e Complementaridades
+    - Insights Estratégicos e Recomendações
+    - Fontes e Referências Bibliográficas completas (todas as pesquisas)
