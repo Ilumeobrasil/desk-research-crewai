@@ -27,6 +27,7 @@ st.set_page_config(
 
 X_QUESTIONS = PERGUNTAS_PADRAO.get("geral", [])
 VIEW_INTERACTIVE_MENU = os.getenv("VIEW_INTERACTIVE_MENU", "FALSE").upper() == "TRUE"
+VIEW_SELECT_INTEGRATED_MENU = os.getenv("VIEW_SELECT_INTEGRATED_MENU", "FALSE").upper() == "TRUE"
 
 def _title_from_text(text: str, max_len: int = MAX_TITLE_LENGTH) -> str:
     """Extrai um título do texto fornecido."""
@@ -116,7 +117,7 @@ def format_result_for_chat(result: Any, modo: Optional[str] = None) -> str:
     
     return texto 
 
-def _prepare_research_params(modo: str, user_text: str) -> Optional[Dict[str, Any]]:
+def _prepare_research_params(modo: str, user_text: str, selected_modos: Optional[list] = None) -> Optional[Dict[str, Any]]:
     """Prepara os parâmetros para execução da pesquisa baseado no modo."""
     params_map = {
         "genie": {"pergunta": user_text, "contexto": ""},
@@ -127,7 +128,7 @@ def _prepare_research_params(modo: str, user_text: str) -> Optional[Dict[str, An
         "consumer_hours": {},
         "integrated": {
             "topic": user_text,
-            "selected_modos": ['web'],
+            "selected_modos": selected_modos if selected_modos else ['web'],
             "params": {
                 "max_papers": DEFAULT_MAX_PAPERS,
                 "max_web_results": DEFAULT_MAX_WEB_RESULTS
@@ -136,18 +137,21 @@ def _prepare_research_params(modo: str, user_text: str) -> Optional[Dict[str, An
     }
     return params_map.get(modo)
 
-def execute_research(user_text: str, modo_selecionado: Optional[str] = None) -> str:
+def execute_research(user_text: str, modo_selecionado: Optional[str] = None, selected_modos: Optional[list] = None) -> str:
     """Executa a pesquisa usando o DeskResearchSystem."""
     try:
         system = DeskResearchSystem()
         
         if not modo_selecionado:
-            modo_selecionado = DEFAULT_MODE if not VIEW_INTERACTIVE_MENU else None
+            if VIEW_SELECT_INTEGRATED_MENU:
+                modo_selecionado = "integrated"
+            else:
+                modo_selecionado = DEFAULT_MODE if not VIEW_INTERACTIVE_MENU else None
         
         if not modo_selecionado:
             return "❌ Erro: Nenhum modo selecionado."
         
-        params = _prepare_research_params(modo_selecionado, user_text)
+        params = _prepare_research_params(modo_selecionado, user_text, selected_modos)
         if params is None:
             return f"❌ Modo '{modo_selecionado}' não suportado."
         
@@ -312,6 +316,9 @@ def _initialize_session_state() -> None:
 
     if "system" not in st.session_state:
         st.session_state.system = DeskResearchSystem()
+    
+    if "selected_crews" not in st.session_state:
+        st.session_state.selected_crews = []
 
 _initialize_session_state()
 
@@ -368,6 +375,8 @@ messages = st.session_state.chats[active]
 st.markdown(f"## {active}")
 
 modo_selecionado = None
+selected_crews = []
+
 if VIEW_INTERACTIVE_MENU:
     st.markdown("---")
     modo_selecionado = st.selectbox(
@@ -378,6 +387,35 @@ if VIEW_INTERACTIVE_MENU:
         help="Selecione qual tipo de pesquisa deseja executar"
     )
     st.markdown("---")
+elif VIEW_SELECT_INTEGRATED_MENU:
+    # Quando VIEW_SELECT_INTEGRATED_MENU=TRUE e VIEW_INTERACTIVE_MENU=FALSE
+    # Sempre usa o modo integrated e mostra multi-select para escolher agentes
+    modo_selecionado = "integrated"
+    st.markdown("---")
+    st.markdown("### Desk research")
+    st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
+    
+    # Opções disponíveis (excluindo integrated e consumer_hours)
+    modos_disponiveis = [k for k in MODE_CONFIG.keys() if k not in ["integrated", "consumer_hours"]]
+    
+    selected_crews = st.multiselect(
+        "🤖 Selecione os agentes:",
+        options=modos_disponiveis,
+        default=st.session_state.selected_crews if st.session_state.selected_crews else ['web'],
+        format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
+        key=f"crews_select_{active}",
+        help="Selecione pelo menos um agente para executar a pesquisa integrada"
+    )
+    
+    # Validação: pelo menos um crew deve ser selecionado
+    if not selected_crews:
+        st.warning("⚠️ Por favor, selecione pelo menos um agente para continuar.")
+    
+    st.session_state.selected_crews = selected_crews
+    st.markdown("---")
+else:
+    # Comportamento padrão quando nenhuma das variáveis está ativa
+    modo_selecionado = DEFAULT_MODE
 
 st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
 
@@ -407,19 +445,27 @@ with st.form("chat_form", clear_on_submit=True):
     with col2:
         send = st.form_submit_button("Enviar")
 
-def process_user_message(message: str, modo: Optional[str] = None) -> None:
+def process_user_message(message: str, modo: Optional[str] = None, selected_crews: Optional[list] = None) -> None:
     """Processa uma mensagem do usuário e adiciona resposta ao chat."""
     if not message.strip():
         return
     
     active_before = st.session_state.active_chat
-    modo_para_execucao = modo if VIEW_INTERACTIVE_MENU else None
+    
+    # Determina o modo para execução
+    if VIEW_INTERACTIVE_MENU:
+        modo_para_execucao = modo
+    elif VIEW_SELECT_INTEGRATED_MENU:
+        modo_para_execucao = "integrated"
+    else:
+        modo_para_execucao = None
     
     st.session_state.chats[active_before].append({"role": "user", "content": message.strip()})
     
     st.session_state.pending_research = {
         "message": message.strip(),
         "modo": modo_para_execucao,
+        "selected_crews": selected_crews,
         "chat_name": active_before
     }
     st.rerun()
@@ -435,9 +481,19 @@ def execute_pending_research() -> None:
     active_before = pesquisa["chat_name"]
     message = pesquisa["message"]
     modo_para_execucao = pesquisa["modo"]
+    selected_crews = pesquisa.get("selected_crews", [])
+    
+    # Validação: se for integrated e não tiver crews selecionados, retorna erro
+    if modo_para_execucao == "integrated" and not selected_crews:
+        st.session_state.chats[active_before].append({
+            "role": "assistant", 
+            "content": "❌ Erro: É necessário selecionar pelo menos um agente para executar a pesquisa integrada."
+        })
+        st.rerun()
+        return
     
     with st.spinner("🔄 Processando pesquisa... Isso pode levar alguns minutos."):
-        resposta = execute_research(message, modo_para_execucao)
+        resposta = execute_research(message, modo_para_execucao, selected_crews)
     
     active_after = maybe_autoname_chat(active_before, message)
     st.session_state.chats[active_after].append({"role": "assistant", "content": resposta})
@@ -448,10 +504,18 @@ def execute_pending_research() -> None:
 if st.session_state.pending_user_message.strip():
     injected = st.session_state.pending_user_message.strip()
     st.session_state.pending_user_message = ""
-    process_user_message(injected, modo_selecionado)
+    # Usa o session_state se VIEW_SELECT_INTEGRATED_MENU estiver ativo
+    crews_para_usar = st.session_state.selected_crews if VIEW_SELECT_INTEGRATED_MENU else selected_crews
+    process_user_message(injected, modo_selecionado, crews_para_usar)
 
 if send and user_text.strip():
-    process_user_message(user_text.strip(), modo_selecionado)
+    # Usa o session_state se VIEW_SELECT_INTEGRATED_MENU estiver ativo
+    crews_para_usar = st.session_state.selected_crews if VIEW_SELECT_INTEGRATED_MENU else selected_crews
+    # Validação: se for integrated e não tiver crews selecionados, não permite enviar
+    if VIEW_SELECT_INTEGRATED_MENU and modo_selecionado == "integrated" and not crews_para_usar:
+        st.error("⚠️ Por favor, selecione pelo menos um agente antes de enviar.")
+    else:
+        process_user_message(user_text.strip(), modo_selecionado, crews_para_usar)
 
 if st.session_state.pending_research:
     execute_pending_research()

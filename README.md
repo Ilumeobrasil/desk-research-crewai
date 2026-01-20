@@ -54,10 +54,16 @@ Pré-requisitos: Python 3.10+ e [Chaves de API](CONFIGURAR_ENV.md).
 2.  **Configure o Ambiente:**
     Crie um arquivo `.env` na raiz com suas chaves (veja `.env.example`).
 
-3.  **Execute:**
-    ```bash
+3.  **Execute:**h
     crewai run
-    ```
+        ou
+
+    para executar a interface Streamlit:
+  
+    streamlit run streamlit_app
+        ou utilizando o script:h
+    ./run_streamlit.sh
+    
 
 ## 🛠️ Modos de Uso
 
