@@ -11,7 +11,7 @@ from typing import Literal
 
 logger = logging.getLogger(__name__)
 
-CrewName = Literal["genie", "youtube", "academic", "web", "x", "integrated_analysis", "consumer_hours"]
+CrewName = Literal["genie", "youtube", "academic", "web", "x", "integrated_analysis", "consumer_hours", "knowledge_bar_stravito"]
 
 class AcademicPDF(FPDF):
     """Classe customizada para PDF com cabeçalho e rodapé AMBEV"""
