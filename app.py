@@ -3,48 +3,40 @@ from datetime import datetime
 import os
 import sys
 import logging
+import traceback
 from pathlib import Path
+from typing import Optional, Dict, Any
 from desk_research.system.research_system import DeskResearchSystem
 from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
 
-# Adicionar o diretório src ao path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-# Configurações de logging
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
-# ----------------------------
-# Page config (tamanho e título)
-# ----------------------------
+DEFAULT_CHAT_NAME = "Nova Pesquisa"
+DEFAULT_MODE = "integrated"
+MAX_TITLE_LENGTH = 28
+
 st.set_page_config(
-    page_title="Ambev.ia",
+    page_title="Desk Research System",
     page_icon="💬",
     layout="wide",
 )
 
-# ----------------------------
-# Perguntas pré-definidas (X / Twitter)
-# ----------------------------
 X_QUESTIONS = PERGUNTAS_PADRAO.get("geral", [])
-
-# ----------------------------
-# Variável de ambiente para menu interativo
-# ----------------------------
 VIEW_INTERACTIVE_MENU = os.getenv("VIEW_INTERACTIVE_MENU", "FALSE").upper() == "TRUE"
 
-# ----------------------------
-# Helpers (ordem e nome automático)
-# ----------------------------
-def _title_from_text(text: str, max_len: int = 28) -> str:
+def _title_from_text(text: str, max_len: int = MAX_TITLE_LENGTH) -> str:
+    """Extrai um título do texto fornecido."""
     t = " ".join((text or "").strip().split())
     if not t:
-        return "Novo chat"
-    t = t[:max_len].strip()
-    return t
+        return DEFAULT_CHAT_NAME
+    return t[:max_len].strip()
 
 def _unique_chat_name(base: str) -> str:
+    """Gera um nome único para o chat, adicionando número se necessário."""
     name = base
     i = 2
     while name in st.session_state.chats:
@@ -52,19 +44,19 @@ def _unique_chat_name(base: str) -> str:
         i += 1
     return name
 
-def bump_chat_to_top(chat_name: str):
+def bump_chat_to_top(chat_name: str) -> None:
+    """Move um chat para o topo da lista de ordem."""
     if "chat_order" not in st.session_state:
         st.session_state.chat_order = list(st.session_state.chats.keys())
     if chat_name in st.session_state.chat_order:
         st.session_state.chat_order.remove(chat_name)
     st.session_state.chat_order.insert(0, chat_name)
 
-def rename_chat(old, new):
+def rename_chat(old: str, new: str) -> bool:
+    """Renomeia um chat. Retorna True se bem-sucedido."""
     new = (new or "").strip()
-    if not new:
-        return
-    if new in st.session_state.chats:
-        return
+    if not new or new in st.session_state.chats:
+        return False
 
     st.session_state.chats[new] = st.session_state.chats.pop(old)
 
@@ -73,9 +65,11 @@ def rename_chat(old, new):
         st.session_state.chat_order[idx] = new
 
     st.session_state.active_chat = new
+    return True
 
 def maybe_autoname_chat(chat_name: str, user_text: str) -> str:
-    is_generic = chat_name == "Novo chat" or chat_name.startswith("Chat ")
+    """Renomeia automaticamente o chat se tiver nome genérico."""
+    is_generic = chat_name == DEFAULT_CHAT_NAME or chat_name.startswith("Chat ")
     if not is_generic:
         return chat_name
 
@@ -88,113 +82,86 @@ def maybe_autoname_chat(chat_name: str, user_text: str) -> str:
 
     return chat_name
 
-# ----------------------------
-# Helper para extrair texto dos resultados dos crews
-# ----------------------------
-def extract_result_text(result: any) -> str:
-    """Extrai texto formatado dos resultados dos crews"""
+def extract_result_text(result: Any) -> str:
+    """Extrai texto formatado dos resultados dos crews."""
     if isinstance(result, dict):
-        # Tentar diferentes chaves comuns
-        if 'resultado' in result:
-            return extract_result_text(result['resultado'])
-        if 'result' in result:
-            return extract_result_text(result['result'])
+        for key in ['resultado', 'result', 'master_report']:
+            if key in result:
+                return extract_result_text(result[key])
+        
         if 'report_markdown' in result:
             return result['report_markdown']
-        if 'master_report' in result:
-            return extract_result_text(result['master_report'])
         if 'final_report' in result:
             return result['final_report']
-        # Se for dict com erro
         if 'erro' in result:
             return f"❌ Erro: {result['erro']}"
     
-    # Se for objeto CrewAI
     if hasattr(result, 'raw'):
         return result.raw
     if hasattr(result, 'tasks_output') and result.tasks_output:
-        return result.tasks_output[-1].raw if hasattr(result.tasks_output[-1], 'raw') else str(result.tasks_output[-1])
+        last_task = result.tasks_output[-1]
+        return last_task.raw if hasattr(last_task, 'raw') else str(last_task)
     if hasattr(result, 'pydantic'):
         return str(result.pydantic)
     
-    # Fallback para string
     return str(result)
 
-def format_result_for_chat(result: any, modo: str = None) -> str:
-    """Formata o resultado para exibição no chat"""
+def format_result_for_chat(result: Any, modo: Optional[str] = None) -> str:
+    """Formata o resultado para exibição no chat."""
     texto = extract_result_text(result)
     
-    # Adicionar header com modo se disponível
-    header = ""
     if modo and modo in MODE_CONFIG:
         modo_info = MODE_CONFIG[modo]
-        header = f"**{modo_info['emoji']} {modo_info['nome']}**\n\n"
+        return f"**{modo_info['emoji']} {modo_info['nome']}**\n\n{texto}"
     
-    return header + texto 
+    return texto 
 
-# ----------------------------
-# Função para executar pesquisa real
-# ----------------------------
-def execute_research(user_text: str, modo_selecionado: str = None) -> str:
-    """Executa a pesquisa usando o DeskResearchSystem"""
+def _prepare_research_params(modo: str, user_text: str) -> Optional[Dict[str, Any]]:
+    """Prepara os parâmetros para execução da pesquisa baseado no modo."""
+    params_map = {
+        "genie": {"pergunta": user_text, "contexto": ""},
+        "youtube": {"topic": user_text},
+        "academic": {"topic": user_text, "max_papers": DEFAULT_MAX_PAPERS},
+        "web": {"query": user_text, "max_results": DEFAULT_MAX_WEB_RESULTS},
+        "x": {"topic": user_text},
+        "consumer_hours": {},
+        "integrated": {
+            "topic": user_text,
+            "selected_modos": ['web'],
+            "params": {
+                "max_papers": DEFAULT_MAX_PAPERS,
+                "max_web_results": DEFAULT_MAX_WEB_RESULTS
+            }
+        }
+    }
+    return params_map.get(modo)
+
+def execute_research(user_text: str, modo_selecionado: Optional[str] = None) -> str:
+    """Executa a pesquisa usando o DeskResearchSystem."""
     try:
         system = DeskResearchSystem()
         
-        # Se modo não foi selecionado e VIEW_INTERACTIVE_MENU está desabilitado, usar modo integrado
-        if not modo_selecionado and not VIEW_INTERACTIVE_MENU:
-            modo_selecionado = "integrated"
+        if not modo_selecionado:
+            modo_selecionado = DEFAULT_MODE if not VIEW_INTERACTIVE_MENU else None
         
-        # Se ainda não tem modo, retornar erro
         if not modo_selecionado:
             return "❌ Erro: Nenhum modo selecionado."
         
-        # Preparar parâmetros baseado no modo
-        params = {}
-        
-        if modo_selecionado == "genie":
-            params = {"pergunta": user_text, "contexto": ""}
-        elif modo_selecionado == "youtube":
-            params = {"topic": user_text}
-        elif modo_selecionado == "academic":
-            params = {"topic": user_text, "max_papers": DEFAULT_MAX_PAPERS}
-        elif modo_selecionado == "web":
-            params = {"query": user_text, "max_results": DEFAULT_MAX_WEB_RESULTS}
-        elif modo_selecionado == "x":
-            params = {"topic": user_text}
-        elif modo_selecionado == "consumer_hours":
-            params = {}
-        elif modo_selecionado == "integrated":
-            # Modo integrado usa todos os modos disponíveis por padrão
-            selected_modos = ['web']
-            params = {
-                "topic": user_text,
-                "selected_modos": selected_modos,
-                "params": {
-                    "max_papers": DEFAULT_MAX_PAPERS,
-                    "max_web_results": DEFAULT_MAX_WEB_RESULTS
-                }
-            }
-        else:
+        params = _prepare_research_params(modo_selecionado, user_text)
+        if params is None:
             return f"❌ Modo '{modo_selecionado}' não suportado."
         
-        # Executar pesquisa
         executor = system._executors.get(modo_selecionado)
         if not executor:
             return f"❌ Executor para modo '{modo_selecionado}' não encontrado."
         
         resultado = executor(**params)
-        
-        # Formatar resultado para chat
         return format_result_for_chat(resultado, modo_selecionado)
         
     except Exception as e:
-        import traceback
         error_msg = f"❌ Erro na execução: {str(e)}\n\n```\n{traceback.format_exc()}\n```"
         return error_msg
 
-# ----------------------------
-# CSS (estilo ChatGPT-like)
-# ----------------------------
 st.markdown(
     """
     <style>
@@ -317,34 +284,39 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ----------------------------
-# Estado (chats / menu / envio pendente)
-# ----------------------------
-if "chats" not in st.session_state:
-    st.session_state.chats = {
-        "Novo chat": [
-            {"role": "assistant", "content": "Oi! Esse é a IA da Ambev. 😊\n\nMe manda uma mensagem aí embaixo."}
-        ]
-    }
-    st.session_state.active_chat = "Novo chat"
-    st.session_state.chat_order = ["Novo chat"]
+def _initialize_session_state() -> None:
+    """Inicializa o estado da sessão com valores padrão."""
+    if "chats" not in st.session_state:
+        st.session_state.chats = {
+            DEFAULT_CHAT_NAME: [
+                {"role": "assistant", "content": "Oi! Esse é a IA da Ambev. 😊\n\nMe manda uma mensagem aí embaixo."}
+            ]
+        }
+        st.session_state.active_chat = DEFAULT_CHAT_NAME
+        st.session_state.chat_order = [DEFAULT_CHAT_NAME]
 
-if "chat_order" not in st.session_state:
-    st.session_state.chat_order = list(st.session_state.chats.keys())
+    if "chat_order" not in st.session_state:
+        st.session_state.chat_order = list(st.session_state.chats.keys())
 
-if "sidebar_section" not in st.session_state:
-    st.session_state.sidebar_section = "chats" 
+    if "sidebar_section" not in st.session_state:
+        st.session_state.sidebar_section = "chats" 
 
-if "pending_user_message" not in st.session_state:
-    st.session_state.pending_user_message = ""
+    if "pending_user_message" not in st.session_state:
+        st.session_state.pending_user_message = ""
 
-if "pending_mode" not in st.session_state:
-    st.session_state.pending_mode = None
+    if "pending_mode" not in st.session_state:
+        st.session_state.pending_mode = None
 
-if "system" not in st.session_state:
-    st.session_state.system = DeskResearchSystem()
-    
-def new_chat():
+    if "pending_research" not in st.session_state:
+        st.session_state.pending_research = None
+
+    if "system" not in st.session_state:
+        st.session_state.system = DeskResearchSystem()
+
+_initialize_session_state()
+
+def new_chat() -> None:
+    """Cria um novo chat."""
     name = _unique_chat_name(f"Chat {len(st.session_state.chats)+1}")
     st.session_state.chats[name] = [
         {"role": "assistant", "content": "Começamos uma novo chat. Como posso ajudar?"}
@@ -352,12 +324,7 @@ def new_chat():
     st.session_state.active_chat = name
     bump_chat_to_top(name)
 
-# ----------------------------
-# Sidebar (menu fixo + chats / X)
-# ----------------------------
 with st.sidebar:
-    # Menu fixo
-    colA, colB = st.columns(2)
     if st.session_state.sidebar_section == "chats":
         st.markdown("### Chats")
         st.button("➕ Novo chat", use_container_width=True, on_click=new_chat)
@@ -392,20 +359,14 @@ with st.sidebar:
         if st.button("Enviar para o chat", use_container_width=True, key="x_send_custom"):
             if custom.strip():
                 st.session_state.pending_user_message = custom.strip()
-                st.session_state["x_custom_question"] = ""  # limpa a caixa
+                st.session_state["x_custom_question"] = ""
                 st.rerun()
 
-# ----------------------------
-# Área principal
-# ----------------------------
 active = st.session_state.active_chat
 messages = st.session_state.chats[active]
 
 st.markdown(f"## {active}")
 
-# ----------------------------
-# Seleção de modo (se VIEW_INTERACTIVE_MENU estiver ativo)
-# ----------------------------
 modo_selecionado = None
 if VIEW_INTERACTIVE_MENU:
     st.markdown("---")
@@ -418,9 +379,6 @@ if VIEW_INTERACTIVE_MENU:
     )
     st.markdown("---")
 
-# ----------------------------
-# Render das mensagens (bolhas)
-# ----------------------------
 st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
 
 for m in messages:
@@ -443,58 +401,58 @@ for m in messages:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ----------------------------
-# Input (form)
-# ----------------------------
 with st.form("chat_form", clear_on_submit=True):
     user_text = st.text_area("Mensagem", placeholder="Digite sua mensagem...", label_visibility="collapsed", height=70)
     col1, col2 = st.columns([6, 1])
     with col2:
         send = st.form_submit_button("Enviar")
 
+def process_user_message(message: str, modo: Optional[str] = None) -> None:
+    """Processa uma mensagem do usuário e adiciona resposta ao chat."""
+    if not message.strip():
+        return
+    
+    active_before = st.session_state.active_chat
+    modo_para_execucao = modo if VIEW_INTERACTIVE_MENU else None
+    
+    st.session_state.chats[active_before].append({"role": "user", "content": message.strip()})
+    
+    st.session_state.pending_research = {
+        "message": message.strip(),
+        "modo": modo_para_execucao,
+        "chat_name": active_before
+    }
+    st.rerun()
 
-# ----------------------------
-# Processamento de mensagens
-# ----------------------------
+def execute_pending_research() -> None:
+    """Executa uma pesquisa pendente e adiciona a resposta ao chat."""
+    if not st.session_state.pending_research:
+        return
+    
+    pesquisa = st.session_state.pending_research
+    st.session_state.pending_research = None
+    
+    active_before = pesquisa["chat_name"]
+    message = pesquisa["message"]
+    modo_para_execucao = pesquisa["modo"]
+    
+    with st.spinner("🔄 Processando pesquisa... Isso pode levar alguns minutos."):
+        resposta = execute_research(message, modo_para_execucao)
+    
+    active_after = maybe_autoname_chat(active_before, message)
+    st.session_state.chats[active_after].append({"role": "assistant", "content": resposta})
+    
+    bump_chat_to_top(active_after)
+    st.rerun()
 
-# 1) Se veio algo do menu lateral (X/Twitter), injeta no chat
 if st.session_state.pending_user_message.strip():
     injected = st.session_state.pending_user_message.strip()
     st.session_state.pending_user_message = ""
-    
-    # Determinar modo
-    modo_para_execucao = modo_selecionado if VIEW_INTERACTIVE_MENU else None
-    
-    active_before = st.session_state.active_chat
-    st.session_state.chats[active_before].append({"role": "user", "content": injected})
-    
-    # Executar pesquisa real
-    with st.spinner("🔄 Processando pesquisa... Isso pode levar alguns minutos."):
-        resposta = execute_research(injected, modo_para_execucao)
-    
-    active_after = maybe_autoname_chat(active_before, injected)
-    st.session_state.chats[active_after].append({"role": "assistant", "content": resposta})
-    
-    bump_chat_to_top(active_after)
-    st.rerun()
+    process_user_message(injected, modo_selecionado)
 
-# 2) Envio normal pelo input
 if send and user_text.strip():
-    txt = user_text.strip()
-    active_before = st.session_state.active_chat
-    
-    # Determinar modo
-    modo_para_execucao = modo_selecionado if VIEW_INTERACTIVE_MENU else None
-    
-    st.session_state.chats[active_before].append({"role": "user", "content": txt})
-    
-    # Executar pesquisa real
-    with st.spinner("🔄 Processando pesquisa... Isso pode levar alguns minutos."):
-        resposta = execute_research(txt, modo_para_execucao)
-    
-    active_after = maybe_autoname_chat(active_before, txt)
-    st.session_state.chats[active_after].append({"role": "assistant", "content": resposta})
-    
-    bump_chat_to_top(active_after)
-    st.rerun()
+    process_user_message(user_text.strip(), modo_selecionado)
+
+if st.session_state.pending_research:
+    execute_pending_research()
 
