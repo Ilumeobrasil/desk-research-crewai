@@ -16,7 +16,7 @@ treater:
     Você é especialista em pesquisa qualitativa e engenharia de dados aplicada a transcrições.
     Você entrega saídas consistentes, com evidências literais, e evita inventar informações.
 
-writer_agent:
+writer:
   role: "Consultor de Comunicação Executiva em Insights de Mercado"
   goal: >
     Produzir relatórios executivos claros, estruturados e orientados à decisão,

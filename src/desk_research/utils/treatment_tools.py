@@ -166,9 +166,7 @@ def run_treatment_folder(
         if enable_rag:
             model = (os.getenv("MODEL") or "").strip()
             if not model:
-                out_item["rag"]["ok"] = False
-                out_item["rag"]["error"] = "missing_MODEL_env"
-                out_item["semantics"] = _fallback_semantics(cleaned_text)
+                resp = {"ok": False, "reason": "missing_MODEL_env", "error": "MODEL environment variable not set"}
             else:
                 resp = rag.completion_with_context(
                     messages=[
@@ -183,61 +181,58 @@ def run_treatment_folder(
                     poll_sleep_s=poll_sleep_s,
                 )
 
-                out_item["rag"]["ok"] = bool(resp.get("ok"))
-                out_item["rag"]["status"] = resp.get("status")
-                # url não é retornado por completion_with_context, mas pode ser construído do uuid
-                uuid = resp.get("uuid")
-                out_item["rag"]["url"] = f"/api/completions/context/{uuid}" if uuid else None
-                out_item["rag"]["status_payload"] = resp.get("status_payload")
-                # error pode vir de reason ou text
-                out_item["rag"]["error"] = resp.get("reason") or (resp.get("text") if not resp.get("ok") else None)
-                out_item["rag"]["detail"] = resp.get("text") if not resp.get("ok") else None
+            out_item["rag"]["ok"] = bool(resp.get("ok"))
+            out_item["rag"]["status"] = resp.get("status")
+            out_item["rag"]["url"] = resp.get("url")
+            out_item["rag"]["status_payload"] = resp.get("status_payload")
+            out_item["rag"]["error"] = resp.get("error")
+            out_item["rag"]["detail"] = resp.get("detail")
 
-                if resp.get("ok"):
-                    parsed = _parse_llm_json(resp.get("content"))
-                    if isinstance(parsed, dict):
-                        sem = out_item["semantics"]
-                        sem["language"] = parsed.get("language") or None
-                        sem["brand_mentions"] = [str(x) for x in (parsed.get("brand_mentions") or []) if x]
-                        sem["themes"] = [str(x) for x in (parsed.get("themes") or []) if x]
-                        sem["sentiments"] = [str(x) for x in (parsed.get("sentiments") or []) if x]
-                        sem["moments"] = [str(x) for x in (parsed.get("moments") or []) if x]
+            if resp.get("ok"):
+                parsed = _parse_llm_json(resp.get("content"))
+                if isinstance(parsed, dict):
+                    sem = out_item["semantics"]
+                    sem["language"] = parsed.get("language") or None
+                    sem["brand_mentions"] = [str(x) for x in (parsed.get("brand_mentions") or []) if x]
+                    sem["themes"] = [str(x) for x in (parsed.get("themes") or []) if x]
+                    sem["sentiments"] = [str(x) for x in (parsed.get("sentiments") or []) if x]
+                    sem["moments"] = [str(x) for x in (parsed.get("moments") or []) if x]
 
-                        ev = parsed.get("evidence") or []
-                        keep: list[dict[str, Any]] = []
-                        if isinstance(ev, list):
-                            for e in ev[:7]:
-                                if not isinstance(e, dict):
-                                    continue
-                                txt = str(e.get("text") or "").strip()
-                                if not txt:
-                                    continue
-                                keep.append(
-                                    {
-                                        "text": txt[:500],
-                                        "source": (e.get("source") if isinstance(e.get("source"), str) else None),
-                                    }
-                                )
-                        sem["evidence"] = keep
-                    else:
-                        # LLM respondeu mas não veio JSON parseável -> fallback
-                        out_item["semantics"] = _fallback_semantics(cleaned_text)
-                        top_errors["rag_unparseable_json"] = top_errors.get("rag_unparseable_json", 0) + 1
+                    ev = parsed.get("evidence") or []
+                    keep: list[dict[str, Any]] = []
+                    if isinstance(ev, list):
+                        for e in ev[:7]:
+                            if not isinstance(e, dict):
+                                continue
+                            txt = str(e.get("text") or "").strip()
+                            if not txt:
+                                continue
+                            keep.append(
+                                {
+                                    "text": txt[:500],
+                                    "source": (e.get("source") if isinstance(e.get("source"), str) else None),
+                                }
+                            )
+                    sem["evidence"] = keep
                 else:
-                    # erro de RAG (inclui model_not_authorized) -> fallback + auditoria
+                    # LLM respondeu mas não veio JSON parseável -> fallback
                     out_item["semantics"] = _fallback_semantics(cleaned_text)
-                    err_key = out_item["rag"]["error"] or f"rag_error:{out_item['rag']['status'] or 'unknown'}"
-                    top_errors[err_key] = top_errors.get(err_key, 0) + 1
+                    top_errors["rag_unparseable_json"] = top_errors.get("rag_unparseable_json", 0) + 1
+            else:
+                # erro de RAG (inclui model_not_authorized) -> fallback + auditoria
+                out_item["semantics"] = _fallback_semantics(cleaned_text)
+                err_key = out_item["rag"]["error"] or f"rag_error:{out_item['rag']['status'] or 'unknown'}"
+                top_errors[err_key] = top_errors.get(err_key, 0) + 1
 
-                    if len(error_samples) < 5:
-                        error_samples.append(
-                            {
-                                "file": fp.name,
-                                "status": out_item["rag"]["status"],
-                                "url": out_item["rag"]["url"],
-                                "detail": (out_item["rag"]["detail"] or "")[:300],
-                            }
-                        )
+                if len(error_samples) < 5:
+                    error_samples.append(
+                        {
+                            "file": fp.name,
+                            "status": out_item["rag"]["status"],
+                            "url": out_item["rag"]["url"],
+                            "detail": (out_item["rag"]["detail"] or "")[:300],
+                        }
+                    )
 
         # grava sempre
         (output_dir / fp.name).write_text(json.dumps(out_item, ensure_ascii=False, indent=2), encoding="utf-8")

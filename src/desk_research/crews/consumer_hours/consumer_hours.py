@@ -218,6 +218,14 @@ class IngestorCrew:
             tools=[treat_folder_tool],
             verbose=VERBOSE_AGENTS,
         )
+    
+    @agent
+    def writer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["writer"],
+            verbose=VERBOSE_AGENTS,
+            allow_delegation=False,
+        )
 
     @task
     def ingest(self) -> Task:
@@ -235,6 +243,15 @@ class IngestorCrew:
             agent=self.treater(),
             output_key="treatment_result",
             context=[self.ingest()],
+        )
+    
+    @task
+    def write(self) -> Task:
+        return Task(
+            config=self.tasks_config["write_report"],
+            agent=self.writer(),
+            output_key="report_markdown",
+            context=[self.treat()],
         )
 
     @crew

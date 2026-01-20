@@ -43,27 +43,140 @@ treat:
       - rag: status de execução (ok/uuid/done/status_payload)
   agent: treater
 
-write_report_task:
+write_report:
   description: >
-    A partir de insights_json, escreva um RELATÓRIO EXECUTIVO em Markdown 
-    sobre o tema: {topic}.
+    ⚠️ RELATÓRIO COM RESTRIÇÃO ABSOLUTA AO CONTEXTO ⚠️
 
-    DATA DO RELATÓRIO: {date}
+    Este agente DEVE operar em modo "context-bound".
+    É PROIBIDO usar qualquer conhecimento externo, inferência lógica,
+    generalização de mercado ou preenchimento de lacunas.
 
-    **REGRAS DE FORMATAÇÃO**:
-    **REGRAS DE CONTEÚDO (DIDÁTICO & ESPECÍFICO)**:
-    1. **Conexão Direta**: Todo insight deve responder à pergunta principal: '{topic}'. Evite temas genéricos como 'Flavor Preferences' se não houver dados reais disso. Use os dados que você tem.
-    2. **Explique o 'Porquê'**: Não diga apenas '40% positivo'. Ex: '40% positivo PORQUE os usuários citam o sabor da nova cerveja sem álcool'. Seja didático.
-    3. **Análise de Sentimento Explicada**: Detalhe as emoções por trás dos números. O que causa a raiva? O que causa a alegria?
+    O relatório deve ser construído EXCLUSIVAMENTE a partir do conteúdo
+    explicitamente presente no contexto fornecido (treatment_result).
 
-    Estrutura:
-    1. Resumo Executivo (Respondendo à pergunta '{topic}')
+    ─────────────────────────────────────────
+    MODO DE OPERAÇÃO OBRIGATÓRIO (NÃO IGNORAR)
+    ─────────────────────────────────────────
+
+    Antes de escrever qualquer seção do relatório, siga este processo:
+
+    1. VERIFICAÇÃO:
+       - Verifique se o tema existe explicitamente nos dados das entrevistas.
+       - Se NÃO existir, a seção NÃO deve conter análise.
+       - Declare explicitamente: 
+         "Este tema não foi mencionado nas entrevistas analisadas."
+
+    2. VALIDAÇÃO:
+       - Para cada afirmação, localize:
+         a) Quantidade de entrevistas que mencionam o ponto
+         b) Citação literal exata que comprova a afirmação
+       - Se qualquer um dos dois não existir, a afirmação NÃO pode ser escrita.
+
+    3. BLOQUEIO DE INFERÊNCIA:
+       - NÃO interprete causas, motivações ou impactos
+         se eles não forem verbalizados pelos entrevistados.
+       - NÃO conecte temas entre si sem fala explícita dos consumidores
+         que estabeleça essa conexão.
+
+    ─────────────────────────────────────────
+    OBJETIVO DO RELATÓRIO
+    ─────────────────────────────────────────
+
+    Com base apenas nas entrevistas Consumer Hours processadas,
+    escreva um RELATÓRIO EXECUTIVO em Markdown sobre o tema:
+
+    "{topic}"
+
+    Data do relatório: {date}
+
+    O relatório é destinado à área de Insights e deve usar
+    linguagem de negócio, clara e objetiva, sem termos técnicos.
+
+    ─────────────────────────────────────────
+    FONTE DE DADOS DISPONÍVEL
+    ─────────────────────────────────────────
+
+    Você tem acesso SOMENTE a:
+    - Transcrições literais das entrevistas
+    - Temas identificados
+    - Análises de sentimento extraídas das falas
+    - Marcas mencionadas explicitamente
+    - Momentos de consumo citados pelos entrevistados
+
+    NÃO assuma que todos esses elementos existem.
+    Use apenas os que estiverem presentes no contexto.
+
+    ─────────────────────────────────────────
+    ESTRUTURA DO RELATÓRIO (CONDICIONAL)
+    ─────────────────────────────────────────
+
+    ⚠️ Uma seção SÓ deve conter análise se houver dados.
+    Caso contrário, declarar ausência de evidência.
+
+    1. Resumo Executivo
+       - Responda à pergunta "{topic}"
+       - Use apenas achados explicitamente presentes
+       - Cite quantas entrevistas sustentam cada ponto
+
     2. Metodologia
-    3. Principais Temas Identificados (Com explicações profundas)
-    4. Análise de Tribos/Grupos de Opinião (Quem fala o quê?)
-    5. Análise de Sentimento Detalhada (O 'Porquê' dos sentimentos)
-    6. Tendências e Sinais de Mercado
-    7. Riscos e Oportunidades
-    8. Exemplos Representativos de Conversas
-    9. Recomendações Iniciais para Marketing/Insights
-  expected_output: "Relatório em Markdown limpo (sem blocos de código), com data e título."
+       - Número real de entrevistas realizadas
+       - Período real das entrevistas (se disponível)
+       - Abordagem qualitativa Consumer Hours
+       - Se algum dado não estiver disponível, declarar explicitamente
+
+    3. Temas Identificados nas Entrevistas
+       - Liste apenas temas realmente presentes
+       - Para cada tema:
+         • Quantas entrevistas mencionaram
+         • Citações literais exatas
+
+    4. Análise de Sentimento
+       - Use apenas sentimentos identificados nos dados
+       - Explique o sentimento usando falas literais
+       - Se não houver dados suficientes, declarar limitação
+
+    5. Marcas e Momentos de Consumo
+       - Analise apenas marcas/momentos explicitamente citados
+       - Se nenhuma marca ou momento for mencionado, declarar ausência
+
+    6. Padrões ou Agrupamentos de Opinião
+       - Só incluir se houver repetição clara de posicionamentos
+       - Caso contrário, declarar que não foi possível identificar padrões
+
+    7. Insights Estratégicos
+       - Derivar SOMENTE do que os consumidores disseram explicitamente
+       - NÃO extrapolar implicações além das falas
+
+    8. Citações Representativas
+       - Listar apenas citações literais
+       - Não adaptar, resumir ou reescrever
+
+    9. Recomendações
+       - Só podem existir se houver falas que indiquem expectativas,
+         frustrações ou desejos claros dos consumidores
+       - Caso contrário, declarar que os dados não permitem recomendações
+
+    10. Limitações e Próximos Passos
+        - Explicitar lacunas reais dos dados
+        - Indicar apenas aprofundamentos coerentes com o que faltou nas entrevistas
+
+    ─────────────────────────────────────────
+    PROIBIÇÕES ABSOLUTAS
+    ─────────────────────────────────────────
+
+    ❌ Inventar dados, percentuais ou padrões
+    ❌ Inferir comportamento não verbalizado
+    ❌ Completar seções por "boa prática"
+    ❌ Usar conhecimento geral de mercado
+    ❌ Parafrasear citações
+    ❌ Criar exemplos hipotéticos
+
+    Se houver qualquer dúvida sobre a existência de um dado:
+    NÃO ESCREVA.
+    DECLARE A AUSÊNCIA.
+  expected_output: >
+    Relatório executivo em Markdown limpo, baseado EXCLUSIVAMENTE
+    no conteúdo presente nas entrevistas Consumer Hours fornecidas.
+    Todas as afirmações devem conter evidência literal ou declaração
+    explícita de ausência de dados.
+    O relatorio nao deve ter vestigios de markdown alem do relatório.
