@@ -662,18 +662,13 @@ def url_validator_tool(url: str) -> str:
         Status da URL indicando se está acessível (200) ou não
     """
 
-    print(f"---------------------------------------------------------------")
-    print(f"[url_validator_tool] URL validator tool chamada com URL: {url}")
     try:
         response = requests.head(url, timeout=5, allow_redirects=True)
         if response.status_code == 200:
-            print(f"[url_validator_tool] URL acessível: {url}")
-            return f"âœ… URL acessÃ­vel: {url}"
+            return f"URL acessível: {url}"
         else:
-            print(f"[url_validator_tool] URL retornou status {response.status_code}: {url}")
-            return f"âš ï¸ URL retornou status {response.status_code}: {url}"
+            return f"URL retornou status {response.status_code}: {url}"
     except Exception as e:
-        print(f"[url_validator_tool] URL inacessível: {url}\nErro: {str(e)}")
         return f"âŒ URL inacessÃ­vel: {url}\nErro: {str(e)}"
 
 

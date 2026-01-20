@@ -11,13 +11,11 @@ plan_research_task:
     INSTRUÇÕES:
     - Liste palavras-chave principais diretamente relacionadas ao tema.
     - Inclua variações semânticas e termos usados espontaneamente por consumidores.
-    - Sugira hashtags apenas se forem relevantes e usadas de forma orgânica.
     - Defina janelas de tempo e filtros de engajamento coerentes com o tema.
     - Evite termos genéricos que gerem ruído irrelevante.
   expected_output: >
     Retorne APENAS um JSON válido com as chaves:
     - queries: array de strings (priorizando precisão sobre quantidade)
-    - hashtags: array de strings (pode ser vazio [])
     - days_window_sugerido: inteiro
     - min_engagement_sugerido: inteiro
 

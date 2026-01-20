@@ -286,7 +286,8 @@ st.markdown(
 
     /* ===== Ajuste do container do botão Enviar ===== */
     form[data-testid="stForm"] div[data-testid="stVerticalBlock"]:has(button[data-testid="stBaseButton-secondaryFormSubmit"]),
-    form[data-testid="stForm"] div[data-testid="stColumn"]:last-child div[data-testid="stVerticalBlock"] {
+    form[data-testid="stForm"] div[data-testid="stColumn"]:last-child div[data-testid="stVerticalBlock"],
+    div.stVerticalBlock[data-testid="stVerticalBlock"] {
         justify-content: flex-start !important;
         align-items: flex-end !important;
     }
@@ -446,11 +447,15 @@ for m in messages:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-with st.form("chat_form", clear_on_submit=True):
-    user_text = st.text_area("Mensagem", placeholder="Digite sua mensagem...", label_visibility="collapsed", height=70)
-    col1, col2 = st.columns([6, 1])
-    with col2:
-        send = st.form_submit_button("Enviar")
+if not st.session_state.pending_research:
+    with st.form("chat_form", clear_on_submit=True):
+        user_text = st.text_area("Mensagem", placeholder="Digite sua mensagem...", label_visibility="collapsed", height=70)
+        col1, col2 = st.columns([6, 1])
+        with col2:
+            send = st.form_submit_button("Enviar")
+else:
+    user_text = ""
+    send = False
 
 def process_user_message(message: str, modo: Optional[str] = None, selected_crews: Optional[list] = None) -> None:
     """Processa uma mensagem do usuário e adiciona resposta ao chat."""
