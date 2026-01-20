@@ -212,7 +212,7 @@ class DeskResearchSystem:
             "metadados": {"topic": topic}
         }
 
-    def executar_consumer_hours(self, topic: str = "Entrevistas em Profundidade") -> Dict[str, Any]:
+    def executar_consumer_hours(self, topic: str) -> Dict[str, Any]:
         print(f"\n⏳ Iniciando Consumer Hours...")
         print(f"Tema: {topic}\n")
         try:

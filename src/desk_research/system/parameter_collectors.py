@@ -122,9 +122,10 @@ class ConsumerHoursParameterCollector(ParameterCollector):
         print("|" + "⏳ CONFIGURAÇÃO - CONSUMER HOURS".center(70) + "|")
         print("=" * 73)
 
-        print("\nℹ️  Este modo utiliza as configurações do arquivo .env e pastas locais.")
-        input("\n👉 Pressione ENTER para iniciar a execução...")
-        return {}
+        topic = ParameterCollector.selecionar_pergunta_padrao()
+        if topic is None:
+            return None
+        return {"topic": topic}
 
 
 class IntegratedParameterCollector(ParameterCollector):
