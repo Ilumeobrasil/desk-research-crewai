@@ -4,6 +4,7 @@ import datetime
 
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.research_tools import google_search_tool, web_scraper_tool, url_validator_tool
 
 from desk_research.utils.reporting import export_report
@@ -23,7 +24,7 @@ class WebCrew:
                 url_validator_tool
             ],
 
-            verbose=True
+            verbose=VERBOSE_AGENTS
         )
 
     @agent
@@ -31,7 +32,7 @@ class WebCrew:
         return Agent(
             config=self.agents_config['content_analyzer'],
 
-            verbose=True
+            verbose=VERBOSE_AGENTS
         )
 
     @agent
@@ -39,7 +40,7 @@ class WebCrew:
         return Agent(
             config=self.agents_config['web_report_writer'],
 
-            verbose=True
+            verbose=VERBOSE_AGENTS
         )
 
     @task
@@ -69,7 +70,7 @@ class WebCrew:
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=True
+            verbose=VERBOSE_CREW
         )
 
 def run_web_research(query: str, max_results: int = 10):

@@ -1,14 +1,23 @@
 plan_research_task:
   description: >
-    Receba o tema de negócio: '{topic}' e produza um PLANO DE PESQUISA para X.
-    - Liste palavras-chave principais e variações.
-    - Sugira hashtags relevantes.
-    - Sugira janelas de tempo (em dias) e filtros de engajamento para as buscas.
-    - O output deve ser um JSON com campos: queries, hashtags, days_window_sugerido, min_engagement_sugerido.
+    Receba o tema de negócio: '{topic}' e elabore um PLANO DE PESQUISA ESTRATÉGICO
+    para o X (Twitter), com foco em revelar percepções relevantes do consumidor,
+    riscos reputacionais e sinais de oportunidade para a marca.
+
+    CONTEXTO:
+    Este plano será usado para orientar análises que apoiam decisões de marketing
+    e insights de negócio. Priorize relevância estratégica em vez de volume.
+
+    INSTRUÇÕES:
+    - Liste palavras-chave principais diretamente relacionadas ao tema.
+    - Inclua variações semânticas e termos usados espontaneamente por consumidores.
+    - Sugira hashtags apenas se forem relevantes e usadas de forma orgânica.
+    - Defina janelas de tempo e filtros de engajamento coerentes com o tema.
+    - Evite termos genéricos que gerem ruído irrelevante.
   expected_output: >
-    Retorne o Plano de pesquisa APENAS em um JSON válido com as chaves:
-    - queries: array de strings
-    - hashtags: array de strings
+    Retorne APENAS um JSON válido com as chaves:
+    - queries: array de strings (priorizando precisão sobre quantidade)
+    - hashtags: array de strings (pode ser vazio [])
     - days_window_sugerido: inteiro
     - min_engagement_sugerido: inteiro
 
@@ -22,10 +31,31 @@ collect_tweets_task:
     - Não invente dados; use apenas o retorno da ferramenta.
   expected_output: "Lista JSON de tweets padronizados."
 
+
 analyze_insights_task:
   description: >
+    **REGRA CRÍTICA - VALIDAÇÃO DE DADOS**:
+    ANTES de qualquer análise, você DEVE verificar se tweets_raw contém dados reais.
+    
+    **SE tweets_raw estiver VAZIO ([]), NULL, ou contiver MENOS de 3 tweets válidos**:
+    - Retorne APENAS este JSON:
+    {{
+      "insufficient_data": true,
+      "message": "Não foram encontradas informações suficientes no X (Twitter) para realizar a análise. Possíveis causas: ausência de conversas sobre o tema no período pesquisado, ou filtros muito restritivos.",
+      "themes": [],
+      "tribes": [],
+      "overall_sentiment": {{"positive": 0, "neutral": 0, "negative": 0}},
+      "key_trends": [],
+      "risks": [],
+      "opportunities": []
+    }}
+    - NÃO invente temas, sentimentos, tribos ou tendências.
+    - NÃO use dados de exemplo ou genéricos.
+    
+    **SE tweets_raw contiver dados suficientes (>= 3 tweets válidos)**:
     A partir de tweets_raw, produza um JSON de insights estruturado com o formato:
     {{
+      "insufficient_data": false,
       "themes": [
         {{
           "name": "Tema X",
@@ -44,7 +74,16 @@ analyze_insights_task:
       "risks": ["risco 1", "risco 2"],
       "opportunities": ["oportunidade 1", "oportunidade 2"]
     }}
-  expected_output: "JSON de insights sobre o tema com análise de tribos."
+    
+    **REGRAS OBRIGATÓRIAS**:
+    1. Use APENAS os dados reais de tweets_raw. NUNCA invente tweets, IDs, ou métricas.
+    2. Se um tema não aparecer claramente nos tweets, NÃO o inclua.
+    3. Todos os example_tweets_ids devem ser IDs REAIS que existem em tweets_raw.
+    4. Percentuais devem ser calculados baseados nos tweets reais, não estimados.
+    5. Se não houver dados suficientes para uma categoria (ex: tribes), deixe o array vazio [].
+  expected_output: >
+    JSON de insights sobre o tema com análise de tribos.
+    Se não houver dados suficientes, retorne o JSON com insufficient_data: true e mensagem explicativa.
 
 write_report_task:
   description: >

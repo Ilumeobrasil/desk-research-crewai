@@ -650,21 +650,30 @@ def openalex_search_tool(query: str) -> str:
 @tool("url_validator")
 def url_validator_tool(url: str) -> str:
     """
-    Valida se uma URL estÃ¡ acessÃ­vel
+    Valida se uma URL está acessível e retorna o status.
+    
+    Use esta ferramenta OBRIGATORIAMENTE para validar TODAS as URLs encontradas
+    antes de incluí-las como fontes confiáveis. URLs inacessíveis devem ser descartadas.
     
     Args:
-        url: URL para validar
+        url: URL para validar (ex: https://example.com/article)
     
     Returns:
-        Status da URL
+        Status da URL indicando se está acessível (200) ou não
     """
+
+    print(f"---------------------------------------------------------------")
+    print(f"[url_validator_tool] URL validator tool chamada com URL: {url}")
     try:
         response = requests.head(url, timeout=5, allow_redirects=True)
         if response.status_code == 200:
+            print(f"[url_validator_tool] URL acessível: {url}")
             return f"âœ… URL acessÃ­vel: {url}"
         else:
+            print(f"[url_validator_tool] URL retornou status {response.status_code}: {url}")
             return f"âš ï¸ URL retornou status {response.status_code}: {url}"
     except Exception as e:
+        print(f"[url_validator_tool] URL inacessível: {url}\nErro: {str(e)}")
         return f"âŒ URL inacessÃ­vel: {url}\nErro: {str(e)}"
 
 

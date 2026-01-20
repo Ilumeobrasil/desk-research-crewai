@@ -7,6 +7,7 @@ search_web:
     1. **RECÊNCIA**: Priorize notícias e artigos publicados nos **ÚLTIMOS 12 MESES**.
     2. **FONTES**: Priorize portais de notícias reconhecidos, sites oficiais e relatórios de indústria.
     3. **LINKS**: Guarde a URL de TODAS as fontes encontradas para citação.
+    4. **VALIDAÇÃO DE URLs**: OBRIGATORIAMENTE use a ferramenta `url_validator` para validar TODAS as URLs encontradas antes de incluí-las nas fontes. URLs inacessíveis devem ser descartadas.
   expected_output: >
     - Snippet/Resumo
     - Data de publicação (se disponível)
@@ -17,6 +18,7 @@ search_web:
     - **NAVEGAÇÃO PROFUNDA**: Se cair em uma "Home Page" genérica, você OBRIGATORIAMENTE deve buscar links internos relevantes (ex: "/reports", "/about", "/cases") e fazer scrape deles para ter dados concretos. Não aceite "marketing fluff".
     - Se os primeiros resultados forem superficiais, refine a query (ex: busque dados estatísticos, PDFs, relatórios oficiais).
     - Tente cruzar fontes para evitar viés de um único portal.
+    - **VALIDAÇÃO OBRIGATÓRIA**: Para cada URL encontrada, use `url_validator` para verificar se está acessível antes de incluí-la nos resultados.
 
 analyze_content:
   description: >

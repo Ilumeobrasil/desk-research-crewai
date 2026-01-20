@@ -9,23 +9,26 @@ import requests
 from crewai.tools import BaseTool
 from dotenv import load_dotenv
 
+import time
+import random
+
 load_dotenv()
 
 
 def _log(msg: str) -> None:
-    print(f"[TwitterSearchTool] {msg}")
+    print(f"[SocialNetworkXSearchTool] {msg}")
 
 
 from pydantic import BaseModel, Field
 
 class TwitterSearchToolInput(BaseModel):
-    """Input schema for TwitterSearchTool."""
+    """Input schema for SocialNetworkXSearchTool."""
     query: str = Field(..., description="A query de busca (tema ou keywords)")
     max_results: Optional[Union[int, str]] = Field(None, description="Número máximo de tweets")
     days_window: Optional[Union[int, str]] = Field(None, description="Janela de dias para busca (ex: 7)")
     min_engagement: Optional[Union[int, str]] = Field(None, description="Mínimo de engajamento (likes+retweets)")
 
-class TwitterSearchTool(BaseTool):
+class SocialNetworkXSearchTool(BaseTool):
     """
     Tool de busca no X (Twitter).
 
@@ -101,64 +104,6 @@ class TwitterSearchTool(BaseTool):
             return [{"error": str(e)}]
 
     # ---------------------------
-    # Implementação STUB
-    # ---------------------------
-
-    def _fake_results(self, query: str) -> List[Dict[str, Any]]:
-        """
-        Retorna uma lista de tweets fake, no mesmo formato que a API real.
-        Útil para desenvolvimento, testes e demonstrações.
-        """
-        now = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-        return [
-            {
-                "id": "1001",
-                "text": f"Gente, parei de beber tanto álcool recentemente e tô me sentindo bem melhor. #saude #{query.split()[0] if query else 'trend'}",
-                "author": "@fitness_lover",
-                "created_at": now,
-                "language": "pt",
-                "metrics": {"likes": 120, "retweets": 45, "replies": 12, "quotes": 5},
-                "tags": ["lifestyle", "positive"],
-            },
-            {
-                "id": "1002",
-                "text": f"Sinceramente, cerveja sem álcool tá cada vez melhor. Provei uma ontem que era idêntica à normal. {query}",
-                "author": "@cervejeiro_fake",
-                "created_at": now,
-                "language": "pt",
-                "metrics": {"likes": 89, "retweets": 20, "replies": 30, "quotes": 2},
-                "tags": ["product", "positive"],
-            },
-            {
-                "id": "1003",
-                "text": f"Saio com os amigos e só vejo gente pedindo drink sem álcool ou refrigerante. O mundo tá chato ou a gente tá velho? {query}",
-                "author": "@baladeiro_old",
-                "created_at": now,
-                "language": "pt",
-                "metrics": {"likes": 200, "retweets": 80, "replies": 150, "quotes": 10},
-                "tags": ["social", "negative"],
-            },
-            {
-                "id": "1004",
-                "text": f"Alguém sabe se a nova {query} tem muito açúcar? Tô evitando álcool mas não quero diabetes.",
-                "author": "@health_freak",
-                "created_at": now,
-                "language": "pt",
-                "metrics": {"likes": 15, "retweets": 2, "replies": 5, "quotes": 0},
-                "tags": ["question", "neutral"],
-            },
-            {
-                "id": "1005",
-                "text": f"A indústria tá forçando essa barra de 'menos álcool'. Eu quero é cerveja de verdade! #volta{query}",
-                "author": "@hater_raiz",
-                "created_at": now,
-                "language": "pt",
-                "metrics": {"likes": 50, "retweets": 10, "replies": 40, "quotes": 20},
-                "tags": ["complaint", "negative"],
-            }
-        ]
-
-    # ---------------------------
     # Implementação real (API X)
     # ---------------------------
 
@@ -177,12 +122,13 @@ class TwitterSearchTool(BaseTool):
         Simplificado para PoC: não trata paginação em profundidade, apenas uma página.
         """
         # Ajusta a janela de datas
-        end_time = dt.datetime.utcnow()
+        end_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=15)
         start_time = end_time - dt.timedelta(days=days_window)
 
         # A API nova do X usa api.x.com; a antiga, api.twitter.com.
         # Para PoC, qualquer um dos dois domínios pode ser ajustado pelos devs.
-        url = "https://api.x.com/2/tweets/search/recent"
+        #url = "https://api.x.com/2/tweets/search/recent"
+        url = "https://api.twitter.com/2/tweets/search/recent"
 
         headers = {
             "Authorization": f"Bearer {bearer}",
@@ -200,6 +146,13 @@ class TwitterSearchTool(BaseTool):
         }
 
         resp = requests.get(url, headers=headers, params=params, timeout=30)
+
+        if resp.status_code == 429:
+            reset = resp.headers.get("x-rate-limit-reset")
+            print(f"reset: {reset}")
+            _log("Rate limit atingido.")
+            return []
+
         if resp.status_code != 200:
             _log(f"ERRO API Twitter: {resp.status_code} - {resp.text}")
             return []
@@ -240,4 +193,4 @@ class TwitterSearchTool(BaseTool):
 
 
 # Instância pronta para uso nos agentes
-twitter_search_tool = TwitterSearchTool()
+twitter_search_tool = SocialNetworkXSearchTool()
