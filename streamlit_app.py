@@ -392,7 +392,8 @@ elif VIEW_SELECT_INTEGRATED_MENU:
     # Sempre usa o modo integrated e mostra multi-select para escolher agentes
     modo_selecionado = "integrated"
     st.markdown("---")
-    st.markdown("### Desk research")
+    st.markdown("### Teste Deploy")
+    #st.markdown("### Desk research")
     st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
     
     # Opções disponíveis (excluindo integrated e consumer_hours)
