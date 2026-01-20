@@ -265,6 +265,12 @@ st.markdown(
         border-radius: 10px !important;
     }
 
+    /* ===== Botão de Enviar ===== */
+    div[data-testid="column"]:last-child button {
+        margin-left: 1px !important;
+        background-color: red !important;
+    }
+
     .stButton>button:hover {
         background-color: #e5e7eb !important;
     }
@@ -392,12 +398,11 @@ elif VIEW_SELECT_INTEGRATED_MENU:
     # Sempre usa o modo integrated e mostra multi-select para escolher agentes
     modo_selecionado = "integrated"
     st.markdown("---")
-    st.markdown("### Teste Deploy")
-    #st.markdown("### Desk research")
+    st.markdown("### Desk research (BETA)")
     st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
     
     # Opções disponíveis (excluindo integrated e consumer_hours)
-    modos_disponiveis = [k for k in MODE_CONFIG.keys() if k not in ["integrated", "consumer_hours"]]
+    modos_disponiveis = [k for k in MODE_CONFIG.keys() if k not in ["integrated"]]
     
     selected_crews = st.multiselect(
         "🤖 Selecione os agentes:",

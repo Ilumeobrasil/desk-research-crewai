@@ -7,4 +7,4 @@ if [ -d ".venv" ]; then
 fi
 
 # Executar Streamlit
-streamlit run streamlit_app
+streamlit run streamlit_app.py
