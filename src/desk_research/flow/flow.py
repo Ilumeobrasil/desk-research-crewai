@@ -197,12 +197,12 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @listen("approved")
     def finalize_approved(self):
-        self._export_final()
+        return self._export_final()
 
     @listen("max_retries")
     def finalize_forced(self):
         safe_print("⚠️ Finalizando com versão 'Best Effort'.")
-        self._export_final()
+        return self._export_final()
 
     @listen("rejected")
     def retry_synthesis(self):

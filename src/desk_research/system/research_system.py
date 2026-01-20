@@ -20,7 +20,6 @@ from desk_research.crews.academic.academic import run_academic_research
 from desk_research.crews.web.web import run_web_research
 from desk_research.crews.x.twitter_x_crew import run_twitter_social_listening
 from desk_research.crews.consumer_hours.consumer_hours import run_consumer_hours_analysis
-from desk_research.utils.makelog.makeLog import make_log
 
 class DeskResearchSystem:
     def __init__(self):
@@ -239,11 +238,7 @@ class DeskResearchSystem:
                 "params": params
             }
             final_result = flow.kickoff(inputs=inputs)
-            
-            make_log({
-                "content": final_result,
-                "logName": "final_result_flow_kickoff"
-            })
+         
             return {
                 "modo": "integrated",
                 "resultado": final_result,

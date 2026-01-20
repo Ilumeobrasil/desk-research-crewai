@@ -1,4 +1,3 @@
-from desk_research.utils.makelog.makeLog import make_log
 import streamlit as st
 from datetime import datetime
 import os
@@ -184,11 +183,6 @@ def execute_research(user_text: str, modo_selecionado: str = None) -> str:
             return f"❌ Executor para modo '{modo_selecionado}' não encontrado."
         
         resultado = executor(**params)
-
-        make_log({
-            "content": resultado,
-            "logName": "resultado_integrado"
-        })
         
         # Formatar resultado para chat
         return format_result_for_chat(resultado, modo_selecionado)
