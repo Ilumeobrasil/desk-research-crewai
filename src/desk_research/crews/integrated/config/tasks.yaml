@@ -1,61 +1,248 @@
 synthesis_task:
   description: >
     Você recebeu relatórios brutos de diferentes frentes de pesquisa sobre o tema: '{topic}'.
-    
+
     {instruction}
 
-    CONTEXTO DOS RELATÓRIOS:
+    ============================
+    CONTEXTO DOS RELATÓRIOS
+    ============================
     {reports_context}
 
-    SUA MISSÃO:
-    1. Analise todos os relatórios fornecidos.
-    2. Identifique pontos de convergência (onde todos concordam) e divergência.
-    3. Destaque insights únicos que só apareceram em um canal específico (ex: algo que só o Twitter viu).
-    4. Produza um RELATÓRIO MASTER INTEGRADO em Markdown.
+    ============================
+    REGRAS ABSOLUTAS (CRÍTICO)
+    ============================
+    - O OUTPUT DEVE SEGUIR **EXATAMENTE** A ESTRUTURA DE SEÇÕES FORNECIDA ABAIXO.
+    - NÃO crie, remova, renomeie ou reordene seções.
+    - NÃO inclua seções extras.
+    - NÃO altere os títulos das seções.
+    - Utilize EXCLUSIVAMENTE informações presentes nos relatórios fornecidos.
+    - NÃO presuma, complete ou “infira criativamente” dados ausentes.
+    - Quando não houver evidência suficiente, declare explicitamente a ausência.
 
-    DIRETRIZES DE IDIOMA E FORMATAÇÃO (CRÍTICO):
-    - O RELATÓRIO DEVE SER ESCRITO 100% EM PORTUGUÊS (PT-BR).
-    - TODOS os títulos e subtítulos de seções DEVEM estar em Português (ex: 'Resumo Executivo', 'Conclusão').
-    - EXCESSÃO: Títulos de papers, artigos, vídeos ou nomes de marcas devem ser mantidos no IDIOMA ORIGINAL (Inglês, etc). NÃO traduza títulos de obras.
+    ============================
+    REGRA DE EVIDÊNCIA E CITAÇÃO (CRÍTICO)
+    ============================
+    - TODA afirmação factual DEVE conter indicação explícita da fonte.
+    - A fonte deve ser uma url clicavel e deve ser presente em {reports_context} e nao deve ser inventada.
+    - Utilize SOMENTE fontes explicitamente presentes em {reports_context}.
+    - NÃO invente nomes de relatórios, estudos, autores, instituições ou links.
+    - Se uma afirmação não puder ser atribuída a uma fonte específica,
+      ela NÃO DEVE ser incluída no relatório.
+    - Afirmações sem fonte explícita são consideradas inválidas.
 
-    ESTRUTURA DO RELATÓRIO MASTER:
-    # Relatório Master Integrado: [Tema]
-    **Data: {date}**
+    ============================
+    SUA MISSÃO
+    ============================
+    1. Analisar todos os relatórios fornecidos.
+    2. Sintetizar os achados de forma integrada (convergências, divergências e sinais únicos).
+    3. Consolidar o resultado final no FORMATO OBRIGATÓRIO abaixo.
 
-    ## 1. Resumo Executivo
-    ## 2. Visão 360º (Cruzamento de Fontes)
-       - O que a Academia diz vs. O que a Rua diz (Social)
-    ## 3. Principais Insights por Canal
-       - Acadêmico
-       - Web/Notícias
-       - YouTube/Mídia
-       - Social Listening (X)
-       - Consumer Hours (Brand Audit)
-       - Genie (IA)
-    ## 4. Análise de Sentimento Consolidada
-       - Adicione um breve parágrafo EXPLICANDO que o gráfico abaixo representa o **Índice Estimado de Sentimento Positivo (0-100%)** identificado em cada canal.
-       - Crie um GRÁFICO ASCII (usando blocos █) comparando o sentimento preponderante entre os canais.
-       - **OBRIGATÓRIO**: Ao lado de cada barra, escreva uma BREVE justificativa de 1 frase explicando o porquê da nota.
-       Exemplo:
-       Twitter:  [██████....] 60% -> (Viralização de memes positivos)
-       Academia: [██........] 20% -> (Foco em riscos à saúde)
-    ## 5. Recomendações Estratégicas Finais
+    ============================
+    DIRETRIZES DE IDIOMA
+    ============================
+    - Texto 100% em Português (PT-BR).
+    - Títulos de artigos, papers, vídeos ou marcas devem permanecer no idioma original.
+    - Não traduza nomes próprios ou títulos de obras.
 
-  expected_output: "Relatório Master Integrado em Markdown (sem emojis no título)."
+    ============================
+    FORMATO OBRIGATÓRIO DO OUTPUT
+    ============================
+
+    # PERGUNTA
+
+    > **Pergunta analisada:**  
+    > _Formule a pergunta central que este relatório integrado responde,
+    baseada exclusivamente no tema '{topic}' e no conteúdo dos relatórios._
+
+    ---
+
+    ## DIRETO AO PONTO
+
+    - Responda diretamente à pergunta acima.
+    - Limite-se a 1-2 parágrafos.
+    - Utilize apenas conclusões sustentadas por evidência recorrente
+      em mais de um relatório.
+    - NÃO inclua recomendações nesta seção.
+    - Toda afirmação deve ser implicitamente sustentada por fontes
+      que aparecerão nas seções seguintes.
+
+    ---
+
+    ## COMO CHEGAMOS A ISSO
+
+    ### Fontes analisadas
+    - Liste TODAS as fontes e urls efetivamente utilizadas.
+    - Para cada fonte, descreva brevemente o tipo de dado analisado.
+    - Se uma fonte foi fornecida mas não trouxe insights relevantes,
+      ela ainda deve ser listada, com essa observação explícita.
+
+    ### Período coberto
+    - Informe o período temporal de cada fonte.
+    - Caso o período não esteja disponível, escreva:
+      "Período não informado nos relatórios."
+
+    ---
+
+    ## DÁ PARA AFIRMAR
+
+    - Inclua APENAS afirmações:
+      • Objetivas  
+      • Diretamente baseadas em evidência  
+      • Observadas em um ou mais relatórios  
+    - Cada bullet deve conter **UMA afirmação clara**.
+    - TODAS as afirmações DEVEM conter fonte explícita no formato abaixo.
+    - NÃO inclua hipóteses, interpretações ou previsões.
+
+    Exemplo obrigatório de formato:
+
+    - **[Insight]:** descrição objetiva do achado.  
+      _Fonte:_ [Nome exato e url da fonte conforme reports_context]
+
+    ---
+
+    ## NÃO FICA CLARO
+
+    - Liste ambiguidades, lacunas ou pontos inconclusivos.
+    - Explique brevemente o motivo da incerteza:
+      falta de dados, conflito entre fontes, sinal fraco ou enviesado.
+    - Sempre que possível, indique quais fontes NÃO permitiram a conclusão.
+    - NÃO tente resolver a incerteza nesta seção.
+
+    ---
+
+    ## ALGUMAS SUPOSIÇÕES
+
+    > Hipóteses plausíveis, **não comprovadas**, mas úteis para interpretação.
+
+    - Inclua apenas suposições que:
+      • Tenham base em padrões observados nos relatórios  
+      • NÃO estejam diretamente comprovadas  
+    - TODA suposição deve indicar sua base observacional.
+    - NÃO trate suposições como fatos.
+
+    Formato obrigatório:
+
+    - **[Suposição]:** descrição da hipótese.  
+      _Base observacional:_ [Fonte(s) que originam o padrão]
+
+    ---
+
+    ## ISSO SIGNIFICA QUE…
+
+    - Traduza os achados em implicações estratégicas.
+    - Diferencie claramente:
+      • O que é implicação prática imediata  
+      • O que depende de validação futura  
+    - NÃO extrapole além do que os dados permitem.
+    - NÃO introduza novos fatos nesta seção.
+
+    ---
+
+    ## OBSERVAÇÕES FINAIS
+
+    - Limitações relevantes do conjunto de relatórios.
+    - Pontos que exigem investigação adicional.
+    - Alertas de interpretação para decisores.
+
+  expected_output: >
+    Relatório em Markdown seguindo fielmente a estrutura especificada,
+    com todas as afirmações ancoradas em fontes explícitas,
+    sem seções adicionais,
+    sem extrapolações não fundamentadas,
+    e com distinção clara entre evidência, incerteza e suposição.
+    O relatorio deve comecar em # PERGUNTA e terminar em ## OBSERVAÇÕES FINAIS, e nao deve ter vestigios de markdown alem disso.
+
+
 
 evaluation_task:
   description: >
-    Avalie o relatório de pesquisa fornecido abaixo com rigor extremo.
+    Avalie o relatório de pesquisa fornecido abaixo com RIGOR EXTREMO,
+    atuando como um auditor técnico e não como um leitor casual.
 
-    Critérios de Avaliação:
-    1. Profundidade (Tem dados concretos ou só lero-lero?)
-    2. Integração (Usa todas as fontes ou ignora alguma?)
-    3. Estratégia (As recomendações são acionáveis?)
-    4. Formatação (Markdown limpo e estruturado?)
+    ============================
+    OBJETIVO DA AVALIAÇÃO
+    ============================
+    Verificar se o relatório:
+    - Segue fielmente a estrutura obrigatória definida
+    - Utiliza evidência de forma correta e rastreável
+    - Evita extrapolações, suposições disfarçadas de fatos ou alucinação
+    - Produz implicações estratégicas coerentes com os dados
 
-    RELATÓRIO PARA AVALIAR:
+    ============================
+    RELATÓRIO PARA AVALIAR
+    ============================
     {report_content}
 
-    IMPORTANTE: Se a nota for < 80, forneça feedback claro do que deve mudar.
-    Output MUST be a JSON object with 'score', 'feedback', and 'approved' fields.
-  expected_output: "Objeto QualityReview com score, feedback e veredicto."
+    ============================
+    CRITÉRIOS DE AVALIAÇÃO
+    ============================
+
+    1. Aderência Estrutural (0-25)
+       - Todas as seções obrigatórias estão presentes?
+       - Os títulos das seções estão exatamente como definidos?
+       - Não existem seções extras ou renomeadas?
+
+    2. Profundidade Baseada em Evidência (0-25)
+       - As afirmações em "DÁ PARA AFIRMAR" possuem fonte explícita?
+       - Há distinção clara entre fato, incerteza e suposição?
+       - O texto evita linguagem opinativa ou vaga?
+
+    3. Integração e Uso das Fontes (0-20)
+       - Todas as fontes citadas existem em {reports_context}?
+       - Fontes fracas ou ausentes foram explicitamente declaradas?
+       - Não há fontes inventadas ou genéricas?
+
+    4. Qualidade Estratégica (0-20)
+       - A seção "ISSO SIGNIFICA QUE…" deriva logicamente dos achados?
+       - As implicações respeitam as limitações dos dados?
+       - Não há recomendações desconectadas das evidências?
+
+    5. Clareza e Formatação Markdown (0-10)
+       - Markdown limpo, consistente e legível?
+       - Uso correto de listas, títulos e separadores?
+       - Ausência de ruído visual ou estrutura confusa?
+
+    ============================
+    REGRAS DE REPROVAÇÃO AUTOMÁTICA
+    ============================
+    - Se existir QUALQUER afirmação factual sem fonte explícita:
+      • score máximo permitido: 70
+      • approved: false
+    - Se existir QUALQUER fonte inventada ou não presente nos relatórios:
+      • score máximo permitido: 50
+      • approved: false
+    - Se houver quebra estrutural grave:
+      • score máximo permitido: 60
+      • approved: false
+
+    ============================
+    OUTPUT OBRIGATÓRIO (JSON)
+    ============================
+    Retorne APENAS um objeto JSON válido com os campos abaixo:
+
+    {
+      "score": number (0-100),
+      "approved": boolean,
+      "feedback": string
+    }
+
+    ============================
+    DIRETRIZ DE FEEDBACK
+    ============================
+    - Se score >= 80:
+      • Feedback curto, confirmando aprovação.
+    - Se score < 80:
+      • Feedback DEVE listar claramente:
+        - O que está errado
+        - Em qual seção
+        - Qual regra foi violada
+        - O que deve ser corrigido de forma objetiva
+      • Evite termos vagos como "aprofundar" ou "melhorar".
+      • Seja direto, técnico e acionável.
+
+  expected_output: >
+    Objeto JSON de avaliação de qualidade,
+    sem texto fora do JSON,
+    com veredicto claro de aprovação ou reprovação,
+    e feedback tecnicamente acionável.

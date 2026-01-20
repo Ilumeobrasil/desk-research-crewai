@@ -16,7 +16,7 @@ from desk_research.flow.crew_executors import (
 from desk_research.crews.integrated.integrated_analysis import IntegratedCrew
 from desk_research.utils.reporting import export_report
 from desk_research.utils.logging_utils import safe_print
-from desk_research.constants import MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC
+from desk_research.constants import MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW
 
 
 class DeskResearchFlow(Flow[DeskResearchState]):
@@ -129,7 +129,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         crew_runner = Crew(
             agents=[integ_crew.chief_editor_agent()],
             tasks=[task],
-            verbose=True
+            verbose=VERBOSE_CREW
         )
         
         inputs = {
@@ -151,10 +151,15 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         qa_crew = Crew(
             agents=[integ_crew.evaluator_agent()],
             tasks=[task],
-            verbose=True
+            verbose=VERBOSE_CREW
         )
         
-        inputs = {"report_content": self.state.final_report}
+        reports_context = self._build_reports_text()
+        
+        inputs = {
+            "report_content": self.state.final_report,
+            "reports_context": reports_context
+        }
         qa_result = qa_crew.kickoff(inputs=inputs)
         
         review = qa_result.pydantic or qa_result
@@ -204,64 +209,19 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         pass
 
     def _export_final(self):
-        safe_print("\n📚 MONTANDO DOSSIÊ COMPLETO (MASTER + ANEXOS)...")
+        safe_print("\n📚 MONTANDO RELATÓRIO COMPLETO...")
         
         try:
             master_report = self.state.final_report
             if not master_report:
-                safe_print("⚠️  AVISO: Relatório Master vazio. Nada a exportar.")
+                safe_print("⚠️  AVISO: Relatório vazio. Nada a exportar.")
                 return ""
 
-            anexos_text = self._build_annexes()
-            full_dossier = master_report + anexos_text
-
-            export_report(full_dossier, self.state.topic, prefix="integrated_master", crew_name="integrated_analysis")
-            safe_print("\n✅ FLOW FINALIZADO COM SUCESSO! (Dossiê Exportado)")
-            return full_dossier
+            export_report(master_report, self.state.topic, prefix="integrated_master", crew_name="integrated_analysis")
+            safe_print("\n✅ FLOW FINALIZADO COM SUCESSO! (Relatório Exportado)")
+            return master_report
 
         except Exception as e:
-            safe_print(f"❌ ERRO CRÍTICO AO MONTAR DOSSIÊ: {e}")
-            safe_print("🔄 Tentando exportar apenas o Relatório Master (sem anexos)...")
-            self._export_fallback()
+            safe_print(f"❌ ERRO CRÍTICO AO MONTAR RELATÓRIO: {e}")
             return self.state.final_report
 
-    def _build_annexes(self) -> str:
-        if not self.state.results:
-            return ""
-        
-        results_buffer = []
-        for crew_id, res in self.state.results.items():
-            try:
-                content = self._extract_content(res)
-                content = content.replace("======================", "---")
-                results_buffer.append(
-                    f"\n\n<div style='page-break-before: always;'></div>\n\n"
-                    f"# 📚 ANEXO: RELATÓRIO {crew_id.upper()}\n\n{content}"
-                )
-            except Exception as e_inner:
-                safe_print(f"⚠️  Erro ao processar anexo {crew_id}: {e_inner}")
-                results_buffer.append(
-                    f"\n\n# ERRO ANEXO {crew_id}\n(Falha ao processar conteúdo: {e_inner})"
-                )
-
-        if not results_buffer:
-            return ""
-        
-        anexos_text = (
-            "\n\n<div style='page-break-before: always;'></div>\n\n"
-            "# 🗂️ ANEXOS: RELATÓRIOS INDIVIDUAIS\n\n"
-            "Abaixo seguem os relatórios completos gerados por cada frente de pesquisa.\n"
-        )
-        anexos_text += "".join(results_buffer)
-        return anexos_text
-
-    def _export_fallback(self):
-        try:
-            export_report(
-                self.state.final_report,
-                self.state.topic,
-                prefix="integrated_master_FALLBACK"
-            )
-            safe_print("✅ Relatório Master (Fallback) exportado com sucesso.")
-        except Exception as e2:
-            safe_print(f"❌ Falha total na exportação: {e2}")

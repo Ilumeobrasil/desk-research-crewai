@@ -4,14 +4,14 @@ VERBOSE_AGENTS = False
 VERBOSE_CREW = False
 
 MIN_APPROVAL_SCORE = 80
-MAX_RETRY_COUNT = 2
+MAX_RETRY_COUNT = 3
 DEFAULT_MAX_PAPERS = 5
 DEFAULT_MAX_WEB_RESULTS = 5
 DEFAULT_TOPIC = "Pesquisa Genérica"
 
 MODE_CONFIG = {
     "genie": {
-        "nome": "Análise de perguntas com IA",
+        "nome": "Análise de perguntas com IA (Genie)",
         "emoji": "🧞",
         "descricao": "Análise inteligente de perguntas usando IA"
     },
