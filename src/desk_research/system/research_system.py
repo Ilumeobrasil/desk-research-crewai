@@ -238,7 +238,7 @@ class DeskResearchSystem:
                 "params": params
             }
             final_result = flow.kickoff(inputs=inputs)
-            
+         
             return {
                 "modo": "integrated",
                 "resultado": final_result,

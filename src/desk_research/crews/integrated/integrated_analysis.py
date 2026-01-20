@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import sys
 import logging
 
@@ -52,6 +50,10 @@ class QualityReview(BaseModel):
     score: int = Field(default=0, description="Nota de 0 a 100 para a qualidade do relatório.")
     feedback: str = Field(default="Sem feedback fornecido.", description="Críticas construtivas e pontos específicos de melhoria.")
     approved: bool = Field(default=False, description="Se a nota for >= 80, aprovado. Caso contrário, reprovado.")
+    
+    class Config:
+        # Garantir que o modelo seja totalmente resolvido
+        frozen = False
 
 @CrewBase
 class IntegratedCrew:
@@ -173,6 +175,7 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
         else:
             master_text = str(master_result)
         
+        anexos_text = ""
         for res in results_buffer:
             clean_res = res.replace("======================", "---")
             anexos_text += f"\n{clean_res}\n"

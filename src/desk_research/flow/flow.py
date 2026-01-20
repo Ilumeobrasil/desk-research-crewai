@@ -37,6 +37,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             self.state.topic = DEFAULT_TOPIC
 
         self.state.results = {}
+        self._synthesis_executed = False
         return "initialized"
 
     @listen(initialize_research)
@@ -47,8 +48,10 @@ class DeskResearchFlow(Flow[DeskResearchState]):
                 max_papers=self.state.params.get('max_papers', 5)
             )
             self.state.results["academic"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping Academic")
+            return "skipped"
 
     @listen(initialize_research)
     def run_web(self):
@@ -58,51 +61,67 @@ class DeskResearchFlow(Flow[DeskResearchState]):
                 max_results=self.state.params.get('max_web_results', 5)
             )
             self.state.results["web"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping Web")
+            return "skipped"
 
     @listen(initialize_research)
     def run_x(self):
         if "x" in self.state.selected_crews:
             result = XCrewExecutor.run(topic=self.state.topic)
             self.state.results["x"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping X")
+            return "skipped"
 
     @listen(initialize_research)
     def run_genie(self):
         if "genie" in self.state.selected_crews:
             result = GenieCrewExecutor.run(topic=self.state.topic)
             self.state.results["genie"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping Genie")
+            return "skipped"
             
     @listen(initialize_research)
     def run_youtube(self):
         if "youtube" in self.state.selected_crews:
             result = YouTubeCrewExecutor.run(topic=self.state.topic)
             self.state.results["youtube"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping YouTube")
+            return "skipped"
 
     @listen(initialize_research)
     def run_consumer_hours(self):
         if "consumer_hours" in self.state.selected_crews:
             result = ConsumerHoursCrewExecutor.run()
             self.state.results["consumer_hours"] = result
+            return "completed"
         else:
             safe_print("⏭️ Skipping Consumer Hours")
+            return "skipped"
 
     @listen(or_(and_(run_academic, run_web, run_x, run_genie, run_youtube, run_consumer_hours), "retry_synthesis"))
     def synthesize_report(self):
+        # Evitar execuções múltiplas - verificar se já foi executado
+        if hasattr(self, '_synthesis_executed') and self._synthesis_executed:
+            return "already_executed"
+        
         safe_print(f"\n✍️ SÍNTESE FINAL (Tentativa {self.state.retry_count + 1})")
         
         all_reports_text = self._build_reports_text()
         
         if not all_reports_text.strip():
             safe_print("⚠️ Nenhum relatório gerado para síntese.")
-            return
+            return "no_reports"
 
+        self._synthesis_executed = True
+        
         master_result = self._run_synthesis_crew(all_reports_text)
         self.state.final_report = str(master_result)
         
@@ -121,6 +140,13 @@ class DeskResearchFlow(Flow[DeskResearchState]):
     def _extract_content(result: Any) -> str:
         if isinstance(result, dict):
             return result.get('report_markdown') or result.get('result') or str(result)
+        
+        # Tratar objetos CrewAI
+        if hasattr(result, 'raw'):
+            return result.raw
+        if hasattr(result, 'tasks_output') and result.tasks_output:
+            return result.tasks_output[-1].raw if hasattr(result.tasks_output[-1], 'raw') else str(result.tasks_output[-1])
+        
         return str(result)
 
     def _run_synthesis_crew(self, reports_text: str) -> Any:
@@ -136,7 +162,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             'topic': self.state.topic,
             'reports_context': reports_text,
             'feedback': self.state.feedback,
-            'instruction': self.state.feedback,
+            'instruction': self.state.feedback if self.state.feedback else "",
             'date': datetime.now().strftime('%d/%m/%Y')
         }
 
@@ -197,16 +223,24 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @listen("approved")
     def finalize_approved(self):
-        self._export_final()
+        return self._export_final()
 
     @listen("max_retries")
     def finalize_forced(self):
         safe_print("⚠️ Finalizando com versão 'Best Effort'.")
-        self._export_final()
+        return self._export_final()
+
+    @listen("no_reports")
+    def handle_no_reports(self):
+        safe_print("❌ Não é possível gerar relatório sem dados dos crews.")
+        return "error"
 
     @listen("rejected")
     def retry_synthesis(self):
-        pass
+        safe_print(f"🔄 Preparando retry (tentativa {self.state.retry_count})...")
+        # Resetar flag para permitir nova execução
+        self._synthesis_executed = False
+        return "retry_synthesis"
 
     def _export_final(self):
         safe_print("\n📚 MONTANDO RELATÓRIO COMPLETO...")

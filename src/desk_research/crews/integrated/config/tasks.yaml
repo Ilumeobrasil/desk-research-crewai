@@ -221,11 +221,11 @@ evaluation_task:
     ============================
     Retorne APENAS um objeto JSON válido com os campos abaixo:
 
-    {
+    {{
       "score": number (0-100),
       "approved": boolean,
       "feedback": string
-    }
+    }}
 
     ============================
     DIRETRIZ DE FEEDBACK

@@ -19,6 +19,10 @@ def main():
     result = system.executar_interativo()
     return result
 
+    """ twitter_search_tool = SocialNetworkXSearchTool()
+    result = twitter_search_tool._run(query="#JuventudeSaudável", max_results=100, days_window=90, min_engagement=50)
+    print(result) """
+
 
 def kickoff():
     try:
