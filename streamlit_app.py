@@ -265,12 +265,6 @@ st.markdown(
         border-radius: 10px !important;
     }
 
-    /* ===== Botão de Enviar ===== */
-    div[data-testid="column"]:last-child button {
-        margin-left: 1px !important;
-        background-color: red !important;
-    }
-
     .stButton>button:hover {
         background-color: #e5e7eb !important;
     }
@@ -289,6 +283,13 @@ st.markdown(
     div[data-testid="stToolbarActions"] { display: none !important; }
     .stAppToolbar { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
+
+    /* ===== Ajuste do container do botão Enviar ===== */
+    form[data-testid="stForm"] div[data-testid="stVerticalBlock"]:has(button[data-testid="stBaseButton-secondaryFormSubmit"]),
+    form[data-testid="stForm"] div[data-testid="stColumn"]:last-child div[data-testid="stVerticalBlock"] {
+        justify-content: flex-start !important;
+        align-items: flex-end !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
