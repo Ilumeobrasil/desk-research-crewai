@@ -219,7 +219,9 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
             export_report(master_report, self.state.topic, prefix="integrated_master", crew_name="integrated_analysis")
             safe_print("\n✅ FLOW FINALIZADO COM SUCESSO! (Relatório Exportado)")
-            return master_report
+            return {
+                "result": master_report
+            }
 
         except Exception as e:
             safe_print(f"❌ ERRO CRÍTICO AO MONTAR RELATÓRIO: {e}")
