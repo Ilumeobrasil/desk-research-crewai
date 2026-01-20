@@ -9,9 +9,6 @@ import requests
 from crewai.tools import BaseTool
 from dotenv import load_dotenv
 
-import time
-import random
-
 load_dotenv()
 
 
@@ -29,13 +26,6 @@ class TwitterSearchToolInput(BaseModel):
     min_engagement: Optional[Union[int, str]] = Field(None, description="Mínimo de engajamento (likes+retweets)")
 
 class SocialNetworkXSearchTool(BaseTool):
-    """
-    Tool de busca no X (Twitter).
-
-    - Usa TWITTER_BEARER_TOKEN quando TWITTER_STUB_MODE=false.
-    - Quando TWITTER_STUB_MODE=true ou não há token, retorna dados de EXEMPLO (stub).
-    """
-
     name: str = "twitter_search_tool"
     description: str = (
         "Busca tweets relevantes sobre um tema no X (Twitter), aplicando filtros de "
