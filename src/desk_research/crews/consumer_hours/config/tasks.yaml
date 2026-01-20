@@ -1,12 +1,69 @@
 ingest:
   description: >
-    Leia os arquivos .docx em {input_dir}, extraia o texto integral e escreva
-    arquivos .json em {output_dir}. Use a ferramenta ingest_folder_tool.
+    Leia os arquivos .docx em {ingest_input_dir} (recursivo), extraia o texto integral e escreva
+    arquivos .json em {ingest_output_dir}. Use a ferramenta ingest_folder_tool com:
+
+    - input_dir: {ingest_input_dir}
+    - output_dir: {ingest_output_dir}
+    - upload_to_asimov: {upload_to_asimov} (DEVE ser true)
+    - snippet_chunk_chars: {snippet_chunk_chars}
+    - max_snippets_per_request: {max_snippets_per_request}
+
     Retorne um resumo com contagem de arquivos processados e avisos.
   expected_output: >
     Um resumo textual contendo:
     - input_dir e output_dir efetivos
     - quantidade de docx lidos
     - quantidade de json escritos
+    - status do upload Asimov (ok/erro, contagem, dataset)
     - lista curta de avisos (se houver)
   agent: ingestor
+
+treat:
+  description: >
+    Execute o Agente 2 (Treatment) sobre os JSONs gerados pelo Agente 1 (ingestor).
+
+    Leia os arquivos .json em {treat_input_dir} (onde o ingestor escreveu os JSONs) 
+    e escreva a saída tratada em {treat_output_dir}. Use a ferramenta treat_folder com:
+
+    - input_dir: {treat_input_dir}
+    - output_dir: {treat_output_dir}
+    - enable_rag: {enable_rag} (DEVE ser true)
+    - poll_attempts: {poll_attempts}
+    - poll_sleep_s: {poll_sleep_s}
+    - temperature: {temperature}
+    - max_tokens: {max_tokens}
+
+    Você deve limpar/normalizar o texto e consultar o Asimov RAG para extrair semântica
+    (temas, marcas, momentos, sentimentos) com evidências literais.
+  expected_output: >
+    Um arquivo JSON tratado por arquivo de entrada, contendo:
+      - text e cleaned_text
+      - semantics: language, brand_mentions, themes, sentiments, moments, evidence
+      - rag: status de execução (ok/uuid/done/status_payload)
+  agent: treater
+
+write_report_task:
+  description: >
+    A partir de insights_json, escreva um RELATÓRIO EXECUTIVO em Markdown 
+    sobre o tema: {topic}.
+
+    DATA DO RELATÓRIO: {date}
+
+    **REGRAS DE FORMATAÇÃO**:
+    **REGRAS DE CONTEÚDO (DIDÁTICO & ESPECÍFICO)**:
+    1. **Conexão Direta**: Todo insight deve responder à pergunta principal: '{topic}'. Evite temas genéricos como 'Flavor Preferences' se não houver dados reais disso. Use os dados que você tem.
+    2. **Explique o 'Porquê'**: Não diga apenas '40% positivo'. Ex: '40% positivo PORQUE os usuários citam o sabor da nova cerveja sem álcool'. Seja didático.
+    3. **Análise de Sentimento Explicada**: Detalhe as emoções por trás dos números. O que causa a raiva? O que causa a alegria?
+
+    Estrutura:
+    1. Resumo Executivo (Respondendo à pergunta '{topic}')
+    2. Metodologia
+    3. Principais Temas Identificados (Com explicações profundas)
+    4. Análise de Tribos/Grupos de Opinião (Quem fala o quê?)
+    5. Análise de Sentimento Detalhada (O 'Porquê' dos sentimentos)
+    6. Tendências e Sinais de Mercado
+    7. Riscos e Oportunidades
+    8. Exemplos Representativos de Conversas
+    9. Recomendações Iniciais para Marketing/Insights
+  expected_output: "Relatório em Markdown limpo (sem blocos de código), com data e título."

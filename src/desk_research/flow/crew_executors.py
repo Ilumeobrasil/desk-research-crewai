@@ -78,11 +78,14 @@ class YouTubeCrewExecutor(CrewExecutor):
 
 class ConsumerHoursCrewExecutor(CrewExecutor):
     @staticmethod
-    def run() -> Any:
+    def run(topic: str) -> Any:
         safe_print(f"\n⏳ Running Consumer Hours Crew...")
         return CrewExecutor.execute_with_error_handling(
             "Consumer Hours",
-            run_consumer_hours_analysis
+            run_consumer_hours_analysis,
+            topic=topic
         )
+
+
 
 

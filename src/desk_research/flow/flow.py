@@ -99,7 +99,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
     @listen(initialize_research)
     def run_consumer_hours(self):
         if "consumer_hours" in self.state.selected_crews:
-            result = ConsumerHoursCrewExecutor.run()
+            result = ConsumerHoursCrewExecutor.run(topic=self.state.topic)
             self.state.results["consumer_hours"] = result
             return "completed"
         else:
