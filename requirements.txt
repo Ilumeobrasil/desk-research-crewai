@@ -38,7 +38,9 @@ typing-extensions>=4.8.0
 numpy>=1.24.0
 pandas>=2.0.0
 
-# Litellm
-litellm==1.75.3
 
 streamlit>=1.28.0
+
+fastapi==0.115.0
+uvicorn==0.30.0
+litellm==1.75.3
