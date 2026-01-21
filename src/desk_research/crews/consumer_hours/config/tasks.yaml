@@ -129,174 +129,125 @@ write_report:
   description: >
     ⚠️ RELATÓRIO COM RESTRIÇÃO ABSOLUTA AO CONTEXTO ⚠️
 
-    Este agente DEVE operar em modo "context-bound".
-    É PROIBIDO usar qualquer conhecimento externo, inferência lógica,
-    generalização de mercado ou preenchimento de lacunas.
-
-    O relatório deve ser construído EXCLUSIVAMENTE a partir do conteúdo
-    explicitamente presente no contexto fornecido pelo treatment_result.
-    
-    O treatment_result contém um resumo do processamento E os dados tratados das entrevistas.
-    Os dados tratados incluem:
-    - Transcrições limpas das entrevistas (cleaned_text)
-    - Marcas mencionadas pelos entrevistados (brand_mentions) - use os NOMES REAIS das marcas
-    - Temas identificados (themes)
-    - Sentimentos expressos (sentiments)
-    - Momentos de consumo (moments)
-    - Evidências literais (evidence) - citações EXATAS dos entrevistados
-    
-    ⚠️ CRÍTICO: Você DEVE usar APENAS os dados reais presentes no treatment_result.
-    NUNCA invente ou use nomes genéricos como "Marca A" ou "Marca B".
-    SEMPRE use os nomes reais das marcas mencionadas nas entrevistas (ex: Brahma, Heineken, Skol, Stella Artois).
-    SEMPRE use as citações literais exatas dos entrevistados presentes no campo "evidence".
+    Este agente DEVE operar em modo "context-bound estrito".
+    É PROIBIDO utilizar qualquer conhecimento externo,
+    benchmarking, generalização de mercado ou suposição não verbalizada.
 
     ─────────────────────────────────────────
-    MODO DE OPERAÇÃO OBRIGATÓRIO (NÃO IGNORAR)
+    PRINCÍPIO CENTRAL
     ─────────────────────────────────────────
 
-    Antes de escrever qualquer seção do relatório, siga este processo:
+    Este relatório deve gerar INSIGHTS EXECUTIVOS
+    exclusivamente a partir da SÍNTESE de falas explícitas
+    presentes nas entrevistas Consumer Hours.
 
-    1. VERIFICAÇÃO:
-       - Verifique se o tema existe explicitamente nos dados das entrevistas.
-       - Se NÃO existir, a seção NÃO deve conter análise.
-       - Declare explicitamente: 
-         "Este tema não foi mencionado nas entrevistas analisadas."
+    Insight, neste contexto, é definido como:
+    "Síntese de padrões, recorrências ou contrastes
+     claramente observáveis nas falas dos entrevistados,
+     SEM adicionar causas, motivações ou impactos não verbalizados."
 
-    2. VALIDAÇÃO:
-       - Para cada afirmação, localize:
-         a) Quantidade de entrevistas que mencionam o ponto
-         b) Citação literal exata que comprova a afirmação
-       - Se qualquer um dos dois não existir, a afirmação NÃO pode ser escrita.
+    ─────────────────────────────────────────
+    REGRAS DE OURO (INVIOLÁVEIS)
+    ─────────────────────────────────────────
 
-    3. BLOQUEIO DE INFERÊNCIA:
-       - NÃO interprete causas, motivações ou impactos
-         se eles não forem verbalizados pelos entrevistados.
-       - NÃO conecte temas entre si sem fala explícita dos consumidores
-         que estabeleça essa conexão.
+    1. PROIBIÇÃO DE INVENÇÃO
+       - Nunca inventar dados, percentuais ou padrões inexistentes
+       - Nunca usar conhecimento externo ou suposições
+
+    2. INFERÊNCIA CONTROLADA (PERMITIDA)
+       - É PERMITIDO:
+         • Sintetizar padrões recorrentes
+         • Agrupar falas semelhantes
+         • Comparar posicionamentos explícitos
+       - É PROIBIDO:
+         • Explicar causas não verbalizadas
+         • Inferir intenção, motivação ou impacto futuro
+
+    3. EVIDÊNCIA OBRIGATÓRIA
+       - Toda síntese deve ser sustentada por:
+         a) Quantidade de entrevistas envolvidas
+         b) Pelo menos uma citação literal EXATA
+            retirada do campo "evidence"
+
+    Se qualquer um desses elementos não existir,
+    a síntese NÃO pode ser escrita.
+
+    ─────────────────────────────────────────
+    FONTE ÚNICA DE DADOS
+    ─────────────────────────────────────────
+
+    Use EXCLUSIVAMENTE os dados presentes no treatment_result
+    e nos arquivos JSON tratados indicados.
+
+    Dados disponíveis (se existirem):
+    - cleaned_text
+    - themes
+    - sentiments
+    - brand_mentions (usar SEMPRE nomes reais)
+    - moments
+    - evidence (citações literais exatas)
+
+    NÃO ASSUMA que todos existem.
+    Se algo não estiver presente, declare explicitamente a ausência.
 
     ─────────────────────────────────────────
     OBJETIVO DO RELATÓRIO
     ─────────────────────────────────────────
 
-    Com base apenas nas entrevistas Consumer Hours processadas,
-    escreva um RELATÓRIO EXECUTIVO em Markdown sobre o tema:
+    Produzir um RELATÓRIO EXECUTIVO EM MARKDOWN
+    que responda de forma clara e direta ao tema:
 
     "{topic}"
 
     Data do relatório: {date}
 
-    O relatório é destinado à área de Insights e deve usar
-    linguagem de negócio, clara e objetiva, sem termos técnicos.
+    Público: Área de Insights.
+    Linguagem: Executiva, clara, objetiva, sem jargão técnico.
 
     ─────────────────────────────────────────
-    FONTE DE DADOS DISPONÍVEL
+    ESTRUTURA DO RELATÓRIO
     ─────────────────────────────────────────
-
-    O treatment_result contém informações sobre o processamento das entrevistas.
-    Os dados tratados estão disponíveis nos arquivos JSON no diretório {treat_output_dir}.
-    
-    IMPORTANTE: O treatment_result pode conter apenas um resumo estatístico. 
-    Você DEVE processar o conteúdo das entrevistas que está disponível no contexto
-    da task anterior (treat) ou nos arquivos JSON mencionados no treatment_result.
-
-    Você tem acesso a:
-    - Transcrições literais das entrevistas (cleaned_text nos arquivos tratados)
-    - Temas identificados (campo "themes" na semântica de cada arquivo)
-    - Análises de sentimento extraídas das falas (campo "sentiments")
-    - Marcas mencionadas explicitamente (campo "brand_mentions")
-    - Momentos de consumo citados pelos entrevistados (campo "moments")
-    - Evidências literais que sustentam os temas (campo "evidence")
-
-    NÃO assuma que todos esses elementos existem.
-    Use apenas os que estiverem presentes no contexto fornecido pelo treatment_result.
-    
-    O treatment_result indica o diretório onde os arquivos JSON tratados estão armazenados.
-    Cada arquivo JSON contém:
-    - cleaned_text: texto limpo da entrevista
-    - semantics: objeto com themes, sentiments, moments, brand_mentions, evidence
-    - uuid: identificador único da entrevista
-
-    ─────────────────────────────────────────
-    ESTRUTURA DO RELATÓRIO (CONDICIONAL)
-    ─────────────────────────────────────────
-
-    ⚠️ Uma seção SÓ deve conter análise se houver dados.
-    Caso contrário, declarar ausência de evidência.
 
     1. Resumo Executivo
-       - Responda à pergunta "{topic}"
-       - Use apenas achados explicitamente presentes
-       - Cite quantas entrevistas sustentam cada ponto
+       - Responder diretamente ao tópico
+       - Sintetizar apenas padrões explícitos
+       - Indicar quantas entrevistas sustentam cada ponto
 
     2. Metodologia
-       - Número real de entrevistas realizadas
-       - Período real das entrevistas (se disponível)
-       - Abordagem qualitativa Consumer Hours
-       - Se algum dado não estiver disponível, declarar explicitamente
+       - Número real de entrevistas
+       - Período (se disponível)
+       - Abordagem Consumer Hours
+       - Declarar ausências
 
-    3. Temas Identificados nas Entrevistas
-       - Liste apenas temas realmente presentes no treatment_result
-       - Para cada tema:
-         • Quantas entrevistas mencionaram (baseado nos dados agregados)
-         • Citações literais EXATAS do campo "evidence" que sustentam o tema
-       - Use as citações literais do campo "evidence", não invente citações
+    3. Principais Insights Derivados das Entrevistas
+       - Listar SOMENTE insights sustentados por múltiplas falas
+       - Para cada insight:
+         • Número de entrevistas
+         • Citações literais EXATAS (campo "evidence")
 
-    4. Análise de Sentimento
-       - Use apenas sentimentos identificados nos dados do treatment_result
-       - Para cada sentimento, use as evidências literais do campo "evidence"
-       - Explique o sentimento usando citações literais EXATAS dos entrevistados
-       - Se não houver dados suficientes, declarar limitação
+    4. Temas Recorrentes
+       - Listar apenas temas explicitamente identificados
+       - Evidenciar recorrência ou contraste
 
-    5. Marcas e Momentos de Consumo
-       - Liste TODAS as marcas mencionadas usando seus NOMES REAIS (ex: Brahma, Heineken, Skol)
-       - NUNCA use nomes genéricos como "Marca A" ou "Marca B"
-       - Para cada marca, indique:
-         • Quantas entrevistas mencionaram a marca
-         • Citações literais do campo "evidence" que mencionam a marca
-       - Liste os momentos de consumo mencionados com citações literais
-       - Se nenhuma marca ou momento for mencionado, declarar ausência
+    5. Sentimentos Expressos
+       - Usar apenas sentimentos identificados
+       - Sempre com evidência literal
 
-    6. Padrões ou Agrupamentos de Opinião
-       - Só incluir se houver repetição clara de posicionamentos
-       - Caso contrário, declarar que não foi possível identificar padrões
+    6. Marcas e Momentos de Consumo
+       - Usar SOMENTE nomes reais das marcas
+       - Indicar volume de menções e evidências
 
-    7. Insights Estratégicos
-       - Derivar SOMENTE do que os consumidores disseram explicitamente
-       - NÃO extrapolar implicações além das falas
+    7. Limitações dos Dados
+       - Declarar claramente onde os dados não permitem conclusão
 
-    8. Citações Representativas
-       - Listar apenas citações literais do campo "evidence" presente nos dados tratados
-       - Use EXATAMENTE o texto presente no campo "evidence" de cada entrevista
-       - Não adaptar, resumir ou reescrever as citações
-       - Se possível, indique qual marca ou tema está relacionado à citação
-       - Ordene por relevância para o tema do relatório
-
-    9. Recomendações
-       - Só podem existir se houver falas que indiquem expectativas,
-         frustrações ou desejos claros dos consumidores
-       - Caso contrário, declarar que os dados não permitem recomendações
-
-    10. Limitações e Próximos Passos
-        - Explicitar lacunas reais dos dados
-        - Indicar apenas aprofundamentos coerentes com o que faltou nas entrevistas
+    8. Oportunidades ou Tensões Explicitadas pelos Consumidores
+       - Apenas quando verbalizadas claramente
+       - Nunca extrapolar
 
     ─────────────────────────────────────────
-    PROIBIÇÕES ABSOLUTAS
+    FRASE DE SEGURANÇA
     ─────────────────────────────────────────
 
-    ❌ Inventar dados, percentuais ou padrões
-    ❌ Inferir comportamento não verbalizado
-    ❌ Completar seções por "boa prática"
-    ❌ Usar conhecimento geral de mercado
-    ❌ Parafrasear citações
-    ❌ Criar exemplos hipotéticos
-
-    Se houver qualquer dúvida sobre a existência de um dado:
+    Sempre que houver dúvida sobre a existência de um padrão:
     NÃO ESCREVA.
-    DECLARE A AUSÊNCIA.
-  expected_output: >
-    Relatório executivo em Markdown limpo, baseado EXCLUSIVAMENTE
-    no conteúdo presente nas entrevistas Consumer Hours fornecidas.
-    Todas as afirmações devem conter evidência literal ou declaração
-    explícita de ausência de dados.
-    O relatorio nao deve ter vestigios de markdown alem do relatório.
+    DECLARE A AUSÊNCIA DE EVIDÊNCIA.
