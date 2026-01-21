@@ -39,7 +39,6 @@ numpy>=1.24.0
 pandas>=2.0.0
 
 # Litellm
-litellm[proxy]==1.75.3
-fastapi>=0.100.0
+litellm==1.75.3
 
 streamlit>=1.28.0
