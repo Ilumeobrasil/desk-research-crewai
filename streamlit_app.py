@@ -9,6 +9,10 @@ from typing import Optional, Dict, Any
 from desk_research.system.research_system import DeskResearchSystem
 from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
 
+os.environ["LITELLM_DISABLE_LOGGING"] = "true"
+os.environ["LITELLM_DISABLE_SPEND_TRACKING"] = "true"
+os.environ["LITELLM_DISABLE_COLD_STORAGE"] = "true"
+
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)

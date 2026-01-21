@@ -6,6 +6,9 @@ from desk_research.utils.logging_utils import safe_print
 
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 
+os.environ["LITELLM_DISABLE_LOGGING"] = "true"
+os.environ["LITELLM_DISABLE_SPEND_TRACKING"] = "true"
+os.environ["LITELLM_DISABLE_COLD_STORAGE"] = "true"
 os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
@@ -18,6 +21,14 @@ def main():
     system = DeskResearchSystem()
     result = system.executar_interativo()
     return result
+
+    """ result = google_search_tool("O jovem esta bebendo menos alcool? E cerveja?")
+    make_log({
+        "logName": "google_search_tool",
+        "content": {
+            "result": result,
+        },
+    }) """
 
 
 def kickoff():
