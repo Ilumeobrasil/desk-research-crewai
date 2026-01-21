@@ -103,10 +103,14 @@ def slugify(value):
     return re.sub(r'[-\s]+', '_', value)
 
 def export_report(result: any, topic: str, prefix: str = "report", crew_name: CrewName | None = None) -> dict:
+    # Garantir que a pasta base 'outputs' existe
+    base_output_dir = Path('outputs')
+    base_output_dir.mkdir(exist_ok=True)
+    
     if crew_name:
-        output_dir = Path('outputs') / slugify(crew_name)
+        output_dir = base_output_dir / slugify(crew_name)
     else:
-        output_dir = Path('outputs')
+        output_dir = base_output_dir
 
     output_dir.mkdir(exist_ok=True)
     
