@@ -1,37 +1,43 @@
-# ====== App principal ======
-streamlit==1.28.1
+# Desk Research - Sistema Integrado de Pesquisa AMBEV # Requirements file 
 
-# LiteLLM com proxy (resolve dependências corretamente)
+# Core CrewAI 
+crewai>=0.1.0 
+crewai-tools>=0.1.0 
+
+# LangChain 
+langchain>=0.1.0 
+langchain-community>=0.1.0 
+langchain-openai>=0.0.5 
+
+# HTTP e Web Scraping 
+requests>=2.31.0 
+beautifulsoup4>=4.12.0 
+lxml>=4.9.0 
+urllib3>=2.0.0 
+
+# Data Processing 
+pydantic>=2.0.0 
+pydantic-settings>=2.0.0 
+email-validator>=2.0.0 
+
+# PDF Processing 
+PyPDF2>=3.0.0 
+pdfplumber>=0.10.0 
+
+# Academic APIs 
+feedparser>=6.0.0 
+arxiv>=2.0.0 
+
+# Utilities 
+python-dotenv>=1.0.0 
+pyyaml>=6.0.0 
+typing-extensions>=4.8.0 
+
+# Optional (para melhor performance) 
+numpy>=1.24.0 
+pandas>=2.0.0 
+
+streamlit>=1.28.0 
+fastapi==0.115.0 
+uvicorn==0.30.0 
 litellm[proxy]==1.75.3
-
-# LangChain (versões controladas)
-langchain>=0.1.0,<0.1.10
-langchain-community>=0.1.0,<0.1.10
-langchain-openai>=0.0.5,<0.0.10
-
-# HTTP e Web Scraping
-requests>=2.31.0,<3.0.0
-beautifulsoup4>=4.12.0,<4.13.0
-lxml>=4.9.0,<4.10.0
-
-# Data Processing
-pydantic>=2.0.0,<2.2.0
-pydantic-settings>=2.0.0,<2.2.0
-email-validator>=2.0.0,<2.1.0
-
-# PDF
-PyPDF2>=3.0.0,<3.1.0
-pdfplumber>=0.10.0,<0.11.0
-
-# APIs acadêmicas
-feedparser>=6.0.0,<6.1.0
-arxiv>=2.0.0,<2.2.0
-
-# Utilitários
-python-dotenv>=1.0.0,<1.1.0
-pyyaml>=6.0.0,<7.0.0
-typing-extensions>=4.8.0,<5.0.0
-
-# Dados (opcional)
-numpy>=1.24.0,<1.26.0
-pandas>=2.0.0,<2.1.0
