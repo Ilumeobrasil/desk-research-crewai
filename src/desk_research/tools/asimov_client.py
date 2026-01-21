@@ -10,9 +10,7 @@ from dotenv import load_dotenv
 
 
 def _load_env() -> None:
-    # Carrega variáveis padrão e depois .env.asimov (sem sobrescrever o que já está no ambiente)
     load_dotenv(override=False)
-    load_dotenv(".env.asimov", override=False)
 
 
 def _safe_json(resp: requests.Response) -> Any:

@@ -13,7 +13,6 @@ from desk_research.tools.asimov_client import AsimovClient, _safe_json
 
 def _load_env() -> None:
     load_dotenv(override=False)
-    load_dotenv(".env.asimov", override=False)
 
 
 def _get_chat_base() -> str:

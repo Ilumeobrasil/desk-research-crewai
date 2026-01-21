@@ -251,3 +251,17 @@ write_report:
     Sempre que houver dúvida sobre a existência de um padrão:
     NÃO ESCREVA.
     DECLARE A AUSÊNCIA DE EVIDÊNCIA.
+  expected_output: >
+    Um relatório executivo completo em formato Markdown contendo:
+    - Resumo Executivo respondendo ao tema "{topic}"
+    - Metodologia com número de entrevistas e período
+    - Principais Insights derivados das entrevistas com evidências literais
+    - Temas Recorrentes identificados
+    - Sentimentos Expressos com citações
+    - Marcas e Momentos de Consumo mencionados
+    - Limitações dos Dados
+    - Oportunidades ou Tensões explicitadas pelos consumidores
+    
+    O relatório deve ser estruturado, executivo, e baseado exclusivamente
+    nos dados presentes no treatment_result, sem adicionar conhecimento externo.
+  agent: writer

@@ -2,7 +2,6 @@ import os
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(".env.asimov")
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY") or os.getenv("ASIMOV_API_KEY")

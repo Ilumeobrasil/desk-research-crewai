@@ -81,7 +81,6 @@ def _is_truthy(value: str | None) -> bool:
 
 def _load_environment_files() -> None:
     load_dotenv(PROJECT_ROOT / ".env", override=False)
-    load_dotenv(PROJECT_ROOT / ".env.asimov", override=False)
 
 
 def _get_optional_env_string(key: str) -> str | None:
