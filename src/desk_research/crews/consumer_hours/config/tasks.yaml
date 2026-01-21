@@ -1,12 +1,253 @@
 ingest:
   description: >
-    Leia os arquivos .docx em {input_dir}, extraia o texto integral e escreva
-    arquivos .json em {output_dir}. Use a ferramenta ingest_folder_tool.
+    Leia os arquivos .docx em {ingest_input_dir} (recursivo), extraia o texto integral e escreva
+    arquivos .json em {ingest_output_dir}. Use a ferramenta ingest_folder_tool com:
+
+    - input_dir: {ingest_input_dir}
+    - output_dir: {ingest_output_dir}
+    - upload_to_asimov: {upload_to_asimov} (DEVE ser true)
+    - snippet_chunk_chars: {snippet_chunk_chars}
+    - max_snippets_per_request: {max_snippets_per_request}
+
     Retorne um resumo com contagem de arquivos processados e avisos.
   expected_output: >
     Um resumo textual contendo:
     - input_dir e output_dir efetivos
     - quantidade de docx lidos
     - quantidade de json escritos
+    - status do upload Asimov (ok/erro, contagem, dataset)
     - lista curta de avisos (se houver)
   agent: ingestor
+
+treat:
+  description: >
+    Execute o Agente 2 (Treatment) sobre os JSONs gerados pelo Agente 1 (ingestor).
+
+    Leia os arquivos .json em {treat_input_dir} (onde o ingestor escreveu os JSONs) 
+    e escreva a saída tratada em {treat_output_dir}. Use a ferramenta treat_folder com:
+
+    - input_dir: {treat_input_dir}
+    - output_dir: {treat_output_dir}
+    - enable_rag: {enable_rag} (DEVE ser true)
+    - poll_attempts: {poll_attempts}
+    - poll_sleep_s: {poll_sleep_s}
+    - temperature: {temperature}
+    - max_tokens: {max_tokens}
+
+    ─────────────────────────────────────────
+    LIMPEZA E NORMALIZAÇÃO DO TEXTO
+    ─────────────────────────────────────────
+
+    O texto extraído dos documentos pode conter artefatos e ruído. Você DEVE aplicar
+    uma limpeza rigorosa antes de processar:
+
+    1. **Remoção de Artefatos de Formatação**:
+       - Remover caracteres de controle invisíveis (tabs, quebras de linha excessivas)
+       - Normalizar espaços múltiplos para espaço único
+       - Remover formatação markdown residual (**texto**, *texto*, `código`)
+       - Normalizar aspas inteligentes (" " → " ")
+       - Normalizar traços especiais (- — → -)
+       - Remover caracteres especiais quebrados (�, ? em sequências)
+
+    2. **Remoção de Conteúdo Não-Informativo**:
+       - Remover cabeçalhos e rodapés repetitivos de documentos
+       - Remover metadados de arquivo (nomes de arquivo, caminhos, timestamps)
+       - Remover instruções de formatação ou templates visíveis
+       - Remover linhas vazias excessivas (manter no máximo 2 linhas consecutivas)
+       - Remover pontuação repetida excessiva (!!! → !, ??? → ?)
+
+    3. **Normalização de Estrutura**:
+       - Manter apenas o conteúdo textual relevante das entrevistas
+       - Preservar diálogos e falas dos entrevistados
+       - Remover identificadores técnicos ou códigos internos quando não informativos
+       - Normalizar variações de escrita (ex.: "não" vs "não" com acento)
+
+    4. **Foco em Pontos Importantes**:
+       - Priorizar declarações diretas dos consumidores sobre comportamentos, opiniões e sentimentos
+       - Manter contexto suficiente para entender o significado das falas
+       - Remover redundâncias e repetições desnecessárias
+       - Preservar evidências literais que sustentam insights
+
+    ─────────────────────────────────────────
+    EXTRAÇÃO DE SEMÂNTICA VIA RAG
+    ─────────────────────────────────────────
+
+    Após a limpeza, consulte o Asimov RAG para extrair semântica estruturada:
+
+    - **language**: Identifique o idioma do texto (código ISO, ex.: "pt")
+    - **brand_mentions**: Liste marcas mencionadas explicitamente (normalizadas, sem duplicatas)
+    - **themes**: Extraia temas principais discutidos (focos em insights de consumo, comportamentos, preferências)
+    - **sentiments**: Identifique sentimentos expressos (positivo, neutro, negativo, ambivalente)
+    - **moments**: Capture momentos/ocasiões de consumo mencionados
+    - **evidence**: Selecione 2-5 evidências literais mais relevantes do texto limpo que sustentam os temas identificados
+
+    ⚠️ IMPORTANTE: As evidências devem ser trechos EXATOS do texto limpo, não paráfrases.
+    Priorize evidências que sejam:
+    - Declarações diretas dos consumidores
+    - Exemplos concretos de comportamento ou opinião
+    - Citações que ilustram sentimentos ou temas identificados
+
+  expected_output: >
+    Após processar os arquivos com a ferramenta treat_folder, você DEVE fornecer um resumo
+    estruturado que será usado pela task write_report. O resumo DEVE incluir:
+    
+    1. Resumo estatístico do processamento (já fornecido pela ferramenta):
+       - Número de arquivos processados
+       - Número de arquivos com sucesso/erro
+       - Status do RAG
+    
+    2. Resumo dos dados tratados (CRÍTICO para o relatório):
+       Após a ferramenta treat_folder processar os arquivos, você DEVE ler os arquivos JSON tratados
+       no diretório {treat_output_dir} e consolidar os seguintes dados:
+       
+       - Lista de TODAS as marcas mencionadas com seus NOMES REAIS (ex: Brahma, Heineken, Skol, Stella Artois)
+         e quantas entrevistas mencionaram cada marca
+       
+       - Lista de TODOS os temas identificados e quantas entrevistas mencionaram cada tema
+       
+       - Lista de TODOS os sentimentos encontrados e sua distribuição
+       
+       - Lista de TODOS os momentos de consumo mencionados
+       
+       - Lista das evidências mais importantes (citações literais do campo "evidence")
+         organizadas por tema ou marca quando aplicável
+       
+       - Número total de entrevistas processadas com sucesso
+       
+       FORMATO DO RESUMO:
+       Apresente os dados consolidados de forma estruturada, listando explicitamente:
+       - Nomes reais das marcas (nunca use genéricos)
+       - Citações literais exatas do campo "evidence"
+       - Contagens de menções por tema/marca/sentimento
+       
+       IMPORTANTE: O resumo dos dados tratados é essencial porque será a única fonte de informação
+       disponível para a task write_report. Sem esse resumo detalhado com nomes reais de marcas
+       e citações literais, o relatório não poderá ser gerado corretamente.
+  agent: treater
+
+write_report:
+  description: >
+    ⚠️ RELATÓRIO COM RESTRIÇÃO ABSOLUTA AO CONTEXTO ⚠️
+
+    Este agente DEVE operar em modo "context-bound estrito".
+    É PROIBIDO utilizar qualquer conhecimento externo,
+    benchmarking, generalização de mercado ou suposição não verbalizada.
+
+    ─────────────────────────────────────────
+    PRINCÍPIO CENTRAL
+    ─────────────────────────────────────────
+
+    Este relatório deve gerar INSIGHTS EXECUTIVOS
+    exclusivamente a partir da SÍNTESE de falas explícitas
+    presentes nas entrevistas Consumer Hours.
+
+    Insight, neste contexto, é definido como:
+    "Síntese de padrões, recorrências ou contrastes
+     claramente observáveis nas falas dos entrevistados,
+     SEM adicionar causas, motivações ou impactos não verbalizados."
+
+    ─────────────────────────────────────────
+    REGRAS DE OURO (INVIOLÁVEIS)
+    ─────────────────────────────────────────
+
+    1. PROIBIÇÃO DE INVENÇÃO
+       - Nunca inventar dados, percentuais ou padrões inexistentes
+       - Nunca usar conhecimento externo ou suposições
+
+    2. INFERÊNCIA CONTROLADA (PERMITIDA)
+       - É PERMITIDO:
+         • Sintetizar padrões recorrentes
+         • Agrupar falas semelhantes
+         • Comparar posicionamentos explícitos
+       - É PROIBIDO:
+         • Explicar causas não verbalizadas
+         • Inferir intenção, motivação ou impacto futuro
+
+    3. EVIDÊNCIA OBRIGATÓRIA
+       - Toda síntese deve ser sustentada por:
+         a) Quantidade de entrevistas envolvidas
+         b) Pelo menos uma citação literal EXATA
+            retirada do campo "evidence"
+
+    Se qualquer um desses elementos não existir,
+    a síntese NÃO pode ser escrita.
+
+    ─────────────────────────────────────────
+    FONTE ÚNICA DE DADOS
+    ─────────────────────────────────────────
+
+    Use EXCLUSIVAMENTE os dados presentes no treatment_result
+    e nos arquivos JSON tratados indicados.
+
+    Dados disponíveis (se existirem):
+    - cleaned_text
+    - themes
+    - sentiments
+    - brand_mentions (usar SEMPRE nomes reais)
+    - moments
+    - evidence (citações literais exatas)
+
+    NÃO ASSUMA que todos existem.
+    Se algo não estiver presente, declare explicitamente a ausência.
+
+    ─────────────────────────────────────────
+    OBJETIVO DO RELATÓRIO
+    ─────────────────────────────────────────
+
+    Produzir um RELATÓRIO EXECUTIVO EM MARKDOWN
+    que responda de forma clara e direta ao tema:
+
+    "{topic}"
+
+    Data do relatório: {date}
+
+    Público: Área de Insights.
+    Linguagem: Executiva, clara, objetiva, sem jargão técnico.
+
+    ─────────────────────────────────────────
+    ESTRUTURA DO RELATÓRIO
+    ─────────────────────────────────────────
+
+    1. Resumo Executivo
+       - Responder diretamente ao tópico
+       - Sintetizar apenas padrões explícitos
+       - Indicar quantas entrevistas sustentam cada ponto
+
+    2. Metodologia
+       - Número real de entrevistas
+       - Período (se disponível)
+       - Abordagem Consumer Hours
+       - Declarar ausências
+
+    3. Principais Insights Derivados das Entrevistas
+       - Listar SOMENTE insights sustentados por múltiplas falas
+       - Para cada insight:
+         • Número de entrevistas
+         • Citações literais EXATAS (campo "evidence")
+
+    4. Temas Recorrentes
+       - Listar apenas temas explicitamente identificados
+       - Evidenciar recorrência ou contraste
+
+    5. Sentimentos Expressos
+       - Usar apenas sentimentos identificados
+       - Sempre com evidência literal
+
+    6. Marcas e Momentos de Consumo
+       - Usar SOMENTE nomes reais das marcas
+       - Indicar volume de menções e evidências
+
+    7. Limitações dos Dados
+       - Declarar claramente onde os dados não permitem conclusão
+
+    8. Oportunidades ou Tensões Explicitadas pelos Consumidores
+       - Apenas quando verbalizadas claramente
+       - Nunca extrapolar
+
+    ─────────────────────────────────────────
+    FRASE DE SEGURANÇA
+    ─────────────────────────────────────────
+
+    Sempre que houver dúvida sobre a existência de um padrão:
+    NÃO ESCREVA.
+    DECLARE A AUSÊNCIA DE EVIDÊNCIA.

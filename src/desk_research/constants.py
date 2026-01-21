@@ -1,7 +1,7 @@
 from typing import Literal
 
-VERBOSE_AGENTS = False
-VERBOSE_CREW = False
+VERBOSE_AGENTS = True
+VERBOSE_CREW = True
 
 MIN_APPROVAL_SCORE = 80
 MAX_RETRY_COUNT = 3

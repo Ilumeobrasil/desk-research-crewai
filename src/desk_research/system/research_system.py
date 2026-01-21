@@ -212,14 +212,15 @@ class DeskResearchSystem:
             "metadados": {"topic": topic}
         }
 
-    def executar_consumer_hours(self) -> Dict[str, Any]:
+    def executar_consumer_hours(self, topic: str) -> Dict[str, Any]:
         print(f"\n⏳ Iniciando Consumer Hours...")
+        print(f"Tema: {topic}\n")
         try:
-            result = run_consumer_hours_analysis()
+            result = run_consumer_hours_analysis(topic=topic)
             return {
                 "modo": "consumer_hours",
                 "resultado": result,
-                "metadados": {}
+                "metadados": {"topic": topic}
             }
         except Exception as e:
             print(f"❌ Erro na execução: {e}")

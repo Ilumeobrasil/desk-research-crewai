@@ -5,6 +5,25 @@ Converte relatórios Markdown para PDF com formatação profissional
 AMBEV - Desk Research System
 """
 
+import os
+import sys
+from pathlib import Path
+
+# Configurar variáveis de ambiente para WeasyPrint (GTK no macOS)
+if sys.platform == "darwin":  # macOS
+    homebrew_lib = "/opt/homebrew/lib"
+    if os.path.exists(homebrew_lib):
+        # Configurar PKG_CONFIG_PATH para encontrar bibliotecas GTK
+        pkg_config_path = os.path.join(homebrew_lib, "pkgconfig")
+        if pkg_config_path not in os.environ.get("PKG_CONFIG_PATH", ""):
+            current_pkg = os.environ.get("PKG_CONFIG_PATH", "")
+            os.environ["PKG_CONFIG_PATH"] = f"{pkg_config_path}:{current_pkg}" if current_pkg else pkg_config_path
+        
+        # Configurar DYLD_LIBRARY_PATH para carregar bibliotecas GTK
+        if homebrew_lib not in os.environ.get("DYLD_LIBRARY_PATH", ""):
+            current_dyld = os.environ.get("DYLD_LIBRARY_PATH", "")
+            os.environ["DYLD_LIBRARY_PATH"] = f"{homebrew_lib}:{current_dyld}" if current_dyld else homebrew_lib
+
 import markdown2
 from weasyprint import HTML, CSS
 from pathlib import Path

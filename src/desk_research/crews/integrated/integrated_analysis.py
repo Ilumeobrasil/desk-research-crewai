@@ -42,7 +42,7 @@ MODOS = {
     },
     'consumer_hours': {
         'runner': run_consumer_hours_analysis,
-        'args': [],
+        'args': ['topic'],
     },
 }
 
@@ -117,11 +117,18 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
         results_buffer = []
         tasks = []
         
+        arg_values = {
+            'topic': topic,
+            'max_papers': params.get('max_papers', 5),
+            'max_web_results': params.get('max_web_results', 10),
+        }
+        
         for modo in selected_modos:
             if modo in MODOS:
                 config = MODOS[modo]
+                mapped_args = [arg_values.get(arg, arg) for arg in config['args']]
                 tasks.append(
-                    (modo, _run_crew, params, config['runner'], *config['args'])
+                    (modo, _run_crew, params, config['runner'], *mapped_args)
                 )
         
         if tasks:

@@ -22,7 +22,7 @@ def _get_chat_base() -> str:
     Normalmente vem do .env (OPENAI_API_BASE).
     """
     _load_env()
-    base = (os.getenv("OPENAI_API_BASE") or os.getenv("BASE_URL") or "").strip()
+    base = (os.getenv("ASIMOV_API_BASE") or os.getenv("BASE_URL") or "").strip()
     return base.rstrip("/")
 
 
@@ -31,7 +31,7 @@ def _get_chat_key() -> str:
     Chave do chat. Normalmente OPENAI_API_KEY no .env.
     """
     _load_env()
-    return (os.getenv("OPENAI_API_KEY") or os.getenv("API_KEY") or os.getenv("ASIMOV_API_KEY") or "").strip()
+    return (os.getenv("ASIMOV_API_KEY") or os.getenv("API_KEY") or "").strip()
 
 
 def _chat_headers() -> dict[str, str]:
@@ -66,9 +66,9 @@ class RAG:
     ) -> dict[str, Any]:
         chat_base = _get_chat_base()
         if not chat_base:
-            return {"ok": False, "reason": "missing_OPENAI_API_BASE"}
+            return {"ok": False, "reason": "missing_ASIMOV_API_BASE"}
         if not _get_chat_key():
-            return {"ok": False, "reason": "missing_OPENAI_API_KEY"}
+            return {"ok": False, "reason": "missing_ASIMOV_API_KEY"}
 
         payload: dict[str, Any] = {
             "messages": messages,
@@ -81,15 +81,25 @@ class RAG:
             payload["prompt_template"] = prompt_template
 
         # Step 1: initiate
+        url = f"{chat_base}/api/completions/context"
+        headers = _chat_headers()
+        
         resp = requests.post(
-            f"{chat_base}/api/completions/context",
-            headers=_chat_headers(),
+            url,
+            headers=headers,
             json=payload,
             timeout=120,
         )
-
+        
         if resp.status_code not in (200, 201):
-            return {"ok": False, "status": resp.status_code, "text": resp.text, "json": _safe_json(resp)}
+            return {
+                "ok": False,
+                "status": resp.status_code,
+                "url": url,
+                "text": resp.text[:1000] if resp.text else None,  # Limita tamanho do texto
+                "json": _safe_json(resp),
+                "error": f"Endpoint retornou {resp.status_code}. Erro: {_safe_json(resp).get('detail', 'N/A')}",
+            }
 
         init_json = _safe_json(resp) or {}
         uuid = (init_json.get("location", "") or "").split("/")[-1]
@@ -99,10 +109,13 @@ class RAG:
         # Step 2: poll status
         done = False
         status_payload: dict[str, Any] | None = None
-        for _ in range(poll_attempts):
+        status_url = f"{chat_base}/api/completions/status/{uuid}"
+        headers = _chat_headers()
+        
+        for attempt in range(poll_attempts):
             sresp = requests.get(
-                f"{chat_base}/api/completions/status/{uuid}",
-                headers=_chat_headers(),
+                status_url,
+                headers=headers,
                 timeout=60,
             )
             if sresp.status_code == 200:
@@ -114,9 +127,12 @@ class RAG:
             time.sleep(poll_sleep_s)
 
         # Step 3: fetch result
+        result_url = f"{chat_base}/api/completions/context/{uuid}"
+        headers = _chat_headers()
+                
         rresp = requests.get(
-            f"{chat_base}/api/completions/context/{uuid}",
-            headers=_chat_headers(),
+            result_url,
+            headers=headers,
             timeout=120,
         )
 
@@ -127,8 +143,10 @@ class RAG:
                 "done": done,
                 "status_payload": status_payload,
                 "status": rresp.status_code,
-                "text": rresp.text,
+                "url": f"{chat_base}/api/completions/context/{uuid}",
+                "text": rresp.text[:1000] if rresp.text else None,
                 "json": _safe_json(rresp),
+                "error": f"Erro ao buscar resultado: {rresp.status_code}",
             }
 
         result_json = _safe_json(rresp) or {}

@@ -455,3 +455,71 @@ class AsimovClient:
             return {"ok": False, "reason": "missing_snippet_uuid"}
 
         return self._request("DELETE", f"application/snippets/{snippet_uuid}", headers=self._headers_json(), timeout=60)
+
+    def limpar_dataset(self, dataset_name: str, confirm: bool = False) -> dict:
+        """
+        Limpa um dataset.
+        
+        Args:
+            client: Instância do AsimovClient
+            dataset_name: Nome do dataset
+            confirm: Se True, pula a confirmação
+        """
+
+        # Testa conexão
+        result = self.find_snippets(dataset=dataset_name, max_items=1, page_size=1)
+        
+        if not result.get("ok"):
+            print(f"❌ Erro ao acessar dataset: {result.get('reason')}")
+            return {"ok": False}
+        
+        print(f"⚙️ Buscando todos os snippets do dataset '{dataset_name}'")
+        
+        all_result = self.find_snippets(
+            dataset=dataset_name,
+            max_items=10000,
+            page_size=30
+        )
+        
+        if not all_result.get("ok"):
+            print(f"❌ Erro ao listar snippets: {all_result.get('reason')}")
+            return {"ok": False}
+        
+        total = all_result.get("count", 0)
+        
+        if total == 0:
+            print(f"✅ Dataset '{dataset_name}' já está vazio.")
+            return {"ok": True, "deleted": 0}
+        
+        print(f"\n⚠️  ATENÇÃO: Você está prestes a deletar {total} snippets do dataset '{dataset_name}'")
+        
+        if not confirm:
+            resposta = input("Deseja continuar? (digite 'SIM' para confirmar): ")
+            if resposta.strip().upper() != "SIM":
+                print("❌ Operação cancelada.")
+                return {"ok": False, "cancelled": True}
+        
+        # Proceder com a deleção
+        print(f"\n🗑️  Deletando {total} snippets...")
+        
+        snippets = all_result.get("items", [])
+        deleted = 0
+        failed = 0
+        
+        for snippet in snippets:
+            uuid = snippet.get("uuid")
+            if uuid:
+                delete_result = self.delete_snippet(uuid)
+                if delete_result.get("ok"):
+                    deleted += 1
+                else:
+                    failed += 1
+        
+        print(f"\n✅ Concluído: {deleted} deletados, {failed} falharam")
+        
+        return {
+            "ok": True,
+            "deleted": deleted,
+            "failed": failed,
+            "total": total
+        }
