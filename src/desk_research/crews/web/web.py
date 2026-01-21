@@ -14,7 +14,6 @@ class WebCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
-
     def web_researcher(self) -> Agent:
         return Agent(
             config=self.agents_config['web_researcher'],
@@ -23,7 +22,6 @@ class WebCrew:
                 web_scraper_tool,
                 url_validator_tool
             ],
-
             verbose=VERBOSE_AGENTS
         )
 
@@ -31,7 +29,6 @@ class WebCrew:
     def content_analyzer(self) -> Agent:
         return Agent(
             config=self.agents_config['content_analyzer'],
-
             verbose=VERBOSE_AGENTS
         )
 
@@ -39,7 +36,6 @@ class WebCrew:
     def web_report_writer(self) -> Agent:
         return Agent(
             config=self.agents_config['web_report_writer'],
-
             verbose=VERBOSE_AGENTS
         )
 

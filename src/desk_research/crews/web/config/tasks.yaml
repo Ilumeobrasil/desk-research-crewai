@@ -1,58 +1,94 @@
 search_web:
   description: >
-    Buscar informações sobre {query} usando Google Search.
-    Encontrar pelo menos {max_results} fontes relevantes e confiáveis.
-    
-    **CRITÉRIOS OBRIGATÓRIOS**:
-    1. **RECÊNCIA**: Priorize notícias e artigos publicados nos **ÚLTIMOS 12 MESES**.
-    2. **FONTES**: Priorize portais de notícias reconhecidos, sites oficiais e relatórios de indústria.
-    3. **LINKS**: Guarde a URL de TODAS as fontes encontradas para citação.
-    4. **VALIDAÇÃO DE URLs**: OBRIGATORIAMENTE use a ferramenta `url_validator` para validar TODAS as URLs encontradas antes de incluí-las nas fontes. URLs inacessíveis devem ser descartadas.
-  expected_output: >
-    - Snippet/Resumo
-    - Data de publicação (se disponível)
-    - Avaliação de credibilidade
+    Conduzir uma pesquisa web estratégica sobre {query} com o objetivo de
+    identificar fontes confiáveis, recentes e relevantes que sirvam de base
+    para análises posteriores.
 
-    **ESTRATÉGIA ITERATIVA (DEEP LOOP)**:
-    - O agente deve realizar pelo menos **2 RODADAS** de busca.
-    - **NAVEGAÇÃO PROFUNDA**: Se cair em uma "Home Page" genérica, você OBRIGATORIAMENTE deve buscar links internos relevantes (ex: "/reports", "/about", "/cases") e fazer scrape deles para ter dados concretos. Não aceite "marketing fluff".
-    - Se os primeiros resultados forem superficiais, refine a query (ex: busque dados estatísticos, PDFs, relatórios oficiais).
-    - Tente cruzar fontes para evitar viés de um único portal.
-    - **VALIDAÇÃO OBRIGATÓRIA**: Para cada URL encontrada, use `url_validator` para verificar se está acessível antes de incluí-la nos resultados.
+    Execute o processo abaixo:
+    1. Realize pelo menos DUAS rodadas distintas de busca no Google, variando
+       a formulação da query.
+    2. Evite conteúdos promocionais, opinativos ou sem evidência verificável.
+    3. Valide OBRIGATORIAMENTE todas as URLs usando `url_validator`.
+    4. Cruze múltiplas fontes sempre que possível.
+
+    REGRA CRÍTICA:
+    - Se não houver fontes confiáveis ou dados suficientes sobre algum aspecto
+      do tema, registre explicitamente essa ausência.
+    - NÃO presuma, infira ou complete informações inexistentes.
+  expected_output: >
+    Uma lista estruturada em markdown contendo ENTRE {max_results} E {max_results + 5} fontes,
+    onde cada item deve conter:
+
+    - Título da fonte
+    - URL validada
+    - Data de publicação (ou "não informada")
+    - Resumo objetivo (2–3 frases, apenas com informações presentes na fonte)
+    - Tipo de fonte
+    - Avaliação de credibilidade (Alta / Média / Baixa)
+    - Indicação de cobertura de dados:
+      • Dados suficientes
+      • Dados parciais
+      • Dados ausentes
+
+    Caso não existam fontes confiáveis suficientes sobre {query},
+    o output deve conter uma seção final intitulada:
+    "Limitações da Pesquisa Inicial",
+    explicando objetivamente o que não foi encontrado e por quê.
 
 analyze_content:
   description: >
-    Analisar o conteúdo das páginas encontradas sobre: {query}.
-    - Extrair informações principais
-    - Verificar credibilidade das fontes
-    - Identificar padrões e tendências
-    - Detectar informações conflitantes
-    - Validar dados importantes
+    Analisar criticamente os conteúdos coletados, com foco em distinguir
+    fatos comprovados, interpretações fundamentadas e lacunas de informação.
+
+    Siga rigorosamente o processo:
+    1. Extraia apenas informações explicitamente presentes nas fontes.
+    2. Classifique cada informação como:
+       - Verificada (múltiplas fontes confiáveis)
+       - Parcialmente verificada (fonte única ou dados incompletos)
+       - Não verificável com os dados disponíveis
+    3. Identifique padrões e tendências SOMENTE quando houver evidência suficiente.
+    4. Quando os dados forem insuficientes ou conflitantes, declare explicitamente
+       a impossibilidade de conclusão.
+    5. É PROIBIDO inferir intenções, impactos ou tendências sem base empírica clara.
   expected_output: >
-    Análise detalhada contendo:
-    - Resumo de cada fonte com URL
-    - Principais informações encontradas
-    - Avaliação de credibilidade
-    - Informações verificadas vs não verificadas
-    - Insights e conclusões
+    Um relatório analítico em markdown contendo:
+
+    1. Fatos verificados (com referências explícitas)
+    2. Achados parcialmente suportados (com explicação das limitações)
+    3. Pontos sem dados suficientes para conclusão
+    4. Conflitos ou inconsistências entre fontes
+    5. Insights acionáveis (APENAS quando suportados por evidência clara)
+    6. Declaração explícita de limitações da análise
+
+    O relatório deve deixar claro o que é conhecido, o que é incerto
+    e o que não pode ser determinado com os dados disponíveis.
 
 create_web_report:
   description: >
     Criar um relatório completo e EXAUSTIVO sobre "{query}" com as informações coletadas da web.
     O relatório deve ser DENSO (mínimo 1000 palavras), objetivo e citar todas as fontes.
+
+    DIRETRIZES OBRIGATÓRIAS:
+    1. O relatório deve ser escrito em português (PT-BR).
+    2. É ESTRITAMENTE PROIBIDO inventar dados, estimativas ou conclusões.
+    3. Sempre que não houver dados suficientes para sustentar uma afirmação,
+       isso deve ser declarado explicitamente no texto.
+    4. Diferencie claramente fatos, interpretações fundamentadas e incertezas.
+    5. Utilize linguagem precisa e responsável, adequada a stakeholders
+       executivos.
     
-    **REGRAS DE ESCRITA**:
+    REGRAS DE ESCRITA:
     1. INICIE O RELATÓRIO COM: Título e Data ({current_date}).
     2. NÃO USE PLACEHOLDERS como "[Insira texto aqui]".
     3. NÃO CRIE APENAS LISTAS de tópicos. Escreva texto corrido e analítico.
     4. Para cada seção, escreva pelo menos 3-4 parágrafos substanciais.
     5. CITE AS FONTES no texto e na lista final.
     
-    **REGRAS DE IDIOMA**:
+    REGRAS DE IDIOMA:
     1. O RELATÓRIO DEVE SER 100% EM PORTUGUÊS (PT-BR).
     2. Títulos de artigos originais podem ser mantidos em inglês, mas todo o resto deve ser traduzido.
 
-    **ESTRUTURA OBRIGATÓRIA**:
+    ESTRUTURA OBRIGATÓRIA:
     1. Resumo Executivo (Resumo de alto nível)
     2. Introdução ao Tópico (Contexto e importância)
     3. Principais Descobertas (Com dados quantitativos se houver)
@@ -70,3 +106,6 @@ create_web_report:
     - Conclusões
     - Fontes e Referências (Links clicáveis)
     - Recomendações (Se houver)
+
+    Caso os dados disponíveis sejam insuficientes para conclusões robustas,
+    o relatório deve explicitar claramente essa limitação e evitar recomendações

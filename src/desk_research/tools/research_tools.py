@@ -15,7 +15,7 @@ import time
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus, urljoin
 import re
-
+import http.client
 
 # =============================================================================
 # 1. SERPER SCHOLAR TOOL (Google Scholar via API Serper)
@@ -738,26 +738,68 @@ def pdf_analyzer_tool(url: str) -> str:
 @tool("google_search")
 def google_search_tool(query: str) -> str:
     """
-    Realiza busca no Google (via Serper).
+    Realiza busca no Google (via Serper) e retorna resultados normalizados
+    para fácil consumo por agentes LLM.
+
+    Args:
+        query: Termo de busca
+
+    Returns:
+        JSON string com resultados da busca normalizados
     """
+
+    print("=" * 73)
+    print(f"🔧 Tool google_search chamada com query: {query}")
     try:
+        conn = http.client.HTTPSConnection("google.serper.dev")
+
         url = "https://google.serper.dev/search"
-        payload = json.dumps({"q": query, "num": 10})
+        payload = {
+            "q": query,
+            "num": 10
+        }
+
         headers = {
             'X-API-KEY': os.getenv('SERPER_API_KEY', ''),
             'Content-Type': 'application/json'
         }
-        resp = requests.post(url, headers=headers, data=payload, timeout=10)
-        resp.raise_for_status()
-        return json.dumps(resp.json().get('organic', []), indent=2, ensure_ascii=False)
+
+        response = requests.request("POST", url, headers=headers, json=payload)
+        response.raise_for_status()
+
+        organic_results = response.json().get("organic", [])
+
+        if not organic_results:
+            return "⚠️ Nenhum resultado orgânico encontrado para a busca."
+
+        normalized_output = []
+        for idx, item in enumerate(organic_results, start=1):
+            title = item.get("title", "Título não disponível")
+            link = item.get("link", "URL não disponível")
+            snippet = item.get("snippet", "Resumo não disponível")
+
+            normalized_output.append(
+                f"""RESULTADO {idx}
+Título: {title}
+URL: {link}
+Resumo: {snippet}
+"""
+            )
+
+        return "\n".join(normalized_output)
+
+        #return json.dumps(resp.json().get('organic', []), indent=2, ensure_ascii=False)
     except Exception as e:
-        return f"Erro na busca Google: {e}"
+        print(f"❌ Erro na busca Google (Serper): {query} - {str(e)}")
+        return f"❌ Erro na busca Google (Serper): {str(e)}"
 
 @tool("web_scraper")
 def web_scraper_tool(url: str) -> str:
     """
     Extrai texto de uma página web.
     """
+
+    print(f"🔧 Tool web_scraper chamada com URL: {url}")
     try:
         import trafilatura
         
