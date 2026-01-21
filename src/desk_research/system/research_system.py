@@ -143,7 +143,7 @@ class DeskResearchSystem:
             print("\n")
             print(f"📋 Modo: {MODE_CONFIG[modo]['emoji']} {MODE_CONFIG[modo]['nome']}")
             print(f"🤖 Modelo utilizado: {os.getenv('MODEL')}")
-            print(f"🕒 Tempo de execução: {time.strftime("%H:%M:%S", time.gmtime(execution_time))}")
+            #print(f"🕒 Tempo de execução: {time.strftime("%H:%M:%S", time.gmtime(execution_time))}")
             
             print("\n")
             if params:
