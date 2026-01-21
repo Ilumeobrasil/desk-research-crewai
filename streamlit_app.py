@@ -125,7 +125,7 @@ def _prepare_research_params(modo: str, user_text: str, selected_modos: Optional
         "academic": {"topic": user_text, "max_papers": DEFAULT_MAX_PAPERS},
         "web": {"query": user_text, "max_results": DEFAULT_MAX_WEB_RESULTS},
         "x": {"topic": user_text},
-        "consumer_hours": {},
+        "consumer_hours": {"topic": user_text},
         "integrated": {
             "topic": user_text,
             "selected_modos": selected_modos if selected_modos else ['web'],

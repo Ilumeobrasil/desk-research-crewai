@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
 from typing import Any, Type
 
@@ -36,22 +37,17 @@ def _safe_stem(name: str) -> str:
     return "".join(keep).strip().replace(" ", "_")
 
 
-def _rel_source_key(input_root: Path, fp: Path, chunk_idx: int | None = None, chunks_total: int | None = None) -> str:
+def _generate_uuid_key(file_uuid: str, chunk_idx: int | None = None, chunks_total: int | None = None) -> str:
     """
-    Gera uma key estável para o Asimov Snippet:
-      <pasta_relativa>/<nome_arquivo>.docx#chunk_XXofYY
+    Gera uma key usando UUID para o Asimov Snippet:
+      <uuid>#chunk_XXofYY
 
-    Se não houver chunk, retorna apenas o caminho relativo do arquivo.
+    Se não houver chunk, retorna apenas o UUID.
     """
-    try:
-        rel = fp.relative_to(input_root).as_posix()
-    except Exception:
-        rel = fp.name
-
     if chunk_idx is None or chunks_total is None:
-        return rel
+        return file_uuid
 
-    return f"{rel}#chunk_{chunk_idx:02d}of{chunks_total:02d}"
+    return f"{file_uuid}#chunk_{chunk_idx:02d}of{chunks_total:02d}"
 
 
 def _chunk_text(text: str, max_chars: int) -> list[str]:
@@ -203,9 +199,17 @@ class IngestFolderTool(BaseTool):
                     warnings.append(f"empty_text:{fp.name}")
                     continue
 
+                # Gera UUID para este arquivo
+                file_uuid = str(uuid.uuid4())
+
                 # JSON local (sempre)
-                payload = {"source_file": str(fp), "file_name": fp.name, "text": text}
-                out_fp = out_path / (_safe_stem(fp.stem) + ".json")
+                payload = {
+                    "uuid": file_uuid,
+                    "source_file": str(fp),
+                    "file_name": fp.name,
+                    "text": text
+                }
+                out_fp = out_path / (file_uuid + ".json")
                 out_fp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
                 outputs.append(str(out_fp))
 
@@ -218,7 +222,7 @@ class IngestFolderTool(BaseTool):
 
                     total = len(chunks)
                     for idx, chunk in enumerate(chunks, start=1):
-                        key = _rel_source_key(in_path, fp, idx, total) if total > 1 else _rel_source_key(in_path, fp)
+                        key = _generate_uuid_key(file_uuid, idx, total) if total > 1 else _generate_uuid_key(file_uuid)
                         batch.append({"key": key, "content": chunk})
 
                         if len(batch) >= max_snippets_per_request:

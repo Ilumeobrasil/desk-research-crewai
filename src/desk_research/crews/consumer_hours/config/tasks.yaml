@@ -34,13 +34,95 @@ treat:
     - temperature: {temperature}
     - max_tokens: {max_tokens}
 
-    Você deve limpar/normalizar o texto e consultar o Asimov RAG para extrair semântica
-    (temas, marcas, momentos, sentimentos) com evidências literais.
+    ─────────────────────────────────────────
+    LIMPEZA E NORMALIZAÇÃO DO TEXTO
+    ─────────────────────────────────────────
+
+    O texto extraído dos documentos pode conter artefatos e ruído. Você DEVE aplicar
+    uma limpeza rigorosa antes de processar:
+
+    1. **Remoção de Artefatos de Formatação**:
+       - Remover caracteres de controle invisíveis (tabs, quebras de linha excessivas)
+       - Normalizar espaços múltiplos para espaço único
+       - Remover formatação markdown residual (**texto**, *texto*, `código`)
+       - Normalizar aspas inteligentes (" " → " ")
+       - Normalizar traços especiais (- — → -)
+       - Remover caracteres especiais quebrados (�, ? em sequências)
+
+    2. **Remoção de Conteúdo Não-Informativo**:
+       - Remover cabeçalhos e rodapés repetitivos de documentos
+       - Remover metadados de arquivo (nomes de arquivo, caminhos, timestamps)
+       - Remover instruções de formatação ou templates visíveis
+       - Remover linhas vazias excessivas (manter no máximo 2 linhas consecutivas)
+       - Remover pontuação repetida excessiva (!!! → !, ??? → ?)
+
+    3. **Normalização de Estrutura**:
+       - Manter apenas o conteúdo textual relevante das entrevistas
+       - Preservar diálogos e falas dos entrevistados
+       - Remover identificadores técnicos ou códigos internos quando não informativos
+       - Normalizar variações de escrita (ex.: "não" vs "não" com acento)
+
+    4. **Foco em Pontos Importantes**:
+       - Priorizar declarações diretas dos consumidores sobre comportamentos, opiniões e sentimentos
+       - Manter contexto suficiente para entender o significado das falas
+       - Remover redundâncias e repetições desnecessárias
+       - Preservar evidências literais que sustentam insights
+
+    ─────────────────────────────────────────
+    EXTRAÇÃO DE SEMÂNTICA VIA RAG
+    ─────────────────────────────────────────
+
+    Após a limpeza, consulte o Asimov RAG para extrair semântica estruturada:
+
+    - **language**: Identifique o idioma do texto (código ISO, ex.: "pt")
+    - **brand_mentions**: Liste marcas mencionadas explicitamente (normalizadas, sem duplicatas)
+    - **themes**: Extraia temas principais discutidos (focos em insights de consumo, comportamentos, preferências)
+    - **sentiments**: Identifique sentimentos expressos (positivo, neutro, negativo, ambivalente)
+    - **moments**: Capture momentos/ocasiões de consumo mencionados
+    - **evidence**: Selecione 2-5 evidências literais mais relevantes do texto limpo que sustentam os temas identificados
+
+    ⚠️ IMPORTANTE: As evidências devem ser trechos EXATOS do texto limpo, não paráfrases.
+    Priorize evidências que sejam:
+    - Declarações diretas dos consumidores
+    - Exemplos concretos de comportamento ou opinião
+    - Citações que ilustram sentimentos ou temas identificados
+
   expected_output: >
-    Um arquivo JSON tratado por arquivo de entrada, contendo:
-      - text e cleaned_text
-      - semantics: language, brand_mentions, themes, sentiments, moments, evidence
-      - rag: status de execução (ok/uuid/done/status_payload)
+    Após processar os arquivos com a ferramenta treat_folder, você DEVE fornecer um resumo
+    estruturado que será usado pela task write_report. O resumo DEVE incluir:
+    
+    1. Resumo estatístico do processamento (já fornecido pela ferramenta):
+       - Número de arquivos processados
+       - Número de arquivos com sucesso/erro
+       - Status do RAG
+    
+    2. Resumo dos dados tratados (CRÍTICO para o relatório):
+       Após a ferramenta treat_folder processar os arquivos, você DEVE ler os arquivos JSON tratados
+       no diretório {treat_output_dir} e consolidar os seguintes dados:
+       
+       - Lista de TODAS as marcas mencionadas com seus NOMES REAIS (ex: Brahma, Heineken, Skol, Stella Artois)
+         e quantas entrevistas mencionaram cada marca
+       
+       - Lista de TODOS os temas identificados e quantas entrevistas mencionaram cada tema
+       
+       - Lista de TODOS os sentimentos encontrados e sua distribuição
+       
+       - Lista de TODOS os momentos de consumo mencionados
+       
+       - Lista das evidências mais importantes (citações literais do campo "evidence")
+         organizadas por tema ou marca quando aplicável
+       
+       - Número total de entrevistas processadas com sucesso
+       
+       FORMATO DO RESUMO:
+       Apresente os dados consolidados de forma estruturada, listando explicitamente:
+       - Nomes reais das marcas (nunca use genéricos)
+       - Citações literais exatas do campo "evidence"
+       - Contagens de menções por tema/marca/sentimento
+       
+       IMPORTANTE: O resumo dos dados tratados é essencial porque será a única fonte de informação
+       disponível para a task write_report. Sem esse resumo detalhado com nomes reais de marcas
+       e citações literais, o relatório não poderá ser gerado corretamente.
   agent: treater
 
 write_report:
@@ -52,7 +134,21 @@ write_report:
     generalização de mercado ou preenchimento de lacunas.
 
     O relatório deve ser construído EXCLUSIVAMENTE a partir do conteúdo
-    explicitamente presente no contexto fornecido (treatment_result).
+    explicitamente presente no contexto fornecido pelo treatment_result.
+    
+    O treatment_result contém um resumo do processamento E os dados tratados das entrevistas.
+    Os dados tratados incluem:
+    - Transcrições limpas das entrevistas (cleaned_text)
+    - Marcas mencionadas pelos entrevistados (brand_mentions) - use os NOMES REAIS das marcas
+    - Temas identificados (themes)
+    - Sentimentos expressos (sentiments)
+    - Momentos de consumo (moments)
+    - Evidências literais (evidence) - citações EXATAS dos entrevistados
+    
+    ⚠️ CRÍTICO: Você DEVE usar APENAS os dados reais presentes no treatment_result.
+    NUNCA invente ou use nomes genéricos como "Marca A" ou "Marca B".
+    SEMPRE use os nomes reais das marcas mencionadas nas entrevistas (ex: Brahma, Heineken, Skol, Stella Artois).
+    SEMPRE use as citações literais exatas dos entrevistados presentes no campo "evidence".
 
     ─────────────────────────────────────────
     MODO DE OPERAÇÃO OBRIGATÓRIO (NÃO IGNORAR)
@@ -96,15 +192,29 @@ write_report:
     FONTE DE DADOS DISPONÍVEL
     ─────────────────────────────────────────
 
-    Você tem acesso SOMENTE a:
-    - Transcrições literais das entrevistas
-    - Temas identificados
-    - Análises de sentimento extraídas das falas
-    - Marcas mencionadas explicitamente
-    - Momentos de consumo citados pelos entrevistados
+    O treatment_result contém informações sobre o processamento das entrevistas.
+    Os dados tratados estão disponíveis nos arquivos JSON no diretório {treat_output_dir}.
+    
+    IMPORTANTE: O treatment_result pode conter apenas um resumo estatístico. 
+    Você DEVE processar o conteúdo das entrevistas que está disponível no contexto
+    da task anterior (treat) ou nos arquivos JSON mencionados no treatment_result.
+
+    Você tem acesso a:
+    - Transcrições literais das entrevistas (cleaned_text nos arquivos tratados)
+    - Temas identificados (campo "themes" na semântica de cada arquivo)
+    - Análises de sentimento extraídas das falas (campo "sentiments")
+    - Marcas mencionadas explicitamente (campo "brand_mentions")
+    - Momentos de consumo citados pelos entrevistados (campo "moments")
+    - Evidências literais que sustentam os temas (campo "evidence")
 
     NÃO assuma que todos esses elementos existem.
-    Use apenas os que estiverem presentes no contexto.
+    Use apenas os que estiverem presentes no contexto fornecido pelo treatment_result.
+    
+    O treatment_result indica o diretório onde os arquivos JSON tratados estão armazenados.
+    Cada arquivo JSON contém:
+    - cleaned_text: texto limpo da entrevista
+    - semantics: objeto com themes, sentiments, moments, brand_mentions, evidence
+    - uuid: identificador único da entrevista
 
     ─────────────────────────────────────────
     ESTRUTURA DO RELATÓRIO (CONDICIONAL)
@@ -125,18 +235,25 @@ write_report:
        - Se algum dado não estiver disponível, declarar explicitamente
 
     3. Temas Identificados nas Entrevistas
-       - Liste apenas temas realmente presentes
+       - Liste apenas temas realmente presentes no treatment_result
        - Para cada tema:
-         • Quantas entrevistas mencionaram
-         • Citações literais exatas
+         • Quantas entrevistas mencionaram (baseado nos dados agregados)
+         • Citações literais EXATAS do campo "evidence" que sustentam o tema
+       - Use as citações literais do campo "evidence", não invente citações
 
     4. Análise de Sentimento
-       - Use apenas sentimentos identificados nos dados
-       - Explique o sentimento usando falas literais
+       - Use apenas sentimentos identificados nos dados do treatment_result
+       - Para cada sentimento, use as evidências literais do campo "evidence"
+       - Explique o sentimento usando citações literais EXATAS dos entrevistados
        - Se não houver dados suficientes, declarar limitação
 
     5. Marcas e Momentos de Consumo
-       - Analise apenas marcas/momentos explicitamente citados
+       - Liste TODAS as marcas mencionadas usando seus NOMES REAIS (ex: Brahma, Heineken, Skol)
+       - NUNCA use nomes genéricos como "Marca A" ou "Marca B"
+       - Para cada marca, indique:
+         • Quantas entrevistas mencionaram a marca
+         • Citações literais do campo "evidence" que mencionam a marca
+       - Liste os momentos de consumo mencionados com citações literais
        - Se nenhuma marca ou momento for mencionado, declarar ausência
 
     6. Padrões ou Agrupamentos de Opinião
@@ -148,8 +265,11 @@ write_report:
        - NÃO extrapolar implicações além das falas
 
     8. Citações Representativas
-       - Listar apenas citações literais
-       - Não adaptar, resumir ou reescrever
+       - Listar apenas citações literais do campo "evidence" presente nos dados tratados
+       - Use EXATAMENTE o texto presente no campo "evidence" de cada entrevista
+       - Não adaptar, resumir ou reescrever as citações
+       - Se possível, indique qual marca ou tema está relacionado à citação
+       - Ordene por relevância para o tema do relatório
 
     9. Recomendações
        - Só podem existir se houver falas que indiquem expectativas,
