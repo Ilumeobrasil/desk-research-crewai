@@ -1,66 +1,54 @@
 plan_research_task:
   description: >
-    Receba o tema de negócio: '{topic}' e elabore um PLANO DE COLETA ESTRATÉGICA
-    para o X (Twitter), considerando estritamente as limitações da Search API
-    (matching lexical, operadores booleanos, ausência total de semântica).
-
-    OBJETIVO REAL:
-    Traduzir o tema de negócio em QUERIES BOOLEANAS VIÁVEIS que capturem
-    conversas reais de consumidores, usando linguagem coloquial e padrões
-    recorrentes de fala, para posterior análise estratégica
-    (percepções, riscos e oportunidades).
-
-    REGRA FUNDAMENTAL:
-    A query NÃO deve tentar expressar o insight.
-    A query deve apenas capturar matéria-prima textual suficiente
-    para que o insight emerja depois.
-
-    DIRETRIZES OBRIGATÓRIAS PARA QUERIES:
-    - Use APENAS operadores suportados pela Search API:
-      OR, (), -, from:, has:, is:, lang:
-    - Estruture cada query com NO MÁXIMO 2 blocos AND obrigatórios.
-    - Use OR para sinônimos e variações linguísticas reais.
-    - Priorize verbos de opinião, julgamento ou experiência
-      (ex: gostei, achei, curti, ruim, vale a pena, prefiro).
-    - NÃO use termos analíticos, acadêmicos ou abstratos
-      (ex: percepção, posicionamento, imagem, geração, comportamento).
-    - NÃO use filtros de engajamento dentro da query.
-    - Inclua sempre '-is:retweet' e 'lang:pt'.
-    - Cada query deve ser curta, testável isoladamente e focada
-      em UM único ângulo de conversa.
-
-    PADRÃO RECOMENDADO DE QUERY:
-    (termo_principal OR variação)
-    (verbo_opinião OR julgamento)
-    -is:retweet lang:pt
-
-    DEFINIÇÃO DE FILTROS (FORA DA QUERY):
-    - Sugira janela de tempo compatível com busca recente (1 a 7 dias).
-    - Sugira mínimo de engajamento apenas como critério de
-      pós-processamento, nunca como operador de busca.
-
+    Receba o tema de negócio: '{topic}' e produza um PLANO DE PESQUISA para X.
+    - Liste palavras-chave principais e variações.
+    - Sugira janelas de tempo (em dias) e filtros de engajamento para as buscas.
+    - O output deve ser um JSON com campos: queries, days_window_sugerido, min_engagement_sugerido.
   expected_output: >
-    Retorne APENAS um JSON válido com as chaves:
-    - queries: array de strings (queries booleanas curtas e viáveis)
-    - days_window_sugerido: inteiro (1 a 7)
+    Retorne o Plano de pesquisa APENAS em um JSON válido com as chaves:
+    - queries: array de strings
+    - days_window_sugerido: inteiro
     - min_engagement_sugerido: inteiro
 
 collect_tweets_task:
   description: >
-    Usando o research_plan gerado anteriormente, execute a coleta de tweets
-    por meio da ferramenta twitter_search_tool.
+    Usando o research_plan gerado anteriormente, chame a ferramenta 
+    twitter_search_tool para cada query/hashtag.
+    - Respeite, sempre que fizer sentido, os valores de days_window_sugerido 
+    e min_engagement_sugerido.
+    - Consolide todos os tweets em uma lista única JSON, sem duplicar IDs.
+    - Não invente dados; use apenas o retorno da ferramenta.
+  expected_output: "Lista JSON de tweets padronizados."
 
-    REGRAS:
-    - Execute cada query exatamente como definida no plano.
-    - Não reescreva, combine ou "melhore" queries.
-    - Respeite os valores sugeridos de janela de tempo e engajamento
-      sempre que forem compatíveis com a API.
-    - Consolide todos os tweets em uma única lista JSON.
-    - Elimine duplicações apenas por ID.
-    - Não infira, complete ou gere dados inexistentes.
 
+  plan_research_task2:
+  description: >
+    Receba o tema de negócio: '{topic}' e elabore um PLANO DE COLETA ESTRATÉGICA
+    para o X (Twitter), considerando as limitações reais da Search API
+    (matching lexical, ausência de semântica).
+
+    OBJETIVO REAL:
+    Definir queries viáveis que capturem conversas autênticas de consumidores,
+    usando linguagem espontânea, mesmo que imperfeitas, para posterior análise
+    estratégica (percepções, riscos e oportunidades).
+
+    DIRETRIZES OBRIGATÓRIAS:
+    - NÃO use termos analíticos ou acadêmicos (ex: percepção, posicionamento, imagem).
+    - Priorize verbos e expressões coloquiais usadas por pessoas reais
+      (ex: acho, gosto, não gosto, problema, vale a pena).
+    - Prefira múltiplas queries simples a uma query complexa.
+    - Cada query deve ser testável isoladamente.
+    - Evite ANDs excessivos; privilegie recall controlado.
+    - Considere o comportamento típico do X (opiniões curtas, informais).
+
+    DEFINIÇÃO DE FILTROS:
+    - Sugira mínimo de engajamento apenas se fizer sentido estratégico
+      (ex: riscos reputacionais).
   expected_output: >
-    Lista JSON única de tweets padronizados, pronta para análise posterior.
+    Retorne APENAS um JSON válido com as chaves:
+    - queries: array de strings (queries curtas e viáveis para a Search API)
+    - days_window_sugerido: inteiro
+    - min_engagement_sugerido: inteiro
 
 
 analyze_insights_task:

@@ -8,6 +8,9 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 from crewai.tools import BaseTool
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field
+from desk_research.utils.makelog.makeLog import make_log
+
 
 load_dotenv()
 
@@ -16,14 +19,20 @@ def _log(msg: str) -> None:
     print(f"[SocialNetworkXSearchTool] {msg}")
 
 
-from pydantic import BaseModel, Field
-
 class TwitterSearchToolInput(BaseModel):
     """Input schema for SocialNetworkXSearchTool."""
+
     query: str = Field(..., description="A query de busca (tema ou keywords)")
-    max_results: Optional[Union[int, str]] = Field(None, description="Número máximo de tweets")
-    days_window: Optional[Union[int, str]] = Field(None, description="Janela de dias para busca (ex: 7)")
-    min_engagement: Optional[Union[int, str]] = Field(None, description="Mínimo de engajamento (likes+retweets)")
+    max_results: Optional[Union[int, str]] = Field(
+        None, description="Número máximo de tweets"
+    )
+    days_window: Optional[Union[int, str]] = Field(
+        None, description="Janela de dias para busca (ex: 7)"
+    )
+    min_engagement: Optional[Union[int, str]] = Field(
+        None, description="Mínimo de engajamento (likes+retweets)"
+    )
+
 
 class SocialNetworkXSearchTool(BaseTool):
     name: str = "twitter_search_tool"
@@ -49,33 +58,18 @@ class SocialNetworkXSearchTool(BaseTool):
 
             # Cast arguments safely if they come as strings
             try:
-                if max_results is not None: max_results = int(max_results)
-                if days_window is not None: days_window = int(days_window)
-                if min_engagement is not None: min_engagement = int(min_engagement)
+                if max_results is not None:
+                    max_results = int(max_results)
+                if days_window is not None:
+                    days_window = int(days_window)
+                if min_engagement is not None:
+                    min_engagement = int(min_engagement)
             except ValueError:
-                 _log("Warning: Invalid number format in arguments. Using defaults.")
-                 max_results = None
-                 days_window = None
-                 min_engagement = None
+                _log("Warning: Invalid number format in arguments. Using defaults.")
+                max_results = None
+                days_window = None
+                min_engagement = None
 
-            # Defaults alinhados com .env
-            if max_results is None:
-                max_results = int(os.getenv("TWITTER_MAX_TWEETS", "30"))
-            if days_window is None:
-                days_window = int(os.getenv("TWITTER_DAYS_WINDOW", "3"))
-            if min_engagement is None:
-                min_engagement = int(os.getenv("TWITTER_MIN_ENGAGEMENT", "5"))
-
-            # Se não temos token ou stub_mode está ligado, devolve dados de exemplo
-            if not bearer or stub_mode:
-                _log(
-                    f"(STUB) query={query!r}, max_results={max_results}, "
-                    f"days_window={days_window}, min_engagement={min_engagement}, "
-                    f"language={language}"
-                )
-                return self._fake_results(query)
-
-            # Caso contrário, chama a API real do X
             _log(
                 f"query={query!r}, max_results={max_results}, "
                 f"days_window={days_window}, min_engagement={min_engagement}, "
@@ -86,16 +80,12 @@ class SocialNetworkXSearchTool(BaseTool):
                 query=query,
                 max_results=max_results,
                 days_window=days_window,
-                min_engagement=min_engagement,
+                min_engagement=0,
                 language=language,
             )
         except Exception as e:
             _log(f"CRITICAL ERROR in _run: {e}")
             return [{"error": str(e)}]
-
-    # ---------------------------
-    # Implementação real (API X)
-    # ---------------------------
 
     def _call_twitter_api(
         self,
@@ -111,32 +101,55 @@ class SocialNetworkXSearchTool(BaseTool):
 
         Simplificado para PoC: não trata paginação em profundidade, apenas uma página.
         """
-        # Ajusta a janela de datas
-        end_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=15)
-        start_time = end_time - dt.timedelta(days=days_window)
+
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        end_time = now - dt.timedelta(seconds=15)
+        start_time = now - dt.timedelta(days=days_window) + dt.timedelta(seconds=5)
+        # start_time = now - dt.timedelta(days=max_days) + dt.timedelta(seconds=5)
+
+        print(f"start_time: {start_time}")
+        print(f"end_time: {end_time}")
 
         # A API nova do X usa api.x.com; a antiga, api.twitter.com.
         # Para PoC, qualquer um dos dois domínios pode ser ajustado pelos devs.
-        #url = "https://api.x.com/2/tweets/search/recent"
-        url = "https://api.twitter.com/2/tweets/search/recent"
+        url = "https://api.twitter.com/2/tweets/search/all"
+        # url = "https://api.twitter.com/2/tweets/search/recent"
 
         headers = {
             "Authorization": f"Bearer {bearer}",
         }
 
         # Construção simples de query (você pode enriquecer depois)
-        full_query = f"{query} lang:{language}"
+        # full_query = f"{query} lang:{language}"
+        full_query = f"""{query} has:links -is:retweet lang:pt"""
+
+        start_time_str = (
+            start_time.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        )
+        end_time_str = (
+            end_time.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        )
 
         params = {
             "query": full_query,
-            "max_results": max_results,
-            "start_time": start_time.replace(microsecond=0).isoformat() + "Z",
-            "end_time": end_time.replace(microsecond=0).isoformat() + "Z",
-            "tweet.fields": "created_at,public_metrics,lang,author_id",
+            "max_results": 10,#max_results,
+            "tweet.fields": "created_at,public_metrics,lang",
         }
 
         resp = requests.get(url, headers=headers, params=params, timeout=30)
 
+        make_log(
+            {
+                "logName": query,
+                "content": {
+                    "start_time": start_time_str,
+                    "end_time": end_time_str,
+                    "full_query": full_query,
+                    "max_results": max_results,
+                    "resp": resp.json(),
+                },
+            }
+        )
         if resp.status_code == 429:
             reset = resp.headers.get("x-rate-limit-reset")
             print(f"reset: {reset}")
