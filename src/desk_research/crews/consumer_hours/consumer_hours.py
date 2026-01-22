@@ -24,6 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DATA_DIR = PROJECT_ROOT / "data"
 INPUT_RAW_DIR = DATA_DIR / "input_raw"
 OUTPUT_INGESTOR_DIR = DATA_DIR / "output_ingestor"
+OUTPUT_TREATMENT_DIR = DATA_DIR / "output_treatment"
 
 DEFAULT_SNIPPET_CHUNK_CHARS = 3500
 DEFAULT_MAX_SNIPPETS_PER_REQUEST = 30
@@ -52,6 +53,7 @@ TRUTHY_VALUES = {"1", "true", "yes", "y", "on"}
 class Paths:
     input_dir: str
     output_dir: str
+    treatment_output_dir: str
 
 
 @dataclass(frozen=True)
@@ -93,6 +95,7 @@ def get_settings() -> Settings:
 
     input_dir = os.getenv("INGESTOR_INPUT_DIR") or str(INPUT_RAW_DIR)
     output_dir = os.getenv("INGESTOR_OUTPUT_DIR") or str(OUTPUT_INGESTOR_DIR)
+    treatment_output_dir = os.getenv("TREATMENT_OUTPUT_DIR") or str(OUTPUT_TREATMENT_DIR)
 
     llm_config = LLMConfig(
         model=(os.getenv("MODEL") or "").strip(),
@@ -108,7 +111,7 @@ def get_settings() -> Settings:
     )
 
     return Settings(
-        paths=Paths(input_dir=input_dir, output_dir=output_dir),
+        paths=Paths(input_dir=input_dir, output_dir=output_dir, treatment_output_dir=treatment_output_dir),
         llm=llm_config,
         asimov=asimov_config,
     )
@@ -289,6 +292,7 @@ def _build_result_payload(
     return {
         "input_dir": settings.paths.input_dir,
         "output_dir": settings.paths.output_dir,
+        "treatment_output_dir": settings.paths.treatment_output_dir,
         "result": str(crew_result),
         "asimov": {
             "enabled": settings.asimov.enabled,
@@ -411,7 +415,7 @@ def _get_task_inputs(settings: Settings, topic: str = "Entrevistas em Profundida
     # Inputs específicos para a tarefa treat
     # O treater lê do output_dir do ingestor (onde estão os .json gerados)
     treat_input_dir = settings.paths.output_dir  # Onde o ingestor escreveu os .json
-    treat_output_dir = settings.paths.output_dir  # Onde escrever os .json tratados (mesmo diretório)
+    treat_output_dir = settings.paths.treatment_output_dir  # Onde escrever os .json tratados (diretório separado)
     
     return {
         # Inputs para tarefa ingest
@@ -450,7 +454,7 @@ def _execute_crew(settings: Settings, topic: str) -> Any:
         # Agrega os dados tratados para incluir no contexto da task write_report
         # Isso garante que os dados estejam disponíveis mesmo que o treatment_result
         # contenha apenas o resumo estatístico
-        aggregated_data = _aggregate_treated_data(settings.paths.output_dir)
+        aggregated_data = _aggregate_treated_data(settings.paths.treatment_output_dir)
         
         # Converte os dados agregados em formato JSON string para incluir no contexto
         aggregated_data_json = json.dumps(aggregated_data, ensure_ascii=False, indent=2)
@@ -476,6 +480,7 @@ def run_consumer_hours_analysis(topic: str) -> dict[str, Any]:
 
     _ensure_directory(settings.paths.input_dir)
     _ensure_directory(settings.paths.output_dir)
+    _ensure_directory(settings.paths.treatment_output_dir)
 
     crew_result = _execute_crew(settings, topic=topic)
 
