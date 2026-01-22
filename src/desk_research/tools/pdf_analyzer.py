@@ -1,30 +1,32 @@
-﻿"""
-Ferramenta de análise de PDF compatível com CrewAI
-"""
-import requests
+﻿import requests
 import PyPDF2
+from desk_research.utils.makelog.makeLog import make_log
 import pdfplumber
 import io
 import re
+from crewai.tools import tool
+from bs4 import BeautifulSoup
 
-
-def pdf_analyzer_func(url: str) -> str:
+@tool("pdf_analyzer")
+def pdf_analyzer_tool(url: str) -> str:
     """
-    Analisa um PDF acadêmico e extrai todo o conteúdo textual.
-    
+    Analisa um PDF acadêmico extraindo todo o conteúdo textual.
+
+    Esta ferramenta é compatível com o padrão CrewAI e usa lógica robusta
+    para baixar e extrair texto de PDFs (via pdfplumber e PyPDF2).
+
     Args:
-        url: URL direta do PDF (ex: https://arxiv.org/pdf/XXXX.XXXXX)
-        
+        url: URL direta do PDF (ex: https://arxiv.org/pdf/XXXX.XXXXX or https://domain.com/paper.pdf)
+
     Returns:
         Texto completo extraído do PDF
     """
     try:
-        # Validar URL via Content-Type (mais robusto)
+        print("------------------------------------------------------------------------------------------------")
         print(f"📥 Verificando URL: {url}")
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         
         try:
-            # Primeiro tenta HEAD para ser rápido
             head_resp = requests.head(url, headers=headers, allow_redirects=True, timeout=10)
             content_type = head_resp.headers.get('Content-Type', '').lower()
             
@@ -36,10 +38,11 @@ def pdf_analyzer_func(url: str) -> str:
                 
                 if 'application/pdf' in get_resp.headers.get('Content-Type', '').lower():
                     # Era PDF mesmo, mas HEAD falhou ou servidor não mandou type correto no HEAD
+                    print(f"✅ Era PDF mesmo, mas HEAD falhou ou servidor não mandou type correto no HEAD")
                     response = get_resp
                 else:
                     # É HTML. Tentar achar link de PDF.
-                    from bs4 import BeautifulSoup
+                    print(f"✅ É HTML. Tentar achar link de PDF.")
                     soup = BeautifulSoup(get_resp.content, 'html.parser')
                     
                     # Heurística: procurar links que terminam em .pdf ou contêm 'pdf' no href/texto
@@ -58,12 +61,15 @@ def pdf_analyzer_func(url: str) -> str:
                         url = pdf_link
                         response = requests.get(url, headers=headers, timeout=30)
                     else:
+                        print(f"❌ URL retorna HTML e nenhum link de PDF explícito foi encontrado: {url}")
                         return f"ERRO: URL retorna HTML e nenhum link de PDF explícito foi encontrado: {url}"
             else:
                 # É PDF, baixar
+                print(f"✅ É PDF, baixar")
                 response = requests.get(url, headers=headers, timeout=30)
                 
         except Exception as e:
+            print(f"❌ ERRO ao acessar URL: {str(e)}")
             return f"ERRO ao acessar URL: {str(e)}"
 
         response.raise_for_status()
@@ -153,29 +159,11 @@ def pdf_analyzer_func(url: str) -> str:
         
         result = "\n".join(parts)
         print(f"✅ Análise concluída: {len(result)} caracteres")
+        make_log({
+            "logName": f"pdf_analyzer-{url.split('/')[-1]}",
+            "content": result
+        })
         return result
         
     except Exception as e:
         return f"ERRO ao processar PDF: {str(e)}"
-
-
-# Classe wrapper para CrewAI
-class PDFAnalyzerTool:
-    """Wrapper da ferramenta de análise de PDF para CrewAI."""
-    
-    name: str = "pdf_analyzer"
-    description: str = (
-        "Analisa PDFs acadêmicos extraindo TODO o conteúdo textual. "
-        "Use para ler o conteúdo COMPLETO de papers científicos. "
-        "Entrada: url (string) - URL direta do PDF (ex: https://arxiv.org/pdf/2304.02381v2). "
-        "Retorna: Texto completo incluindo título, autores, abstract, metodologia, resultados."
-    )
-    func = pdf_analyzer_func  # ✅ Atributo func apontando para a função
-    
-    def __call__(self, url: str) -> str:
-        """Permite chamar a instância como função."""
-        return self.func(url)
-    
-    def _run(self, url: str) -> str:
-        """Método alternativo para executar."""
-        return self.func(url)

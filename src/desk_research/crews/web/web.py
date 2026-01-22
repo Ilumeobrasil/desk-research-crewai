@@ -1,12 +1,9 @@
-import sys
-from pathlib import Path
 import datetime
 
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.research_tools import google_search_tool, web_scraper_tool, url_validator_tool
-
 from desk_research.utils.reporting import export_report
 
 @CrewBase
@@ -70,15 +67,19 @@ class WebCrew:
         )
 
 def run_web_research(query: str, max_results: int = 10):
-    inputs = {
-        'query': query,
-        'max_results': max_results,
-        'current_date': datetime.datetime.now().strftime('%d/%m/%Y')
-    }
-    
-    crew = WebCrew()
-    result = crew.crew().kickoff(inputs=inputs)
-    
-    export_report(result, query, prefix="web_report", crew_name="web")
-    
-    return result
+    try:    
+        inputs = {
+            'query': query,
+            'max_results': max_results,
+            'current_date': datetime.datetime.now().strftime('%d/%m/%Y')
+        }
+        
+        crew = WebCrew()
+        result = crew.crew().kickoff(inputs=inputs)
+        
+        export_report(result, query, prefix="web_report", crew_name="web")
+        
+        return result
+    except Exception as e:
+        print(f"Error running web research: {e}")
+        return None

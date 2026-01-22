@@ -1,7 +1,8 @@
 ﻿import logging
-from pathlib import Path
+from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
+from desk_research.tools.pdf_analyzer import pdf_analyzer_tool
+from desk_research.utils.reporting import export_report
 from dotenv import load_dotenv
-import os
 from datetime import datetime
 import json
 import httpx
@@ -9,13 +10,10 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from desk_research.tools.research_tools import (
     serper_scholar_tool,
-    semantic_scholar_tool,
-    arxiv_tool,
+    scielo_tool,
     openalex_search_tool,
-    pdf_analyzer_tool
 )
 from desk_research.models.academic_models import AcademicReport, validar_relatorio
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -51,7 +49,6 @@ httpx.Client.send = patched_send
 class AcademicResearchCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
-    
 
     def academic_researcher(self) -> Agent:
         return Agent(
@@ -59,8 +56,8 @@ class AcademicResearchCrew:
             tools=[
                 serper_scholar_tool,
                 openalex_search_tool,
-                arxiv_tool,
-                pdf_analyzer_tool
+                #scielo_tool,
+                #pdf_analyzer_tool
             ],
             verbose=True
         )
@@ -70,8 +67,7 @@ class AcademicResearchCrew:
         return Agent(
             config=self.agents_config['literature_analyst'],
             tools=[pdf_analyzer_tool],
-
-            verbose=True
+            verbose=False
         )
     
     @agent
@@ -79,8 +75,7 @@ class AcademicResearchCrew:
         return Agent(
             config=self.agents_config['academic_synthesizer'],
             tools=[],
-
-            verbose=True
+            verbose=VERBOSE_AGENTS
         )
     
     @task
@@ -116,12 +111,10 @@ class AcademicResearchCrew:
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=True
+            verbose=VERBOSE_CREW
         )
     
     def run(self, topic: str, max_papers: int = 3) -> dict:
-        logger.info(f"Starting research on: {topic}")
-        
         result = self.crew().kickoff(inputs={
             'topic': topic,
             'max_papers': max_papers
@@ -235,8 +228,29 @@ class AcademicResearchCrew:
             sys.stderr.write(f"Error exporting report: {e}\n")
 
 def run_academic_research(topic: str, max_papers: int = 10) -> dict:
-    crew = AcademicResearchCrew()
-    return crew.run(topic=topic, max_papers=max_papers)
+    try:
+        crew = AcademicResearchCrew()
+        return crew.run(topic=topic, max_papers=max_papers)
+    except Exception as e:
+        print(f"Error running academic research: {e}")
+        return None
 
+""" def run_academic_research(topic: str, max_papers: int = 10) -> dict:
+    try:
+        inputs = {
+            'topic': topic,
+            'max_papers': max_papers
+        }
+
+        crew = AcademicResearchCrew()
+        result = crew.crew().kickoff(inputs=inputs)
+        
+        export_report(result, topic, prefix="academic_report", crew_name="academic")
+
+        return result
+    except Exception as e:
+        print(f"Error running academic research: {e}")
+        return None
+ """
 AcademicCrew = AcademicResearchCrew
 
