@@ -1,5 +1,6 @@
 import datetime
 import json
+import time
 
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
@@ -74,9 +75,9 @@ class WebCrew:
         ) """
 
     @task
-    def create_structure(self) -> Task:
+    def evidence_consolidation_task(self) -> Task:
         return Task(
-            config=self.tasks_config['create_structure'],
+            config=self.tasks_config['evidence_consolidation_task'],
             context=[self.extract_web_content()],
             agent=self.web_report_writer()
         )

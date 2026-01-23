@@ -70,34 +70,84 @@ extract_web_content:
     ### Status do conteúdo
     - Conteúdo suficiente / Conteúdo insuficiente / Conteúdo ausente
 
-create_structure:
+evidence_consolidation_task:
   description: >
-    Consolidar todo o material organizado em um documento
-    que funcione como BASE DE EVIDÊNCIAS para análises futuras.
+    Consolidar evidências factuais a partir de conteúdos web já extraídos,
+    preservando ALTA DENSIDADE de informação e máxima fidelidade textual.
 
-    ESTE DOCUMENTO NÃO RESPONDE À PERGUNTA.
-    Ele serve como insumo factual.
+    ESTA TASK NÃO RESPONDE À PERGUNTA '{query}'.
+    Ela NÃO realiza análise, síntese, interpretação ou conclusões.
 
-    REGRAS:
-    1. Idioma: PT-BR
-    2. Preserve a redação original sempre que possível.
-    3. Reescrita mínima apenas para clareza técnica.
-    4. NÃO criar conclusões, sínteses ou respostas.
+    O objetivo é criar uma BASE DE EVIDÊNCIAS DENSA,
+    granular e rastreável, que sirva de insumo direto
+    para um relatório analítico posterior.
+
+    REGRAS ABSOLUTAS (CRÍTICO):
+
+    1. TODO o texto apresentado DEVE ser literal ou quase literal
+       (copiado das fontes extraídas).
+
+    2. É PROIBIDO:
+       - Resumir parágrafos
+       - Parafrasear ideias
+       - Generalizar informações
+       - Criar frases explicativas
+       - Unificar dados de fontes diferentes em uma única frase
+
+    3. Cada evidência DEVE ser atribuída explicitamente à sua fonte.
+
+    4. O agente NÃO pode:
+       - Inferir tendências
+       - Comparar dados entre fontes
+       - Avaliar relevância
+       - Reduzir volume para “melhor leitura”
+
+    ESTRATÉGIA OBRIGATÓRIA DE ALTA DENSIDADE:
+
+    - Priorizar EXTRAÇÃO DE PARÁGRAFOS COMPLETOS
+    - Manter números, percentuais, datas, nomes próprios e citações
+    - Quando necessário cortar texto, usar "..." explicitamente
+    - Repetição de informações ENTRE fontes é PERMITIDA
+      (não deduplicar)
   expected_output: >
-    # Base de Evidências — {query}
+    Documento em markdown com ALTA DENSIDADE de evidências literais,
+    organizado da seguinte forma:
 
-    ## 1. Definições e Contexto (extraídos das fontes)
-    [Trechos literais organizados]
+    ## 1. Fontes Utilizadas
 
-    ## 2. Evidências Numéricas e Percentuais
-    [Dados organizados por fonte]
+    Para cada fonte:
+    - Título
+    - URL
+    - Data de publicação (ou "não informada")
+    - Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo)
 
-    ## 3. Evidências Textuais Relevantes
-    [Parágrafos extraídos, agrupados por tema]
+    ## 2. Evidências Numéricas (Trechos Literais)
 
-    ## 4. Pontos com Ausência de Dados
-    [Lista explícita]
+    ### Fonte: <Título da fonte>
+    - "64% dos adultos afirmaram não beber em 2025..."
+    - "A abstinência passou de 46% para 64% entre pessoas de 18 a 24 anos..."
+    - "O segmento de cervejas sem álcool cresceu 15% no segundo trimestre de 2025..."
 
-    ## 5. Fontes
-    - Título original — URL
-    Este documento NÃO contém respostas, análises ou conclusões.
+    (Não consolidar números de fontes diferentes)
+
+    ## 3. Evidências Textuais Contextuais
+
+    ### Fonte: <Título da fonte>
+    "Parágrafo completo conforme extraído..."
+
+    ### Fonte: <Outra fonte>
+    "Parágrafo completo conforme extraído..."
+
+    ## 4. Declarações de Atores Relevantes
+
+    ### Nome — Cargo — Organização — Fonte
+    "Declaração literal..."
+
+    (Repetir para cada fala relevante)
+
+    ## 5. Pontos Não Explicitamente Abordados nas Fontes
+
+    - Nenhuma das fontes apresenta dados quantitativos específicos
+      sobre consumo de cerveja alcoólica tradicional por geração Z.
+    - Nenhuma fonte afirma explicitamente se a redução observada
+      é uma tendência permanente ou temporária.
