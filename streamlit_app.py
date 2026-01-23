@@ -134,12 +134,7 @@ def extract_result_text(result: Any) -> str:
     return str(result)
 
 def format_result_for_chat(result: Any, modo: Optional[str] = None) -> str:
-    """Formata o resultado para exibição no chat."""
     texto = extract_result_text(result)
-    
-    if modo and modo in MODE_CONFIG:
-        modo_info = MODE_CONFIG[modo]
-        return f"**{modo_info['emoji']} {modo_info['nome']}**\n\n{texto}"
     
     return texto 
 
