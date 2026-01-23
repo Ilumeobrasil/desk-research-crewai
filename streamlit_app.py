@@ -22,9 +22,11 @@ if (_parent_dir / "src" / "desk_research").exists():
 
 # Importações do módulo desk_research com tratamento de erro
 try:
+    # Importar parameter_collectors primeiro para garantir que o módulo seja carregado
+    import desk_research.system.parameter_collectors  # noqa: F401
     from desk_research.system.research_system import DeskResearchSystem
     from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
-except ImportError as e:
+except (ImportError, KeyError) as e:
     error_msg = (
         f"❌ Erro ao importar módulos desk_research.\n\n"
         f"Diretório atual: {_current_dir}\n"
