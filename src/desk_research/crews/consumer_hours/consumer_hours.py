@@ -338,6 +338,7 @@ def _aggregate_treated_data(output_dir: str) -> dict[str, Any]:
             
             semantics = data.get("semantics", {})
             cleaned_text = data.get("cleaned_text", "")
+            resumo = data.get("resumo")
             
             # Agrega temas
             themes = semantics.get("themes", [])
@@ -381,6 +382,7 @@ def _aggregate_treated_data(output_dir: str) -> dict[str, Any]:
                 "uuid": data.get("uuid"),
                 "source_file": data.get("source_file") or data.get("file"),
                 "cleaned_text": cleaned_text[:5000] if cleaned_text else "",  # Limita tamanho
+                "resumo": resumo,
                 "themes": themes,
                 "sentiments": sentiments,
                 "moments": moments,

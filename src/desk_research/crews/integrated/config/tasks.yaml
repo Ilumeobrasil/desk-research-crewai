@@ -33,6 +33,8 @@ synthesis_task:
     - As fontes devem existir literalmente em {reports_context}.
     - Não invente, complete ou presuma dados ausentes.
     - Afirmações sem fonte não devem ser incluídas.
+    - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas
+      como evidência, utilizando texto literal das transcrições.
 
     ============================
     IDIOMA
@@ -60,6 +62,8 @@ synthesis_task:
     ## DÁ PARA AFIRMAR
     - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.
     - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
+    - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas como evidência,
+      utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
     - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
 
     ## NÃO FICA CLARO

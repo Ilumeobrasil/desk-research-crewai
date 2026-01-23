@@ -416,6 +416,21 @@ class IngestFolderTool(BaseTool):
                     warnings.append(f"empty_text:{fp.name}")
                     continue
 
+                file_already_processed = False
+                for json_file in sorted(out_path.rglob("*.json")):
+                    try:
+                        json_data = json.loads(json_file.read_text(encoding="utf-8"))
+                        
+                        if json_data.get("file_name") == str(fp.name):
+                            outputs.append(str(json_file))
+                            file_already_processed = True
+                            break
+                    except (json.JSONDecodeError, KeyError, Exception) as exc:
+                        continue
+            
+                if file_already_processed:
+                    continue
+
                 file_uuid = str(uuid.uuid4())
                 file_meta = _file_metadata(fp, root_dir=in_path)
 

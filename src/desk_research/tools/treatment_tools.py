@@ -381,6 +381,29 @@ TEXTO-ALVO:
 \"\"\"{target}\"\"\"
 """
 
+RAG_SUMMARY_SYSTEM_PROMPT = (
+    "Você é um especialista em pesquisa qualitativa e Consumer Insights. "
+    "Você deve retornar APENAS texto puro (sem markdown, sem JSON), um resumo executivo conciso."
+)
+
+RAG_SUMMARY_QUERY_TEMPLATE = """Com base na entrevista Consumer Hours abaixo, gere um resumo executivo conciso (2-4 parágrafos) que destaque:
+
+- Principais insights e comportamentos mencionados pelo entrevistado
+- Temas centrais da conversa
+- Sentimentos e percepções expressos
+- Momentos ou ocasiões de consumo relevantes
+- Marcas mencionadas (se houver)
+
+O resumo deve ser:
+- Executivo e direto ao ponto
+- Baseado exclusivamente no conteúdo da entrevista
+- Focado em insights acionáveis
+- Escrito em português brasileiro
+
+ENTREVISTA:
+\"\"\"{target}\"\"\"
+"""
+
 
 def _fallback_semantics(cleaned_text: str) -> dict[str, Any]:
     ev = []
@@ -527,6 +550,7 @@ def run_treatment_folder(
                 "moments": [],
                 "evidence": [],
             },
+            "resumo": None,
             "rag": {
                 "enabled": bool(enable_rag),
                 "ok": False,
@@ -540,6 +564,7 @@ def run_treatment_folder(
 
         if not cleaned_text:
             out_item["semantics"] = _fallback_semantics(cleaned_text)
+            out_item["resumo"] = None
             (output_dir / f"{file_uuid}.json").write_text(json.dumps(out_item, ensure_ascii=False, indent=2), encoding="utf-8")
             processed_ok += 1
             continue
@@ -607,9 +632,45 @@ def run_treatment_folder(
                     sem["brand_mentions"] = be_pack["brand_mentions"]
                     sem["brand_mentions_uncertain"] = be_pack["brand_mentions_uncertain"]
                     sem["brand_evidence"] = be_pack["brand_evidence"]
+
+                    # Gera resumo executivo após processar a semântica
+                    if cleaned_text:
+                        try:
+                            summary_resp = rag.completion_with_context(
+                                messages=[
+                                    {"role": "system", "content": RAG_SUMMARY_SYSTEM_PROMPT},
+                                    {"role": "user", "content": RAG_SUMMARY_QUERY_TEMPLATE.format(target=cleaned_text[:8000])},
+                                ],
+                                dataset=dataset or "",
+                                model=model,
+                                temperature=0.3,
+                                max_tokens=800,
+                                poll_attempts=poll_attempts,
+                                poll_sleep_s=poll_sleep_s,
+                            )
+                            if summary_resp.get("ok"):
+                                summary_content = summary_resp.get("content", "").strip()
+                                # Remove markdown code blocks se existirem
+                                if summary_content.startswith("```"):
+                                    lines = summary_content.split("\n")
+                                    summary_content = "\n".join(lines[1:-1]) if len(lines) > 2 else summary_content
+                                out_item["resumo"] = summary_content[:2000] if summary_content else None
+                            else:
+                                # Se falhar, tenta gerar um resumo básico
+                                if cleaned_text:
+                                    out_item["resumo"] = cleaned_text[:500] + "..."
+                        except Exception as e:
+                            # Em caso de erro, não quebra o fluxo, apenas não gera resumo
+                            error_key = f"summary_generation_error:{file_uuid}"
+                            top_errors[error_key] = top_errors.get(error_key, 0) + 1
+                            if cleaned_text:
+                                out_item["resumo"] = cleaned_text[:500] + "..."
                 else:
                     out_item["semantics"] = _fallback_semantics(cleaned_text)
                     top_errors["rag_unparseable_json"] = top_errors.get("rag_unparseable_json", 0) + 1
+                    # Gera resumo básico mesmo quando JSON não é parseável
+                    if cleaned_text and not out_item.get("resumo"):
+                        out_item["resumo"] = cleaned_text[:500] + "..."
             else:
                 out_item["semantics"] = _fallback_semantics(cleaned_text)
                 err_key = out_item["rag"]["error"] or f"rag_error:{out_item['rag']['status'] or 'unknown'}"
@@ -623,6 +684,13 @@ def run_treatment_folder(
                             "detail": (out_item["rag"]["detail"] or "")[:300],
                         }
                     )
+                # Gera resumo básico quando RAG falha
+                if cleaned_text and not out_item.get("resumo"):
+                    out_item["resumo"] = cleaned_text[:500] + "..."
+
+        # Se RAG não está habilitado, gera resumo básico
+        if not enable_rag and cleaned_text and not out_item.get("resumo"):
+            out_item["resumo"] = cleaned_text[:500] + "..."
 
         (output_dir / f"{file_uuid}.json").write_text(json.dumps(out_item, ensure_ascii=False, indent=2), encoding="utf-8")
 

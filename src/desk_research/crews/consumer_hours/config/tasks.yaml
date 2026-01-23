@@ -112,12 +112,16 @@ treat:
        - Lista das evidências mais importantes (citações literais do campo "evidence")
          organizadas por tema ou marca quando aplicável
        
+       - Resumos executivos de cada entrevista (campo "resumo" do JSON tratado)
+         que contêm sínteses dos principais insights de cada entrevista
+       
        - Número total de entrevistas processadas com sucesso
        
        FORMATO DO RESUMO:
        Apresente os dados consolidados de forma estruturada, listando explicitamente:
        - Nomes reais das marcas (nunca use genéricos)
        - Citações literais exatas do campo "evidence"
+       - Resumos executivos das entrevistas (campo "resumo")
        - Contagens de menções por tema/marca/sentimento
        
        IMPORTANTE: O resumo dos dados tratados é essencial porque será a única fonte de informação
@@ -127,141 +131,178 @@ treat:
 
 write_report:
   description: >
-    ⚠️ RELATÓRIO COM RESTRIÇÃO ABSOLUTA AO CONTEXTO ⚠️
+    Criar um RELATÓRIO EXECUTIVO COMPLETO E DENSO
+    (profundo, analítico e responsável) sobre o tema:
 
-    Este agente DEVE operar em modo "context-bound estrito".
-    É PROIBIDO utilizar qualquer conhecimento externo,
-    benchmarking, generalização de mercado ou suposição não verbalizada.
+    "{topic}"
+
+    utilizando EXCLUSIVAMENTE os dados presentes nas entrevistas Consumer Hours.
+
+    Este relatório NÃO é exploratório nem opinativo.
+    Seu objetivo é traduzir evidência qualitativa
+    em INSIGHTS EXECUTIVOS CLAROS,
+    respeitando estritamente os limites dos dados.
+
+    ─────────────────────────────────────────
+    MODO DE OPERAÇÃO OBRIGATÓRIO
+    ─────────────────────────────────────────
+
+    ⚠️ CONTEXT-BOUND ESTRITO ⚠️
+
+    É ESTRITAMENTE PROIBIDO:
+    - Utilizar conhecimento externo
+    - Fazer benchmarking
+    - Generalizar para o mercado
+    - Inferir causas, motivações ou impactos
+      que não estejam verbalizados
+    - Preencher lacunas com suposições
+
+    Tudo o que for escrito DEVE estar ancorado
+    em evidência das entrevistas.
 
     ─────────────────────────────────────────
     PRINCÍPIO CENTRAL
     ─────────────────────────────────────────
 
-    Este relatório deve gerar INSIGHTS EXECUTIVOS
-    exclusivamente a partir da SÍNTESE de falas explícitas
-    presentes nas entrevistas Consumer Hours.
+    Este relatório DEVE:
 
-    Insight, neste contexto, é definido como:
-    "Síntese de padrões, recorrências ou contrastes
-     claramente observáveis nas falas dos entrevistados,
-     SEM adicionar causas, motivações ou impactos não verbalizados."
+    - Diferenciar claramente:
+      • O que os entrevistados AFIRMAM
+      • O que aparece como PADRÃO recorrente
+      • O que NÃO pode ser afirmado
+    - Declarar explicitamente insuficiência de dados
+      sempre que aplicável
+    - Evitar qualquer extrapolação estratégica
+      não verbalizada pelos consumidores
+
+    Insight, neste contexto, significa:
+    "Síntese fiel de padrões, recorrências ou contrastes
+     observáveis nas entrevistas,
+     SEM adicionar explicações externas."
 
     ─────────────────────────────────────────
-    REGRAS DE OURO (INVIOLÁVEIS)
+    REGRAS DE EVIDÊNCIA (INVIOLÁVEIS)
     ─────────────────────────────────────────
 
-    1. PROIBIÇÃO DE INVENÇÃO
-       - Nunca inventar dados, percentuais ou padrões inexistentes
-       - Nunca usar conhecimento externo ou suposições
+    Nenhuma afirmação pode existir sem evidência.
 
-    2. INFERÊNCIA CONTROLADA (PERMITIDA)
-       - É PERMITIDO:
-         • Sintetizar padrões recorrentes
-         • Agrupar falas semelhantes
-         • Comparar posicionamentos explícitos
-       - É PROIBIDO:
-         • Explicar causas não verbalizadas
-         • Inferir intenção, motivação ou impacto futuro
+    Para QUALQUER insight, tendência ou padrão,
+    É OBRIGATÓRIO informar:
 
-    3. EVIDÊNCIA OBRIGATÓRIA
-       - Toda síntese deve ser sustentada por:
-         a) Quantidade de entrevistas envolvidas
-         b) Pelo menos uma citação literal EXATA
-            retirada do campo "evidence"
+    1. Número de entrevistas envolvidas
+    2. Pelo menos uma citação literal EXATA
+       retirada do campo "evidence"
 
-    Se qualquer um desses elementos não existir,
-    a síntese NÃO pode ser escrita.
+    Se qualquer um desses elementos faltar:
+    ➜ NÃO ESCREVA O INSIGHT
+    ➜ DECLARE A AUSÊNCIA DE EVIDÊNCIA
 
     ─────────────────────────────────────────
     FONTE ÚNICA DE DADOS
     ─────────────────────────────────────────
 
-    Use EXCLUSIVAMENTE os dados presentes no treatment_result
-    e nos arquivos JSON tratados indicados.
+    Use EXCLUSIVAMENTE os dados disponíveis
+    no treatment_result e nos arquivos JSON tratados.
 
-    Dados disponíveis (se existirem):
+    Campos que PODEM existir (não assumir todos):
     - cleaned_text
+    - resumo
     - themes
     - sentiments
     - brand_mentions (usar SEMPRE nomes reais)
     - moments
-    - evidence (citações literais exatas)
+    - evidence
 
-    NÃO ASSUMA que todos existem.
-    Se algo não estiver presente, declare explicitamente a ausência.
-
-    ─────────────────────────────────────────
-    OBJETIVO DO RELATÓRIO
-    ─────────────────────────────────────────
-
-    Produzir um RELATÓRIO EXECUTIVO EM MARKDOWN
-    que responda de forma clara e direta ao tema:
-
-    "{topic}"
-
-    Data do relatório: {date}
-
-    Público: Área de Insights.
-    Linguagem: Executiva, clara, objetiva, sem jargão técnico.
+    Se um campo não estiver presente,
+    declare explicitamente sua ausência no relatório.
 
     ─────────────────────────────────────────
-    ESTRUTURA DO RELATÓRIO
+    DIRETRIZES DE ESCRITA
     ─────────────────────────────────────────
 
-    1. Resumo Executivo
-       - Responder diretamente ao tópico
+    1. O relatório deve ser escrito em português (PT-BR)
+    2. Linguagem executiva, clara e precisa
+    3. Texto corrido e analítico (evitar listas soltas)
+    4. Cada seção deve conter múltiplos parágrafos
+       substanciais, quando os dados permitirem
+    5. Nunca “forçar densidade” se os dados não sustentarem
+
+    Densidade aqui significa profundidade analítica,
+    não volume artificial de texto.
+
+    ─────────────────────────────────────────
+    ESTRUTURA OBRIGATÓRIA DO RELATÓRIO
+    ─────────────────────────────────────────
+
+    1. Título e Data
+       - Título relacionado diretamente ao tema "{topic}"
+       - Data do relatório: {date}
+
+    2. Resumo Executivo
+       - Responder diretamente ao tema
        - Sintetizar apenas padrões explícitos
        - Indicar quantas entrevistas sustentam cada ponto
+       - Declarar claramente limites dos dados
+       - Incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
+       - Resumo deve ser claro e possuir múltiplos parágrafos, quando os dados permitirem.
 
-    2. Metodologia
+    3. Introdução e Contexto da Pesquisa
+       - Objetivo das entrevistas
+       - Abordagem Consumer Hours
+       - O que este relatório PODE e NÃO PODE afirmar
+
+    4. Metodologia
        - Número real de entrevistas
        - Período (se disponível)
-       - Abordagem Consumer Hours
-       - Declarar ausências
+       - Estrutura dos dados analisados
+       - Ausências relevantes de informação
 
-    3. Principais Insights Derivados das Entrevistas
-       - Listar SOMENTE insights sustentados por múltiplas falas
-       - Para cada insight:
+    5. Principais Descobertas das Entrevistas
+       - Padrões recorrentes explicitamente observados
+       - Sempre com:
          • Número de entrevistas
-         • Citações literais EXATAS (campo "evidence")
+         • Evidência literal exata - sempre incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
 
-    4. Temas Recorrentes
-       - Listar apenas temas explicitamente identificados
-       - Evidenciar recorrência ou contraste
+    6. Análise Detalhada dos Padrões
+       - Aprofundamento nos contrastes e recorrências
+       - Comparação entre posicionamentos explícitos
+       - Nenhuma explicação causal não verbalizada
 
-    5. Sentimentos Expressos
-       - Usar apenas sentimentos identificados
-       - Sempre com evidência literal
+    7. Temas, Sentimentos, Marcas e Momentos
+       - Apenas elementos explicitamente identificados
+       - Volume de menções
+       - Evidências associadas - sempre incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
 
-    6. Marcas e Momentos de Consumo
-       - Usar SOMENTE nomes reais das marcas
-       - Indicar volume de menções e evidências
+    8. Limitações dos Dados
+       - Onde os dados NÃO permitem conclusão
+       - Onde há baixa recorrência
+       - Onde há ausência de evidência
 
-    7. Limitações dos Dados
-       - Declarar claramente onde os dados não permitem conclusão
-
-    8. Oportunidades ou Tensões Explicitadas pelos Consumidores
+    9. Oportunidades ou Tensões Explicitadas
        - Apenas quando verbalizadas claramente
-       - Nunca extrapolar
+       - Nunca extrapolar implicações estratégicas
 
     ─────────────────────────────────────────
-    FRASE DE SEGURANÇA
+    FRASE DE SEGURANÇA (OBRIGATÓRIA)
     ─────────────────────────────────────────
 
-    Sempre que houver dúvida sobre a existência de um padrão:
+    Sempre que houver dúvida sobre a existência
+    de um padrão ou insight:
     NÃO ESCREVA.
     DECLARE A AUSÊNCIA DE EVIDÊNCIA.
   expected_output: >
-    Um relatório executivo completo em formato Markdown contendo:
-    - Resumo Executivo respondendo ao tema "{topic}"
-    - Metodologia com número de entrevistas e período
-    - Principais Insights derivados das entrevistas com evidências literais
-    - Temas Recorrentes identificados
-    - Sentimentos Expressos com citações
-    - Marcas e Momentos de Consumo mencionados
+    Relatório executivo em Markdown contendo:
+    - Título e Data
+    - Resumo Executivo
+    - Introdução e Contexto da Pesquisa
+    - Metodologia
+    - Principais Descobertas das Entrevistas
+    - Análise Detalhada dos Padrões
+    - Temas, Sentimentos, Marcas e Momentos
     - Limitações dos Dados
-    - Oportunidades ou Tensões explicitadas pelos consumidores
-    
-    O relatório deve ser estruturado, executivo, e baseado exclusivamente
-    nos dados presentes no treatment_result, sem adicionar conhecimento externo.
+    - Oportunidades ou Tensões explicitadas
+
+    O relatório deve ser denso, responsável,
+    analítico e baseado EXCLUSIVAMENTE
+    nas falas explícitas dos entrevistados.
   agent: writer

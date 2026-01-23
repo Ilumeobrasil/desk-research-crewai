@@ -405,7 +405,7 @@ elif VIEW_SELECT_INTEGRATED_MENU:
     selected_crews = st.multiselect(
         "🤖 Selecione os agentes:",
         options=modos_disponiveis,
-        default=st.session_state.selected_crews if st.session_state.selected_crews else ['web'],
+        default=st.session_state.selected_crews if st.session_state.selected_crews else ['web', 'consumer_hours'],
         format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
         key=f"crews_select_{active}",
         help="Selecione pelo menos um agente para executar a pesquisa integrada"
