@@ -1,178 +1,104 @@
 synthesis_task:
   description: >
-    Você recebeu relatórios brutos de diferentes frentes de pesquisa sobre o tema: '{topic}'.
+    Sua tarefa é sintetizar múltiplos relatórios de pesquisa independentes
+    sobre o tema: "{topic}", produzidos por diferentes fontes.
 
-    {instruction}
-
-    ============================
-    CONTEXTO DOS RELATÓRIOS
-    ============================
-    {reports_context}
-
-    ============================
-    REGRAS ABSOLUTAS (CRÍTICO)
-    ============================
-    - O OUTPUT DEVE SEGUIR **EXATAMENTE** A ESTRUTURA DE SEÇÕES FORNECIDA ABAIXO.
-    - NÃO crie, remova, renomeie ou reordene seções.
-    - NÃO inclua seções extras.
-    - NÃO altere os títulos das seções.
-    - Utilize EXCLUSIVAMENTE informações presentes nos relatórios fornecidos.
-    - NÃO presuma, complete ou “infira criativamente” dados ausentes.
-    - Quando não houver evidência suficiente, declare explicitamente a ausência.
+    Este relatório será utilizado como insumo estratégico para tomada
+    de decisão executiva. O valor esperado não está em volume de informação,
+    mas na clareza entre:
+    - o que é sustentado por evidência,
+    - o que permanece incerto,
+    - e o que são apenas hipóteses plausíveis.
 
     ============================
-    REGRA DE EVIDÊNCIA E CITAÇÃO (CRÍTICO)
+    ENTRADAS DA TAREFA
     ============================
-    - TODA afirmação factual DEVE conter indicação explícita da fonte.
-    - A fonte deve ser uma url clicavel e deve ser presente em {reports_context} e nao deve ser inventada.
-    - Utilize SOMENTE fontes explicitamente presentes em {reports_context}.
-    - NÃO invente nomes de relatórios, estudos, autores, instituições ou links.
-    - Se uma afirmação não puder ser atribuída a uma fonte específica,
-      ela NÃO DEVE ser incluída no relatório.
-    - Afirmações sem fonte explícita são consideradas inválidas.
+    - Relatórios brutos consolidados no bloco abaixo:
+      {reports_context}
 
     ============================
-    SUA MISSÃO
+    PROCESSO OBRIGATÓRIO
     ============================
-    1. Analisar todos os relatórios fornecidos.
-    2. Sintetizar os achados de forma integrada (convergências, divergências e sinais únicos).
-    3. Consolidar o resultado final no FORMATO OBRIGATÓRIO abaixo.
+    1. Leia integralmente todos os relatórios fornecidos.
+    2. Identifique convergências, divergências e sinais únicos entre fontes.
+    3. Utilize exclusivamente informações explícitas nos relatórios.
+    4. Quando dados forem insuficientes ou conflitantes, declare isso
+       de forma direta e transparente.
+    5. Organize os achados seguindo rigorosamente a estrutura exigida.
 
     ============================
-    DIRETRIZES DE IDIOMA
+    REGRAS DE EVIDÊNCIA (CRÍTICO)
+    ============================
+    - Toda afirmação factual deve conter fonte explícita.
+    - As fontes devem existir literalmente em {reports_context}.
+    - Não invente, complete ou presuma dados ausentes.
+    - Afirmações sem fonte não devem ser incluídas.
+
+    ============================
+    IDIOMA
     ============================
     - Texto 100% em Português (PT-BR).
-    - Títulos de artigos, papers, vídeos ou marcas devem permanecer no idioma original.
-    - Não traduza nomes próprios ou títulos de obras.
-
-    ============================
-    FORMATO OBRIGATÓRIO DO OUTPUT
-    ============================
+    - Nomes próprios, marcas e títulos permanecem no idioma original.
+  expected_output: >
+    Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo,
+    sem seções extras, renomeadas ou reordenadas:
 
     # PERGUNTA
 
-    > **Pergunta analisada:**  
-    > _Formule a pergunta central que este relatório integrado responde,
-    baseada exclusivamente no tema '{topic}' e no conteúdo dos relatórios._
-
-    ---
-
     ## DIRETO AO PONTO
-
-    - Responda diretamente à pergunta acima.
-    - Limite-se a 1-2 parágrafos.
-    - Utilize apenas conclusões sustentadas por evidência recorrente
-      em mais de um relatório.
-    - NÃO inclua recomendações nesta seção.
-    - Toda afirmação deve ser implicitamente sustentada por fontes
-      que aparecerão nas seções seguintes.
-
-    ---
+    - Resposta objetiva em 1–2 parágrafos.
+    - Apenas conclusões sustentadas por evidência recorrente.
 
     ## COMO CHEGAMOS A ISSO
-
     ### Fontes analisadas
-    - Liste TODAS as fontes e urls efetivamente utilizadas.
-    - Para cada fonte, descreva brevemente o tipo de dado analisado.
-    - Se uma fonte foi fornecida mas não trouxe insights relevantes,
-      ela ainda deve ser listada, com essa observação explícita.
+    - Lista completa das fontes utilizadas, com URLs.
 
     ### Período coberto
-    - Informe o período temporal de cada fonte.
-    - Caso o período não esteja disponível, escreva:
+    - Período temporal de cada fonte ou
       "Período não informado nos relatórios."
-
-    ---
+    - De preferência, informar o período inicial e final de cada fonte.
 
     ## DÁ PARA AFIRMAR
-
-    - Inclua APENAS afirmações:
-      • Objetivas  
-      • Diretamente baseadas em evidência  
-      • Observadas em um ou mais relatórios  
-    - Cada bullet deve conter **UMA afirmação clara**.
-    - TODAS as afirmações DEVEM conter fonte explícita no formato abaixo.
-    - NÃO inclua hipóteses, interpretações ou previsões.
-
-    Exemplo obrigatório de formato:
-
-    - **[Insight]:** descrição objetiva do achado.  
-      _Fonte:_ [Nome exato e url da fonte conforme reports_context]
-
-    ---
+    - Lista de afirmações objetivas, cada uma com fonte explícita.
+    - Não inventar dados ou informações. somente trazer fatos.
+    - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
 
     ## NÃO FICA CLARO
-
-    - Liste ambiguidades, lacunas ou pontos inconclusivos.
-    - Explique brevemente o motivo da incerteza:
-      falta de dados, conflito entre fontes, sinal fraco ou enviesado.
-    - Sempre que possível, indique quais fontes NÃO permitiram a conclusão.
-    - NÃO tente resolver a incerteza nesta seção.
-
-    ---
+    - Ambiguidades, lacunas ou conflitos entre fontes,
+      com explicação breve da causa.
 
     ## ALGUMAS SUPOSIÇÕES
-
-    > Hipóteses plausíveis, **não comprovadas**, mas úteis para interpretação.
-
-    - Inclua apenas suposições que:
-      • Tenham base em padrões observados nos relatórios  
-      • NÃO estejam diretamente comprovadas  
-    - TODA suposição deve indicar sua base observacional.
-    - NÃO trate suposições como fatos.
-
-    Formato obrigatório:
-
-    - **[Suposição]:** descrição da hipótese.  
-      _Base observacional:_ [Fonte(s) que originam o padrão]
-
-    ---
+    - Hipóteses plausíveis não comprovadas, sempre com base observacional indicada.
 
     ## ISSO SIGNIFICA QUE…
-
-    - Traduza os achados em implicações estratégicas.
-    - Diferencie claramente:
-      • O que é implicação prática imediata  
-      • O que depende de validação futura  
-    - NÃO extrapole além do que os dados permitem.
-    - NÃO introduza novos fatos nesta seção.
-
-    ---
-
-    ## OBSERVAÇÕES FINAIS
-
-    - Limitações relevantes do conjunto de relatórios.
-    - Pontos que exigem investigação adicional.
-    - Alertas de interpretação para decisores.
-
-  expected_output: >
-    Relatório em Markdown seguindo fielmente a estrutura especificada,
-    com todas as afirmações ancoradas em fontes explícitas,
-    sem seções adicionais,
-    sem extrapolações não fundamentadas,
-    e com distinção clara entre evidência, incerteza e suposição.
-    O relatorio deve comecar em # PERGUNTA e terminar em ## OBSERVAÇÕES FINAIS, e nao deve ter vestigios de markdown alem disso.
-
+      - Apresente um resumo analítico neutro da resposta à pergunta.
+      - Traduza os achados em leituras possíveis ou implicações conceituais,
+        sem adotar tom prescritivo ou orientar ações ao usuário.
+      - Não inclua recomendações diretas, conselhos ou chamadas à ação,
+        exceto quando explicitamente solicitadas na pergunta original.
+      - Diferencie claramente:
+        • Implicações derivadas diretamente dos dados  
+        • Leituras possíveis que dependem de contexto adicional  
+      - Não introduza novos fatos ou extrapolações além das evidências analisadas.
 
 
 evaluation_task:
   description: >
-    Avalie o relatório de pesquisa fornecido abaixo com RIGOR EXTREMO,
-    atuando como um auditor técnico e não como um leitor casual.
+    Avalie tecnicamente o relatório fornecido, atuando como auditor
+    responsável por garantir que apenas análises defensáveis,
+    rastreáveis e estruturalmente corretas avancem no fluxo decisório.
 
     ============================
-    OBJETIVO DA AVALIAÇÃO
-    ============================
-    Verificar se o relatório:
-    - Segue fielmente a estrutura obrigatória definida
-    - Utiliza evidência de forma correta e rastreável
-    - Evita extrapolações, suposições disfarçadas de fatos ou alucinação
-    - Produz implicações estratégicas coerentes com os dados
-
-    ============================
-    RELATÓRIO PARA AVALIAR
+    ENTRADA
     ============================
     {report_content}
+
+    ============================
+    OBJETIVO
+    ============================
+    Verificar aderência estrutural, rigor analítico,
+    uso correto de evidência e coerência estratégica,
+    bloqueando qualquer forma de extrapolação ou alucinação.
 
     ============================
     CRITÉRIOS DE AVALIAÇÃO
@@ -188,20 +114,16 @@ evaluation_task:
        - Há distinção clara entre fato, incerteza e suposição?
        - O texto evita linguagem opinativa ou vaga?
 
-    3. Integração e Uso das Fontes (0-20)
+    3. Integração e Uso das Fontes (0-25)
        - Todas as fontes citadas existem em {reports_context}?
        - Fontes fracas ou ausentes foram explicitamente declaradas?
        - Não há fontes inventadas ou genéricas?
 
-    4. Qualidade Estratégica (0-20)
-       - A seção "ISSO SIGNIFICA QUE…" deriva logicamente dos achados?
+    4. Qualidade Estratégica (0-25)
+       - A seção "ISSO SIGNIFICA QUE…" é um resumo analítico neutro da resposta?
+       sem fornecer recomendações que não foi solicitado no topico.
        - As implicações respeitam as limitações dos dados?
        - Não há recomendações desconectadas das evidências?
-
-    5. Clareza e Formatação Markdown (0-10)
-       - Markdown limpo, consistente e legível?
-       - Uso correto de listas, títulos e separadores?
-       - Ausência de ruído visual ou estrutura confusa?
 
     ============================
     REGRAS DE REPROVAÇÃO AUTOMÁTICA

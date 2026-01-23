@@ -75,6 +75,7 @@ def run_web_research(query: str, max_results: int = 10):
         }
         
         crew = WebCrew()
+        print("RODANDO WEB")
         result = crew.crew().kickoff(inputs=inputs)
         
         export_report(result, query, prefix="web_report", crew_name="web")

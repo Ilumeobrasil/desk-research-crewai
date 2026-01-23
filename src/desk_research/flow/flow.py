@@ -14,6 +14,7 @@ from desk_research.flow.crew_executors import (
     ConsumerHoursCrewExecutor
 )
 from desk_research.crews.integrated.integrated_analysis import IntegratedCrew
+from desk_research.utils.makelog.makeLog import make_log
 from desk_research.utils.reporting import export_report
 from desk_research.utils.logging_utils import safe_print
 from desk_research.constants import MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW
@@ -166,6 +167,11 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             'date': datetime.now().strftime('%d/%m/%Y')
         }
 
+        make_log({
+            "logName": f"run_synthesis_crew{datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}",
+            "content": inputs
+        })
+
         return crew_runner.kickoff(inputs=inputs)
 
     @listen(synthesize_report)
@@ -186,6 +192,12 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             "report_content": self.state.final_report,
             "reports_context": reports_context
         }
+
+        make_log({
+            "logName": f"evaluate_report{datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}",
+            "content": inputs
+        })
+
         qa_result = qa_crew.kickoff(inputs=inputs)
         
         review = qa_result.pydantic or qa_result

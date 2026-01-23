@@ -1,9 +1,11 @@
+import json
 import sys
 import logging
 
 from typing import Callable, Dict, Any, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from desk_research.utils.makelog.makeLog import make_log
 from pydantic import BaseModel, Field
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
@@ -65,7 +67,7 @@ class IntegratedCrew:
     def chief_editor_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['chief_editor_agent'],
-            verbose=VERBOSE_AGENTS,
+            verbose=True,
             allow_delegation=False
         )
 
@@ -73,7 +75,7 @@ class IntegratedCrew:
     def evaluator_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['evaluator_agent'],
-            verbose=VERBOSE_AGENTS,
+            verbose=True,
             allow_delegation=False
         )
 
@@ -168,8 +170,15 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
             'date': datetime.now().strftime('%d/%m/%Y'),
             'instruction': ""
         }
-
-        print(all_reports_text)
+        make_log({
+            "logName": "integrated_analysis",
+            "content": {
+                'topic': topic,
+                'reports_context': all_reports_text,
+                'date': datetime.now().strftime('%d/%m/%Y'),
+                'instruction': ""
+            }
+        })
 
         crew_instance = IntegratedCrew()
         master_result = crew_instance.crew().kickoff(inputs=inputs)
