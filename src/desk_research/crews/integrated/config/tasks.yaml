@@ -47,15 +47,16 @@ synthesis_task:
     sem seções extras, renomeadas ou reordenadas:
 
     ## DIRETO AO PONTO
-    - Resposta objetiva em 1–2 parágrafos.
+    - Resposta objetiva em 1-2 parágrafos.
     - Apenas conclusões sustentadas por evidência recorrente.
     - Cada parágrafo deve responder explicitamente à pergunta original, sintetizando padrões observados e grau de confiança das evidências.
 
-    ## COMO CHEGAMOS A ISSO
-    ### Fontes analisadas
-    - Lista completa das fontes utilizadas, com URLs.
+    ## COMO CHEGAMOS A ISSO - (MOSTRAR SOMENTE CASO EXISTA DADOS)
+    ### Fontes analisadas (MOSTRAR SOMENTE CASO EXISTA MAIS DE UMA FONTE ANALISADA)
+    - Toda afirmação factual deve conter fonte explícita.
+    - Para fontes Consumer Hours: incluir quantidade de entrevistas que sustentam a afirmação.
 
-    ### Período coberto
+    ### Período coberto (MOSTRAR SOMENTE CASO EXISTA INFORMAÇÃO DE PERÍODO)
       - Período temporal de cada fonte base de dados ou "Período não informado nos relatórios."
       - Exemplo separado por bullets: "- Web: data-inicio, data-fim"
       - De preferência, informar o período inicial e final de cada fonte.

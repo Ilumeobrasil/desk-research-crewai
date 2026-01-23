@@ -68,7 +68,9 @@ class IntegratedCrew:
         return Agent(
             config=self.agents_config['chief_editor_agent'],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3,
         )
 
     @agent
@@ -76,7 +78,9 @@ class IntegratedCrew:
         return Agent(
             config=self.agents_config['evaluator_agent'],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3,
         )
 
     @task
@@ -100,7 +104,9 @@ class IntegratedCrew:
             agents=[self.chief_editor_agent()],
             tasks=[self.synthesis_task()],
             process=Process.sequential,
-            verbose=VERBOSE_CREW
+            verbose=VERBOSE_CREW,
+            planning=True,
+            planning_llm="openai/openai/gpt-4o-mini",
         )
 
 def _run_crew(params: Dict[str, Any], func: Callable, *args) -> tuple[str, str]:

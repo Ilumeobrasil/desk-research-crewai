@@ -211,6 +211,8 @@ class IngestorCrew:
             config=self.agents_config["ingestor"],
             tools=[ingest_folder_tool],
             verbose=VERBOSE_AGENTS,
+            reasoning=True,
+            max_reasoning_attempts=3,
         )
     
     @agent
@@ -219,6 +221,8 @@ class IngestorCrew:
             config=self.agents_config["treater"],
             tools=[treat_folder_tool],
             verbose=VERBOSE_AGENTS,
+            reasoning=True,
+            max_reasoning_attempts=3,
         )
     
     @agent
@@ -227,6 +231,8 @@ class IngestorCrew:
             config=self.agents_config["writer"],
             verbose=VERBOSE_AGENTS,
             allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3,
         )
 
     @task
@@ -265,6 +271,8 @@ class IngestorCrew:
             tasks=self.tasks,
             process=Process.sequential,
             verbose=VERBOSE_CREW,
+            planning=True,
+            planning_llm="openai/openai/gpt-4o-mini",
         )
 
 def _calculate_asimov_batches(total_snippets: int, max_per_request: int) -> int:
