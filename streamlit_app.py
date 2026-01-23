@@ -307,6 +307,7 @@ def _initialize_session_state() -> None:
         st.session_state.active_chat = DEFAULT_CHAT_NAME
         st.session_state.chat_order = [DEFAULT_CHAT_NAME]
 
+    print("SESSION STATE CHATS: ", st.session_state.chats)
     if "chat_order" not in st.session_state:
         st.session_state.chat_order = list(st.session_state.chats.keys())
 
@@ -352,31 +353,6 @@ with st.sidebar:
             if st.button(label, key=f"chat_{chat_name}", use_container_width=True):
                 st.session_state.active_chat = chat_name
 
-    else:
-        st.markdown("### X (Twitter)")
-        st.caption("Clique em uma pergunta pronta para enviar ao chat, ou crie uma nova.")
-
-        st.markdown("**Perguntas pré-definidas**")
-        for i, q in enumerate(X_QUESTIONS, start=1):
-            if st.button(f"{i}. {q}", key=f"xq_{i}", use_container_width=True):
-                st.session_state.pending_user_message = q
-                st.rerun()
-
-        st.markdown("---")
-        st.markdown("**Criar nova**")
-        custom = st.text_area(
-            "Nova pergunta",
-            placeholder="Digite sua pergunta...",
-            label_visibility="collapsed",
-            height=100,
-            key="x_custom_question"
-        )
-        if st.button("Enviar para o chat", use_container_width=True, key="x_send_custom"):
-            if custom.strip():
-                st.session_state.pending_user_message = custom.strip()
-                st.session_state["x_custom_question"] = ""
-                st.rerun()
-
 active = st.session_state.active_chat
 messages = st.session_state.chats[active]
 
@@ -400,7 +376,7 @@ elif VIEW_SELECT_INTEGRATED_MENU:
     # Sempre usa o modo integrated e mostra multi-select para escolher agentes
     modo_selecionado = "integrated"
     st.markdown("---")
-    st.markdown("### Desk research (BETA) v.0.0.2")
+    st.markdown("### Desk research (BETA) v.0.0.3")
     st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
     
     # Opções disponíveis (excluindo integrated e consumer_hours)

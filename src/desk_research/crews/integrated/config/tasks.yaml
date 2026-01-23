@@ -43,8 +43,6 @@ synthesis_task:
     Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo,
     sem seções extras, renomeadas ou reordenadas:
 
-    # PERGUNTA
-
     ## DIRETO AO PONTO
     - Resposta objetiva em 1–2 parágrafos.
     - Apenas conclusões sustentadas por evidência recorrente.
@@ -54,13 +52,14 @@ synthesis_task:
     - Lista completa das fontes utilizadas, com URLs.
 
     ### Período coberto
-    - Período temporal de cada fonte ou
+    - Período temporal de cada fonte base de dados ou
       "Período não informado nos relatórios."
+    - Exemplo: "Web: 2025-2026, Academic: 2020-2025, X: 2025-2026, Consumer Hours: 2025-2026"
     - De preferência, informar o período inicial e final de cada fonte.
 
     ## DÁ PARA AFIRMAR
-    - Lista de afirmações objetivas, cada uma com fonte explícita.
-    - Não inventar dados ou informações. somente trazer fatos.
+    - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.
+    - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
     - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
 
     ## NÃO FICA CLARO
