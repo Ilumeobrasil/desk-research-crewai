@@ -308,7 +308,6 @@ def _initialize_session_state() -> None:
         st.session_state.active_chat = DEFAULT_CHAT_NAME
         st.session_state.chat_order = [DEFAULT_CHAT_NAME]
 
-    print("SESSION STATE CHATS: ", st.session_state.chats)
     if "chat_order" not in st.session_state:
         st.session_state.chat_order = list(st.session_state.chats.keys())
 
