@@ -4,11 +4,9 @@ synthesis_task:
     sobre o tema: "{topic}", produzidos por diferentes fontes.
 
     Este relatório será utilizado como insumo estratégico para tomada
-    de decisão executiva. O valor esperado não está em volume de informação,
-    mas na clareza entre:
-    - o que é sustentado por evidência,
-    - o que permanece incerto,
-    - e o que são apenas hipóteses plausíveis.
+    de decisão executiva. 
+    O valor esperado não está em repetição ou prolixidade, mas em densidade analítica:
+    - Cada parágrafo deve integrar múltiplas evidências, explicitar padrões observáveis e reduzir ambiguidades, mantendo rastreabilidade às fontes..
 
     ============================
     ENTRADAS DA TAREFA
@@ -22,9 +20,12 @@ synthesis_task:
     1. Leia integralmente todos os relatórios fornecidos.
     2. Identifique convergências, divergências e sinais únicos entre fontes.
     3. Utilize exclusivamente informações explícitas nos relatórios.
-    4. Quando dados forem insuficientes ou conflitantes, declare isso
-       de forma direta e transparente.
+    4. Quando dados forem insuficientes ou conflitantes, declare isso de forma direta e transparente.
     5. Organize os achados seguindo rigorosamente a estrutura exigida.
+    6. Sempre que possível, sintetize achados cruzando duas ou mais fontes no mesmo parágrafo, explicitando convergências ou contrastes.
+    7. Evite frases meramente descritivas.
+    8. Sempre que um dado for citado, explicite por que ele é relevante para o tema analisado, sem extrapolar além das fontes.
+    9. Prefira parágrafos mais longos e integrados a múltiplos bullets curtos e isolados.
 
     ============================
     REGRAS DE EVIDÊNCIA (CRÍTICO)
@@ -48,16 +49,16 @@ synthesis_task:
     ## DIRETO AO PONTO
     - Resposta objetiva em 1–2 parágrafos.
     - Apenas conclusões sustentadas por evidência recorrente.
+    - Cada parágrafo deve responder explicitamente à pergunta original, sintetizando padrões observados e grau de confiança das evidências.
 
     ## COMO CHEGAMOS A ISSO
     ### Fontes analisadas
     - Lista completa das fontes utilizadas, com URLs.
 
     ### Período coberto
-    - Período temporal de cada fonte base de dados ou
-      "Período não informado nos relatórios."
-    - Exemplo: "Web: 2025-2026, Academic: 2020-2025, X: 2025-2026, Consumer Hours: 2025-2026"
-    - De preferência, informar o período inicial e final de cada fonte.
+      - Período temporal de cada fonte base de dados ou "Período não informado nos relatórios."
+      - Exemplo separado por bullets: "- Web: data-inicio, data-fim"
+      - De preferência, informar o período inicial e final de cada fonte.
 
     ## DÁ PARA AFIRMAR
     - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.
@@ -65,6 +66,12 @@ synthesis_task:
     - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas como evidência,
       utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
     - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
+    - Esta seção deve conter apenas fatos observáveis ou estatísticos explicitamente declarados nas fontes.
+    - Não incluir interpretações, impactos de mercado ou consequências futuras.
+    - Cada bullet deve conter:
+      - o fato observado
+      - o padrão ou relevância desse fato
+      - a fonte explícita
 
     ## NÃO FICA CLARO
     - Ambiguidades, lacunas ou conflitos entre fontes,
@@ -72,6 +79,8 @@ synthesis_task:
 
     ## ALGUMAS SUPOSIÇÕES
     - Hipóteses plausíveis não comprovadas, sempre com base observacional indicada.
+    - Cada suposição deve indicar explicitamente qual dado, tendência ou trecho das fontes observadas deu origem à hipótese.
+    - Suposições sem ancoragem observacional clara devem ser omitidas.
 
     ## ISSO SIGNIFICA QUE…
       - Apresente um resumo analítico neutro da resposta à pergunta.
@@ -83,6 +92,9 @@ synthesis_task:
         • Implicações derivadas diretamente dos dados  
         • Leituras possíveis que dependem de contexto adicional  
       - Não introduza novos fatos ou extrapolações além das evidências analisadas.
+      - Utilizar linguagem descritiva e analítica.
+      - Evitar verbos normativos como “precisar”, “dever”, “é necessário”, “exige”.
+      - Formular implicações como possíveis leituras, não como direcionamentos.
 
 
 evaluation_task:

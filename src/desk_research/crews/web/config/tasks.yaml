@@ -1,111 +1,103 @@
-search_web:
+search_web_urls:
   description: >
-    Conduzir uma pesquisa web estratégica sobre {query} com o objetivo de
-    identificar fontes confiáveis, recentes e relevantes que sirvam de base
-    para análises posteriores.
+    Localizar URLs públicas relacionadas a '{query}' e validar
+    sua acessibilidade técnica.
 
-    Execute o processo abaixo:
-    1. Realize pelo menos DUAS rodadas distintas de busca no Google, variando
-       a formulação da query.
-    2. Evite conteúdos promocionais, opinativos ou sem evidência verificável.
-    3. Valide OBRIGATORIAMENTE todas as URLs usando `url_validator`.
-    4. Cruze múltiplas fontes sempre que possível.
+    ESTA TASK NÃO COLETA CONTEÚDO.
+    Ela apenas identifica URLs utilizáveis.
 
-    REGRA CRÍTICA:
-    - Se não houver fontes confiáveis ou dados suficientes sobre algum aspecto
-      do tema, registre explicitamente essa ausência.
-    - NÃO presuma, infira ou complete informações inexistentes.
+    PROCEDIMENTO OBRIGATÓRIO:
+    1. Realize pelo menos DUAS buscas distintas no Google com variações da query, usando a ferramenta google_search_tool.
+    2. Liste URLs encontradas sem analisar o conteúdo interno.
+    3. Valide TODAS as URLs usando `url_validator`.
+    4. Descarte URLs inacessíveis, bloqueadas ou inválidas.
+
+    PROIBIÇÕES ABSOLUTAS:
+    - NÃO extrair texto das páginas.
+    - NÃO resumir conteúdo.
+    - NÃO avaliar credibilidade editorial.
+    - NÃO interpretar informações.
   expected_output: >
-    Uma lista estruturada em markdown contendo ENTRE {max_results} E {max_results + 5} fontes,
-    onde cada item deve conter:
+    Lista em markdown contendo ENTRE {max_results} E {max_results_extractions} URLs validadas.
 
-    - Título da fonte
-    - URL validada
+    Para cada item:
+    - URL completa
+    - Status de validação (Válida / Inválida)
+    - Tipo aparente da fonte (ex: institucional, governamental, mídia, acadêmica, desconhecida)
+
+extract_web_content:
+  description: >
+    Extrair conteúdo textual bruto das URLs fornecidas.
+
+    ESTA TASK NÃO RESPONDE À PERGUNTA '{query}'.
+    Ela apenas coleta texto original das fontes.
+
+    PROCEDIMENTO OBRIGATÓRIO:
+    1. Utilizar `web_scraper_tool` para CADA URL recebida.
+    2. Extrair o conteúdo completo da página.
+    3. Preservar linguagem original, números, datas e termos técnicos.
+
+    EXTRAÇÃO (CRÍTICO):
+    - Copiar o conteúdo completo da página.
+    - NÃO reescrever para clareza.
+    - NÃO conectar ideias.
+    - Só truncar texto quando excessivamente longo, apos 2000 caracteres,
+      indicando claramente que houve corte.
+
+    MECANISMO DE RE-EXTRAÇÃO:
+    - Se o conteúdo extraído for insuficiente ou muito superficial,
+      registrar explicitamente: "Conteúdo insuficiente".
+    - Nesses casos, realizar UMA nova tentativa de scraping
+      utilizando variação de user-agent ou carregamento alternativo,
+      se disponível na ferramenta.
+
+    PROIBIÇÕES ABSOLUTAS:
+    - NÃO interpretar dados.
+    - NÃO tirar conclusões.
+    - NÃO responder à pergunta '{query}'.
+  
+  expected_output: >
+    Lista em markdown com uma seção por URL.
+
+    Para cada URL:
+    - Título da página
+    - URL
     - Data de publicação (ou "não informada")
-    - Resumo objetivo (2–3 frases, apenas com informações presentes na fonte)
-    - Tipo de fonte
-    - Avaliação de credibilidade (Alta / Média / Baixa)
-    - Indicação de cobertura de dados:
-      • Dados suficientes
-      • Dados parciais
-      • Dados ausentes
 
-    Caso não existam fontes confiáveis suficientes sobre {query},
-    o output deve conter uma seção final intitulada:
-    "Limitações da Pesquisa Inicial",
-    explicando objetivamente o que não foi encontrado e por quê.
+    ### Conteúdo extraído
+    - Texto bruto extraído
 
-analyze_content:
+    ### Status do conteúdo
+    - Conteúdo suficiente / Conteúdo insuficiente / Conteúdo ausente
+
+create_structure:
   description: >
-    Analisar criticamente os conteúdos coletados, com foco em distinguir
-    fatos comprovados, interpretações fundamentadas e lacunas de informação.
+    Consolidar todo o material organizado em um documento
+    que funcione como BASE DE EVIDÊNCIAS para análises futuras.
 
-    Siga rigorosamente o processo:
-    1. Extraia apenas informações explicitamente presentes nas fontes.
-    2. Classifique cada informação como:
-       - Verificada (múltiplas fontes confiáveis)
-       - Parcialmente verificada (fonte única ou dados incompletos)
-       - Não verificável com os dados disponíveis
-    3. Identifique padrões e tendências SOMENTE quando houver evidência suficiente.
-    4. Quando os dados forem insuficientes ou conflitantes, declare explicitamente
-       a impossibilidade de conclusão.
-    5. É PROIBIDO inferir intenções, impactos ou tendências sem base empírica clara.
+    ESTE DOCUMENTO NÃO RESPONDE À PERGUNTA.
+    Ele serve como insumo factual.
+
+    REGRAS:
+    1. Idioma: PT-BR
+    2. Preserve a redação original sempre que possível.
+    3. Reescrita mínima apenas para clareza técnica.
+    4. NÃO criar conclusões, sínteses ou respostas.
   expected_output: >
-    Um relatório analítico em markdown contendo:
+    # Base de Evidências — {query}
 
-    1. Fatos verificados (com referências explícitas)
-    2. Achados parcialmente suportados (com explicação das limitações)
-    3. Pontos sem dados suficientes para conclusão
-    4. Conflitos ou inconsistências entre fontes
-    5. Insights acionáveis (APENAS quando suportados por evidência clara)
-    6. Declaração explícita de limitações da análise
+    ## 1. Definições e Contexto (extraídos das fontes)
+    [Trechos literais organizados]
 
-    O relatório deve deixar claro o que é conhecido, o que é incerto
-    e o que não pode ser determinado com os dados disponíveis.
+    ## 2. Evidências Numéricas e Percentuais
+    [Dados organizados por fonte]
 
-create_web_report:
-  description: >
-    Criar um relatório completo e EXAUSTIVO sobre "{query}" com as informações coletadas da web.
-    O relatório deve ser DENSO (mínimo 1000 palavras), objetivo e citar todas as fontes.
+    ## 3. Evidências Textuais Relevantes
+    [Parágrafos extraídos, agrupados por tema]
 
-    DIRETRIZES OBRIGATÓRIAS:
-    1. O relatório deve ser escrito em português (PT-BR).
-    2. É ESTRITAMENTE PROIBIDO inventar dados, estimativas ou conclusões.
-    3. Sempre que não houver dados suficientes para sustentar uma afirmação,
-       isso deve ser declarado explicitamente no texto.
-    4. Diferencie claramente fatos, interpretações fundamentadas e incertezas.
-    5. Utilize linguagem precisa e responsável, adequada a stakeholders
-       executivos.
-    
-    REGRAS DE ESCRITA:
-    1. INICIE O RELATÓRIO COM: Título e Data ({current_date}).
-    2. NÃO USE PLACEHOLDERS como "[Insira texto aqui]".
-    3. NÃO CRIE APENAS LISTAS de tópicos. Escreva texto corrido e analítico.
-    4. Para cada seção, escreva pelo menos 3-4 parágrafos substanciais.
-    5. CITE AS FONTES no texto e na lista final.
-    
-    REGRAS DE IDIOMA:
-    1. O RELATÓRIO DEVE SER 100% EM PORTUGUÊS (PT-BR).
-    2. Títulos de artigos originais podem ser mantidos em inglês, mas todo o resto deve ser traduzido.
+    ## 4. Pontos com Ausência de Dados
+    [Lista explícita]
 
-    ESTRUTURA OBRIGATÓRIA:
-    1. Resumo Executivo (Resumo de alto nível)
-    2. Introdução ao Tópico (Contexto e importância)
-    3. Principais Descobertas (Com dados quantitativos se houver)
-    4. Análise Detalhada (Aprofundamento nos temas)
-    5. Tendências Identificadas (O que há de mais novo nos últimos 12 meses)
-    6. Conclusões (O que isso significa para o futuro?)
-    7. **FONTES E REFERÊNCIAS BIBLIOGRÁFICAS**: Lista OBRIGATÓRIA com Título e URL linkada.
-  expected_output: >
-    Relatório web em formato markdown com:
-    - Resumo Executivo
-    - Introdução ao Tópico
-    - Principais Descobertas
-    - Análise Detalhada
-    - Tendências Identificadas
-    - Conclusões
-    - Fontes e Referências (Links clicáveis)
-    - Recomendações (Se houver)
-
-    Caso os dados disponíveis sejam insuficientes para conclusões robustas,
-    o relatório deve explicitar claramente essa limitação e evitar recomendações
+    ## 5. Fontes
+    - Título original — URL
+    Este documento NÃO contém respostas, análises ou conclusões.
