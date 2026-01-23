@@ -6,11 +6,36 @@ import logging
 import traceback
 from pathlib import Path
 from typing import Optional, Dict, Any
-sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from desk_research.system.research_system import DeskResearchSystem
-from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
 
+_current_dir = Path(__file__).resolve().parent
+_src_dir = _current_dir / "src"
+
+if _src_dir.exists() and str(_src_dir) not in sys.path:
+    sys.path.insert(0, str(_src_dir))
+
+_parent_dir = _current_dir.parent
+if (_parent_dir / "src" / "desk_research").exists():
+    _parent_src = _parent_dir / "src"
+    if str(_parent_src) not in sys.path:
+        sys.path.insert(0, str(_parent_src))
+
+# Importações do módulo desk_research com tratamento de erro
+try:
+    from desk_research.system.research_system import DeskResearchSystem
+    from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
+except ImportError as e:
+    error_msg = (
+        f"❌ Erro ao importar módulos desk_research.\n\n"
+        f"Diretório atual: {_current_dir}\n"
+        f"Diretório src: {_src_dir}\n"
+        f"src existe: {_src_dir.exists()}\n"
+        f"sys.path: {sys.path[:5]}\n\n"
+        f"Erro: {str(e)}\n\n"
+        f"Verifique se o diretório 'src' existe e contém o módulo 'desk_research'."
+    )
+    st.error(error_msg)
+    st.stop()
 
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"

@@ -1,3 +1,0 @@
-"""
-Consumer Hours Crew Module
-"""
