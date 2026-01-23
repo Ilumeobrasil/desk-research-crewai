@@ -170,7 +170,7 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
             'date': datetime.now().strftime('%d/%m/%Y'),
             'instruction': ""
         }
-        make_log({
+        """ make_log({
             "logName": "integrated_analysis",
             "content": {
                 'topic': topic,
@@ -178,7 +178,7 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
                 'date': datetime.now().strftime('%d/%m/%Y'),
                 'instruction': ""
             }
-        })
+        }) """
 
         crew_instance = IntegratedCrew()
         master_result = crew_instance.crew().kickoff(inputs=inputs)

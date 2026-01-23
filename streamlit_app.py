@@ -6,10 +6,11 @@ import logging
 import traceback
 from pathlib import Path
 from typing import Optional, Dict, Any
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
 from desk_research.system.research_system import DeskResearchSystem
 from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
 
-sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
