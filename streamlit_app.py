@@ -22,7 +22,6 @@ if (_parent_dir / "src" / "desk_research").exists():
 
 # Importações do módulo desk_research com tratamento de erro
 try:
-    from desk_research.system.research_system import DeskResearchSystem
     from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
 except ImportError as e:
     error_msg = (
@@ -160,6 +159,9 @@ def _prepare_research_params(modo: str, user_text: str, selected_modos: Optional
 
 def execute_research(user_text: str, modo_selecionado: Optional[str] = None, selected_modos: Optional[list] = None) -> str:
     """Executa a pesquisa usando o DeskResearchSystem."""
+
+    from desk_research.system.research_system import DeskResearchSystem
+    
     try:
         system = DeskResearchSystem()
         
@@ -343,6 +345,7 @@ def _initialize_session_state() -> None:
     if "pending_research" not in st.session_state:
         st.session_state.pending_research = None
 
+    from desk_research.system.research_system import DeskResearchSystem
     if "system" not in st.session_state:
         st.session_state.system = DeskResearchSystem()
     
