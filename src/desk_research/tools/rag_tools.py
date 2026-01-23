@@ -9,6 +9,7 @@ import requests
 from dotenv import load_dotenv
 
 from desk_research.tools.asimov_client import AsimovClient, _safe_json
+from desk_research.utils.makelog.makeLog import make_log
 
 
 def _load_env() -> None:
@@ -79,8 +80,8 @@ class RAG:
         if prompt_template:
             payload["prompt_template"] = prompt_template
 
-        # Step 1: initiate
-        url = f"{chat_base}/api/completions/context"
+        base_clean = chat_base.rstrip("/")
+        url = f"{base_clean}/api/completions/context"
         headers = _chat_headers()
         
         resp = requests.post(
@@ -105,10 +106,11 @@ class RAG:
         if not uuid:
             return {"ok": False, "reason": "missing_uuid", "status": resp.status_code, "json": init_json}
 
-        # Step 2: poll status
+        time.sleep(2)
         done = False
         status_payload: dict[str, Any] | None = None
-        status_url = f"{chat_base}/api/completions/status/{uuid}"
+        base_clean = chat_base.rstrip("/")
+        status_url = f"{base_clean}/api/completions/status/{uuid}"
         headers = _chat_headers()
         
         for attempt in range(poll_attempts):
@@ -120,14 +122,26 @@ class RAG:
             if sresp.status_code == 200:
                 status_payload = _safe_json(sresp) or {}
                 status = status_payload.get("status")
-                if status in (0, 2):
+                # Status 0 = "Waiting in queue", Status 2 = "Completed/Ready"
+                # Apenas status 2 indica que o processamento está completo
+                if status == 2:
                     done = True
                     break
             time.sleep(poll_sleep_s)
 
-        # Step 3: fetch result
-        result_url = f"{chat_base}/api/completions/context/{uuid}"
+        base_clean = chat_base.rstrip("/")
+        result_url = f"{base_clean}/api/completions/context/{uuid}"
         headers = _chat_headers()
+        
+        if not done:
+            return {
+                "ok": False,
+                "uuid": uuid,
+                "done": done,
+                "status_payload": status_payload,
+                "reason": "processing_not_complete",
+                "error": f"Processamento não completou após {poll_attempts} tentativas. Status final: {status_payload.get('status') if status_payload else 'unknown'}",
+            }
                 
         rresp = requests.get(
             result_url,

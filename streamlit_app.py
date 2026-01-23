@@ -6,10 +6,65 @@ import logging
 import traceback
 from pathlib import Path
 from typing import Optional, Dict, Any
-sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from desk_research.system.research_system import DeskResearchSystem
-from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
+# Adiciona o diretório src ao path ANTES das importações de desk_research
+# Usa caminho absoluto para garantir funcionamento em produção
+_current_file = Path(__file__).resolve()
+_current_dir = _current_file.parent
+_src_dir = _current_dir / "src"
+
+# Tenta múltiplas estratégias para encontrar o diretório src
+if not _src_dir.exists():
+    # Fallback: tenta encontrar src a partir do diretório atual de trabalho
+    _cwd = Path.cwd()
+    _src_dir_alt = _cwd / "src"
+    if _src_dir_alt.exists():
+        _src_dir = _src_dir_alt
+    else:
+        # Último fallback: procura src em diretórios pais
+        for parent in _current_dir.parents:
+            _src_dir_candidate = parent / "src"
+            if _src_dir_candidate.exists():
+                _src_dir = _src_dir_candidate
+                break
+
+# Adiciona ao path se encontrado e ainda não estiver lá
+if _src_dir.exists():
+    _src_path = str(_src_dir.resolve())
+    if _src_path not in sys.path:
+        sys.path.insert(0, _src_path)
+    
+    # Verifica se o módulo desk_research existe
+    _desk_research_dir = _src_dir / "desk_research"
+    if not _desk_research_dir.exists():
+        raise ImportError(
+            f"Diretório desk_research não encontrado em {_src_dir}. "
+            f"Arquivo atual: {_current_file}, Diretório atual: {_current_dir}, "
+            f"Diretório de trabalho: {Path.cwd()}"
+        )
+else:
+    # Log de erro para debug em produção
+    error_msg = (
+        f"Não foi possível encontrar o diretório src. "
+        f"Procurou em: {_current_dir / 'src'}, {Path.cwd() / 'src'}. "
+        f"Arquivo atual: {_current_file}, Diretório atual: {_current_dir}, "
+        f"Diretório de trabalho: {Path.cwd()}, sys.path: {sys.path[:3]}"
+    )
+    logging.error(error_msg)
+    raise ImportError(error_msg)
+
+# Importações do módulo desk_research
+try:
+    from desk_research.system.research_system import DeskResearchSystem
+    from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
+except ImportError as e:
+    error_msg = (
+        f"Erro ao importar módulo desk_research: {e}. "
+        f"sys.path inclui: {[p for p in sys.path if 'src' in p or 'desk' in p]}. "
+        f"Diretório src encontrado: {_src_dir if _src_dir.exists() else 'NÃO ENCONTRADO'}"
+    )
+    logging.error(error_msg)
+    raise ImportError(error_msg) from e
 
 
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
