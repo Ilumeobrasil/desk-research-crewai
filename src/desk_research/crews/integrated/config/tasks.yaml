@@ -36,6 +36,46 @@ synthesis_task:
     - Afirmações sem fonte não devem ser incluídas.
     - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas
       como evidência, utilizando texto real das transcrições.
+    - Evidências qualitativas (ex.: Consumer Hours) NÃO PODEM ser usadas
+      para afirmar:
+      • preferência populacional
+      • liderança de mercado
+      • predominância por faixa etária
+      • comportamento generalizável
+
+    - Evidências qualitativas DEVEM ser descritas apenas como:
+      • padrões de discurso
+      • associações percebidas
+      • menções recorrentes no corpus analisado
+
+    - Afirmações de preferência, liderança ou predominância
+      SÓ PODEM ser feitas se houver fonte quantitativa representativa explícita.
+
+    ============================
+    RESTRIÇÃO LEXICAL (CRÍTICA):
+    ============================
+
+    É PROIBIDO utilizar termos como:
+    - "preferida"
+    - "líder"
+    - "predominante"
+    - "domina"
+    - "principal escolha"
+
+    a menos que:
+    - a fonte citada seja quantitativa
+    - a base amostral e o recorte populacional estejam explícitos na fonte
+
+    ============================
+    REGRA DE ESCOPO (OBRIGATÓRIA):
+    ============================
+
+    Toda afirmação deve explicitar claramente:
+    - a quem o dado se refere (ex.: entrevistados, respondentes, adultos 18+)
+    - o tipo de dado (qualitativo ou quantitativo)
+
+    Afirmações sem qualificador de escopo devem ser omitidas.
+
 
     ============================
     IDIOMA
@@ -78,12 +118,10 @@ synthesis_task:
       (ex.: entrevistas qualitativas, menções espontâneas, vídeos de opinião, discussões em fórum)
     - Breve descrição do recorte analítico
     - URL explícita, quando aplicável
-
-    Formato obrigatório por bullet:
-    • [Nome da fonte] (URL) — descrição do tipo de dado e recorte analítico
-
-    Exemplo:
-    • [Reddit](https://…) — discussões espontâneas de usuários sobre sabor e similaridade de marcas
+    - Em caso de fontes Consumer Hours, incluir quantidade de entrevistados.
+    - Cada bullet deve conter:
+      - [Nome da fonte] (URL) — descrição do tipo de dado e recorte analítico
+      - Exemplo: [Reddit](https://…) — discussões espontâneas de usuários sobre sabor e similaridade de marcas
 
     ─────────────────────────────────────────
 
@@ -116,6 +154,9 @@ synthesis_task:
     - Sem avaliação de qualidade das fontes
 
     ## DÁ PARA AFIRMAR
+    - NÃO reinterpretar dados
+    - NÃO transformar menções em preferências
+    - NÃO inferir motivação, causalidade ou representatividade
     - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.
     - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
     - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas como evidência,
@@ -123,14 +164,32 @@ synthesis_task:
     - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
     - Esta seção deve conter apenas fatos observáveis ou estatísticos explicitamente declarados nas fontes.
     - Não incluir interpretações, impactos de mercado ou consequências futuras.
+    - Ao cruzar fontes, explicitar claramente:
+      - se elas medem o MESMO fenômeno
+      - ou se apenas tratam de temas relacionados
+      - Convergência temática NÃO implica validação mútua.
     - Cada bullet deve conter:
       - o fato observado
       - o padrão ou relevância desse fato
       - a fonte explícita
+    - Fontes listadas que não contribuírem com dados explícitos
+      NÃO devem ser incluídas na seção "Fontes analisadas".
 
     ## NÃO FICA CLARO
-    - Ambiguidades, lacunas ou conflitos entre fontes,
-      com explicação breve da causa.
+    - Pontos em que os dados NÃO permitem uma conclusão verificável.
+    - Cada item DEVE indicar explicitamente:
+      • qual afirmação seria tentadora, mas NÃO pode ser feita
+      • qual evidência está ausente, incompleta ou conflitante
+      • por que as fontes analisadas são insuficientes para resolvê-la
+    - É OBRIGATÓRIO ancorar cada ambiguidade em:
+      • lacuna de dados
+      • divergência metodológica
+      • diferença de recorte temporal, populacional ou conceitual entre fontes
+    - Não repetir conclusões já apresentadas em “DÁ PARA AFIRMAR”.
+    - Não usar expressões genéricas como:
+      “não há dados suficientes”, “não fica claro”, “não é possível afirmar”
+      sem explicitar exatamente O QUE falta ou entra em conflito.
+
 
     ## ALGUMAS SUPOSIÇÕES
     - Hipóteses plausíveis não comprovadas, sempre com base observacional indicada.

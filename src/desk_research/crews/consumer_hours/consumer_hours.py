@@ -226,7 +226,8 @@ class IngestorCrew:
         return Agent(
             config=self.agents_config["writer"],
             verbose=VERBOSE_AGENTS,
-            allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
 
     @task

@@ -407,7 +407,7 @@ def _initialize_session_state() -> None:
         st.session_state.system = DeskResearchSystem()
     
     if "selected_crews" not in st.session_state:
-        st.session_state.selected_crews = ['web', 'consumer_hours']
+        st.session_state.selected_crews = ['web', 'consumer_hours', 'academic']
 
 
 _initialize_session_state()
