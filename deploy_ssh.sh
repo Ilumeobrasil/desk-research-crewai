@@ -54,7 +54,6 @@ ssh ${SSH_USER}@${SSH_HOST} << EOF
     
     sleep 3
     echo -e "${GREEN}✅ Deploy concluído com sucesso!${NC}"
-    echo -e "${GREEN}📊 Streamlit rodando em: http://${SSH_HOST}:${STREAMLIT_PORT}${NC}"
 EOF
 
 if [ $? -eq 0 ]; then
