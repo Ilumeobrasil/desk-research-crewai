@@ -12,7 +12,7 @@ from desk_research.utils.makelog.makeLog import make_log
 
 
 @tool("serper_scholar_search")
-def serper_scholar_tool(query: str) -> str:
+def serper_scholar_tool(query: str, num: int= 15) -> str:
     """
     Busca papers acadêmicos no Google Scholar via API Serper
 
@@ -21,6 +21,7 @@ def serper_scholar_tool(query: str) -> str:
 
     Args:
         query: Termo de busca acadêmico
+        num: Número de resultados buscados
 
     Returns:
         JSON string com papers encontrados
@@ -30,7 +31,12 @@ def serper_scholar_tool(query: str) -> str:
 
         url = "https://google.serper.dev/scholar"
 
-        payload = json.dumps({"q": query})
+        payload = json.dumps({
+            "q": query,
+            "yearLow": 2018,
+            "sort": "relevance",
+            "num": num
+        })
         headers = {"X-API-KEY": api_key, "Content-Type": "application/json"}
 
         response = requests.post(url, headers=headers, data=payload, timeout=10)

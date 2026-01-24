@@ -1,6 +1,8 @@
 ﻿import logging
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.pdf_analyzer import pdf_analyzer_tool
+from desk_research.utils.console_time import Console
+from desk_research.utils.makelog.makeLog import make_log
 from desk_research.utils.reporting import export_report
 from dotenv import load_dotenv
 from datetime import datetime
@@ -9,8 +11,8 @@ import httpx
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from desk_research.tools.research_tools import (
+    semantic_scholar_tool,
     serper_scholar_tool,
-    scielo_tool,
     openalex_search_tool,
 )
 from desk_research.models.academic_models import AcademicReport, validar_relatorio
@@ -50,16 +52,20 @@ class AcademicResearchCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
+    @agent
     def academic_researcher(self) -> Agent:
         return Agent(
             config=self.agents_config['academic_researcher'],
             tools=[
                 serper_scholar_tool,
                 openalex_search_tool,
+                semantic_scholar_tool
                 #scielo_tool,
                 #pdf_analyzer_tool
             ],
-            verbose=True
+            verbose=True,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
     
     @agent
@@ -67,7 +73,9 @@ class AcademicResearchCrew:
         return Agent(
             config=self.agents_config['literature_analyst'],
             tools=[pdf_analyzer_tool],
-            verbose=False
+            verbose=False,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
     
     @agent
@@ -75,7 +83,9 @@ class AcademicResearchCrew:
         return Agent(
             config=self.agents_config['academic_synthesizer'],
             tools=[],
-            verbose=VERBOSE_AGENTS
+            verbose=VERBOSE_AGENTS,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
     
     @task
@@ -115,9 +125,24 @@ class AcademicResearchCrew:
         )
     
     def run(self, topic: str, max_papers: int = 3) -> dict:
+        #remover
+        Console.time("academic_research")
+
         result = self.crew().kickoff(inputs={
             'topic': topic,
             'max_papers': max_papers
+        })
+        
+        #remover
+        Console.time_end("academic_research")
+        make_log({
+            "logName": f"academic_research",
+            "content": {
+                "result": result,
+                "query": topic,
+                "max_papers": max_papers,
+                "current_date": datetime.now().strftime('%d/%m/%Y')
+            }
         })
         
         self._export_report(result, topic)

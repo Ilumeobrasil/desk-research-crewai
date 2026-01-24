@@ -441,7 +441,7 @@ messages = st.session_state.chats[active]
 st.markdown(f"## {active}")
 
 st.markdown("---")
-st.markdown("### Desk research (BETA) v.0.0.5")
+st.markdown("### Desk research (BETA) v.0.0.6")
 st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
 
 modos_disponiveis = [k for k in MODE_CONFIG.keys() if k != "integrated"]

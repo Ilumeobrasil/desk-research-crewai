@@ -3,10 +3,9 @@ Pydantic Models para Academic Crew
 Estruturas de dados padronizadas para outputs
 """
 
-from pydantic import BaseModel, Field, HttpUrl
 from typing import List, Optional
 from datetime import datetime
-
+from pydantic import BaseModel, Field, field_validator
 
 class PaperMetadata(BaseModel):
     """
@@ -21,11 +20,24 @@ class PaperMetadata(BaseModel):
         min_length=5
     )
     
-    autores: List[str] = Field(
-        ..., 
+    autores: Optional[List[str]] = Field(
+        default_factory=list, 
         description="Lista de autores do paper",
-        min_items=1
+        min_items=0
     )
+
+    @field_validator('autores', mode='before')
+    @classmethod
+    def validate_autores(cls, v):
+        """Converte None em lista vazia e strings únicas em lista"""
+        if v is None:
+            return []
+        if isinstance(v, list):
+            return v
+        # Se for string única, converte para lista
+        if isinstance(v, str):
+            return [v]
+        return []
     
     ano: Optional[int] = Field(
         default=None, 

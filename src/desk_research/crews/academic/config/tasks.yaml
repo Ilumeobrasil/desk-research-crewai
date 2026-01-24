@@ -1,50 +1,81 @@
 ﻿search_papers_task:
   description: >
-    Realizar uma busca acadêmica sistemática, persistente e criteriosa de papers
-    relevantes sobre "{topic}", com foco em publicações recentes, metodologicamente
-    robustas e adequadas para análise técnica profunda.
+    Realizar uma busca acadêmica sistemática, persistente e criteriosa
+    de papers científicos relevantes sobre "{topic}", com foco em
+    publicações recentes, metodologicamente robustas e adequadas
+    para análise técnica profunda.
 
-    CONTEXTO:
-    Esta tarefa é a base de todo o pipeline. Os papers encontrados serão analisados
-    exaustivamente em tarefas posteriores, portanto a prioridade absoluta é a
-    qualidade científica, recência e disponibilidade de PDFs completos.
+    ESTA TAREFA É A BASE DE TODO O PIPELINE.
+    A qualidade do output impacta diretamente todas as análises posteriores.
 
-    PROCESSO OBRIGATÓRIO:
-    1. Buscar papers priorizando publicações dos ÚLTIMOS 5 ANOS (>= 2020).
-       - Se não houver quantidade suficiente, expandir explicitamente o critério
-         temporal e justificar a decisão.
-    2. Garantir um MÍNIMO DE 3 papers relevantes.
-    3. Priorizar venues de alto impacto acadêmico (ex: Nature, Science, IEEE, ACM,
-       Elsevier, arXiv, OpenAlex, SciELO de alto nível).
-    4. Executar a busca em cascata, mudando de estratégia caso uma fonte falhe:
-       - Google Scholar (via Serper Scholar)
-       - OpenAlex (priorizando papers Open Access)
-       - Semantic Scholar (opcional, usar apenas se necessário)
-    5. Caso identifique um paper altamente relevante ou seminal (ex: alto número
-       de citações), realizar buscas adicionais por trabalhos que o citem ou que
-       sejam evoluções diretas da mesma linha de pesquisa.
-    6. Evitar tentativas repetitivas em caso de erro técnico. Se uma ferramenta
-       falhar, prosseguir imediatamente para a próxima estratégia.
+  CONTEXTO:
+    - Prioridade absoluta: qualidade científica, recência e acesso a PDF completo.
+    - A busca deve ser EXAUSTIVA dentro das ferramentas disponíveis.
 
-    RESTRIÇÕES:
-    - Não incluir papers sem relevância clara sobre "{topic}".
-    - Documentar explicitamente qualquer limitação encontrada durante a busca.
+  PROCESSO OBRIGATÓRIO:
+
+    ETAPA 1 — BUSCA PRIMÁRIA (OBRIGATÓRIA):
+      - Utilizar EXCLUSIVAMENTE a ferramenta `serper_scholar_tool`.
+      - Executar NO MÍNIMO 3 queries diferentes, variando:
+        - termos principais
+        - sinônimos técnicos
+        - abordagens metodológicas
+      - Parâmetros obrigatórios:
+        - query: string gerada via query engineering
+        - num: {max_papers}
+      - Priorizar resultados com:
+        - ano >= 2020
+        - link direto para PDF
+        - venues reconhecidos (Nature, Science, IEEE, ACM, Elsevier, arXiv, SciELO)
+
+    CRITÉRIO DE SUCESSO DA ETAPA 1:
+      - Pelo menos 3 papers relevantes com PDF acessível.
+      - Caso contrário, a etapa é considerada FALHA PARCIAL.
+
+    ETAPA 2 — BUSCA SECUNDÁRIA (FALLBACK CONDICIONAL):
+      - Executar SOMENTE se a Etapa 1 falhar.
+      - Utilizar a ferramenta `openalex_search_tool`.
+      - Priorizar:
+        - Open Access = true
+        - artigos com abstract completo
+      - Executar múltiplas queries, alinhadas às da Etapa 1.
+
+    ETAPA 3 — BUSCA TERCIÁRIA (OPCIONAL E JUSTIFICADA):
+      - Utilizar Semantic Scholar APENAS se:
+        - não houver papers suficientes após Etapas 1 e 2
+      - Documentar explicitamente o motivo do uso.
+
+    ETAPA 4 — EXPANSÃO POR CITAÇÕES:
+      - Se identificar paper altamente citado ou seminal:
+        - buscar trabalhos que o citem
+        - ou extensões diretas da mesma linha de pesquisa
+      - Registrar a relação entre os trabalhos.
+
+  RESTRIÇÕES:
+    - Não incluir papers sem relação direta com "{topic}".
+    - Não incluir artigos sem PDF acessível.
+    - Evitar repetir tentativas idênticas em caso de erro técnico.
+    - Se uma ferramenta falhar tecnicamente, avançar imediatamente para a próxima.
+
+  DOCUMENTAÇÃO OBRIGATÓRIA:
+    - Registrar limitações encontradas (ex: escassez de papers recentes).
+
   expected_output: >
-    Lista estruturada contendo DOIS grupos claramente separados:
+    Lista estruturada com DOIS grupos:
 
     1. PAPERS ACEITOS:
-       Para cada paper:
        - Título completo
-       - Autores reais (se disponível)
-       - Ano de publicação (se disponível)
-       - URL do paper
-       - Resumo original do paper
+       - Autores
+       - Ano
+       - Venue
+       - URL do PDF
+       - Resumo ORIGINAL do paper
 
     2. PAPERS DESCARTADOS OU INCOMPLETOS:
-       - Título (se disponível)
-       - URL do paper
-       - Motivo do descarte (ex: metadados ausentes, irrelevância temática, URL não é PDF)
-
+       - Título
+       - URL
+       - Motivo do descarte
+       
 analyze_literature_task:
   description: >
     Analisar de forma INDIVIDUAL, CRÍTICA e EXAUSTIVA cada paper acadêmico recebido,
@@ -65,8 +96,10 @@ analyze_literature_task:
     4. Extrair e documentar detalhes técnicos completos: metodologia, métricas,
        números, parâmetros, resultados quantitativos, limitações e contribuições.
     5. Gerar a referência ABNT COMPLETA antes de qualquer análise textual.
-    6. Se um paper não puder ser acessado, documentar o erro específico
-       (ex: 404, paywall, timeout) e prosseguir com os demais.
+    6. Se um paper não puder ser acessado (erro 403, 404, paywall, etc.):
+    - Documentar o erro específico (ex: "403 Forbidden", "404 Not Found", "Paywall")
+    - Prosseguir imediatamente com os demais papers
+    - NÃO interromper o fluxo por causa de um único paper inacessível
 
     RESTRIÇÕES CRÍTICAS (ZERO TOLERÂNCIA):
     - É PROIBIDO usar reticências ("...") ou truncar texto.
@@ -102,11 +135,6 @@ analyze_literature_task:
 
     8. Avaliação Crítica do Analista
       (2–3 parágrafos avaliando rigor científico e confiabilidade)
-
-    Ao final do documento:
-    - Total de papers analisados com sucesso
-    - Lista de papers inacessíveis com o erro correspondente
-
 
 synthesize_report_task:
   description: >

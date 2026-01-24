@@ -70,7 +70,7 @@ def pdf_analyzer_tool(url: str) -> str:
                 
         except Exception as e:
             print(f"❌ ERRO ao acessar URL: {str(e)}")
-            return f"ERRO ao acessar URL: {str(e)}"
+            return f"FALHA NO ACESSO AO PDF: Não foi possível baixar o PDF. Continue analisando os demais papers normalmente."
 
         response.raise_for_status()
         
