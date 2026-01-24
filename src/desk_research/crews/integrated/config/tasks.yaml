@@ -35,7 +35,7 @@ synthesis_task:
     - Não invente, complete ou presuma dados ausentes.
     - Afirmações sem fonte não devem ser incluídas.
     - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas
-      como evidência, utilizando texto literal das transcrições.
+      como evidência, utilizando texto real das transcrições.
 
     ============================
     IDIOMA
@@ -87,23 +87,25 @@ synthesis_task:
 
     ─────────────────────────────────────────
 
-    ### Período coberto
+    ### Período coberto (apenas se aplicável)
 
-    Liste o período temporal correspondente a cada fonte mencionada.
+    INSTRUÇÃO CONDICIONAL (CRÍTICA):
+
+    - Esta seção SÓ deve ser incluída se pelo menos UMA das fontes analisadas
+      possuir período temporal explicitamente informado nos relatórios.
+    - Se TODAS as fontes NÃO informarem período temporal,
+      a seção “### Período coberto” NÃO deve ser exibida,
+      nem vazia, nem com texto explicativo.
+
+    Quando exibida, seguir o formato abaixo:
+
+    • Nome da fonte: data-início - data-fim
 
     Regras:
-    - Informar data inicial e final sempre que possível
-    - Caso o período não esteja disponível, não informar nada.
-    - NÃO agrupar fontes distintas em um único período genérico
-
-    REGRA CONDICIONAL OBRIGATÓRIA:
-    - Se TODAS as fontes tiverem o período não informado,
-      ENTÃO: NÃO exibir a seção “### Período coberto”
-
-    Formato obrigatório:
-    • Nome da fonte: data-início - data-fim
-    ou
-    • Nome da fonte: Período não informado nos relatórios
+    - Data deve ser formatadas em Português (PT-BR) - Ex: Junho de 2025 - Julho de 2025
+    - Informar apenas períodos explicitamente declarados nas fontes
+    - Não criar bullets para fontes sem período informado
+    - Não utilizar expressões como “Período não informado nos relatórios”
 
     ─────────────────────────────────────────
     TOM E LINGUAGEM

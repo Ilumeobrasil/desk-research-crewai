@@ -208,6 +208,10 @@ st.markdown(
         color: #0f172a;
     }
 
+    .stMain {
+        margin-top: 20px !important;
+    }
+
     /* ===== Sidebar ===== */
     section[data-testid="stSidebar"] {
         background-color: #f9f9f9;
@@ -231,8 +235,8 @@ st.markdown(
         padding: 20px 20px;
         border-radius: 11px;
         margin: 0px 0;
-        line-height: 1.5;
-        font-size: 15px;
+        line-height: 1.7;
+        font-size: 16px;
         max-width: 85%;
         border: 1px solid #e5e7eb;
         background-color: #ffffff;
@@ -367,10 +371,7 @@ st.markdown(
     footer { visibility: hidden; }
 
     /* ===== Ocultar toolbar/header do Streamlit (Share etc.) ===== */
-    div[data-testid="stToolbar"] { display: none !important; }
-    div[data-testid="stToolbarActions"] { display: none !important; }
-    .stAppToolbar { display: none !important; }
-    header[data-testid="stHeader"] { display: none !important; }
+    .stAppDeployButton { display: none !important; }
 
     /* ===== Ajuste do container do botão Enviar ===== */
     form[data-testid="stForm"] div[data-testid="stVerticalBlock"]:has(button[data-testid="stBaseButton-secondaryFormSubmit"]),
@@ -440,7 +441,7 @@ messages = st.session_state.chats[active]
 st.markdown(f"## {active}")
 
 st.markdown("---")
-st.markdown("### Desk research (BETA) v.0.0.4")
+st.markdown("### Desk research (BETA) v.0.0.5")
 st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
 
 modos_disponiveis = [k for k in MODE_CONFIG.keys() if k != "integrated"]

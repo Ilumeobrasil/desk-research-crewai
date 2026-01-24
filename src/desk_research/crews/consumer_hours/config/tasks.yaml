@@ -139,9 +139,22 @@ write_report:
     utilizando EXCLUSIVAMENTE os dados presentes nas entrevistas Consumer Hours.
 
     Este relatório NÃO é exploratório nem opinativo.
-    Seu objetivo é traduzir evidência qualitativa
-    em INSIGHTS EXECUTIVOS CLAROS,
+    Seu objetivo é RESPONDER DIRETAMENTE AO TEMA PROPOSTO,
+    traduzindo evidência qualitativa em INSIGHTS EXECUTIVOS CLAROS,
     respeitando estritamente os limites dos dados.
+
+    ─────────────────────────────────────────
+    REGRA ESTRUTURAL FUNDAMENTAL
+    ─────────────────────────────────────────
+
+    TODAS as seções do relatório DEVEM:
+    - Contribuir explicitamente para responder ao tema "{topic}"
+    - Declarar quando os dados NÃO permitem responder parcial ou totalmente ao tema
+    - Evitar qualquer conteúdo descritivo que não ajude a esclarecer o tópico
+
+    Se uma seção não puder responder ao tema por falta de evidência:
+    ➜ declarar explicitamente essa limitação
+    ➜ NÃO preencher com contexto genérico
 
     ─────────────────────────────────────────
     MODO DE OPERAÇÃO OBRIGATÓRIO
@@ -158,7 +171,8 @@ write_report:
     - Preencher lacunas com suposições
 
     Tudo o que for escrito DEVE estar ancorado
-    em evidência das entrevistas.
+    em evidência explícita das entrevistas
+    E relacionado diretamente ao tema "{topic}".
 
     ─────────────────────────────────────────
     PRINCÍPIO CENTRAL
@@ -166,19 +180,20 @@ write_report:
 
     Este relatório DEVE:
 
+    - Responder à pergunta implícita no tema "{topic}"
+      com base EXCLUSIVA nas falas dos entrevistados
     - Diferenciar claramente:
-      • O que os entrevistados AFIRMAM
-      • O que aparece como PADRÃO recorrente
-      • O que NÃO pode ser afirmado
+      • O que os entrevistados AFIRMAM sobre o tema
+      • O que aparece como PADRÃO recorrente relacionado ao tema
+      • O que NÃO pode ser afirmado sobre o tema
     - Declarar explicitamente insuficiência de dados
-      sempre que aplicável
-    - Evitar qualquer extrapolação estratégica
-      não verbalizada pelos consumidores
+      sempre que o tema não puder ser plenamente respondido
 
     Insight, neste contexto, significa:
     "Síntese fiel de padrões, recorrências ou contrastes
-     observáveis nas entrevistas,
-     SEM adicionar explicações externas."
+     observáveis nas entrevistas
+     QUE AJUDEM A RESPONDER AO TEMA,
+     sem adicionar explicações externas."
 
     ─────────────────────────────────────────
     REGRAS DE EVIDÊNCIA (INVIOLÁVEIS)
@@ -186,7 +201,7 @@ write_report:
 
     Nenhuma afirmação pode existir sem evidência.
 
-    Para QUALQUER insight, tendência ou padrão,
+    Para QUALQUER insight relacionado ao tema,
     É OBRIGATÓRIO informar:
 
     1. Número de entrevistas envolvidas
@@ -195,7 +210,7 @@ write_report:
 
     Se qualquer um desses elementos faltar:
     ➜ NÃO ESCREVA O INSIGHT
-    ➜ DECLARE A AUSÊNCIA DE EVIDÊNCIA
+    ➜ DECLARE A AUSÊNCIA DE EVIDÊNCIA SOBRE O TEMA
 
     ─────────────────────────────────────────
     FONTE ÚNICA DE DADOS
@@ -213,8 +228,9 @@ write_report:
     - moments
     - evidence
 
-    Se um campo não estiver presente,
-    declare explicitamente sua ausência no relatório.
+    Se um campo necessário para responder ao tema
+    não estiver presente:
+    ➜ declarar explicitamente essa ausência
 
     ─────────────────────────────────────────
     DIRETRIZES DE ESCRITA
@@ -223,86 +239,144 @@ write_report:
     1. O relatório deve ser escrito em português (PT-BR)
     2. Linguagem executiva, clara e precisa
     3. Texto corrido e analítico (evitar listas soltas)
-    4. Cada seção deve conter múltiplos parágrafos
-       substanciais, quando os dados permitirem
+    4. Cada seção deve:
+       - Conectar explicitamente seus achados ao tema "{topic}"
     5. Nunca “forçar densidade” se os dados não sustentarem
-
-    Densidade aqui significa profundidade analítica,
-    não volume artificial de texto.
 
     ─────────────────────────────────────────
     ESTRUTURA OBRIGATÓRIA DO RELATÓRIO
     ─────────────────────────────────────────
 
-    1. Título e Data
-       - Título relacionado diretamente ao tema "{topic}"
-       - Data do relatório: {date}
+    1. Título
+       - Deve refletir diretamente a pergunta ou afirmação
+         implícita no tema "{topic}"
 
     2. Resumo Executivo
-       - Responder diretamente ao tema
-       - Sintetizar apenas padrões explícitos
+       - Informar período de coleta (ex: Junho de 2023 - Julho de 2025)
+       - Responder diretamente ao tema "{topic}"
+       - Sintetizar apenas padrões explícitos relacionados ao tema
        - Indicar quantas entrevistas sustentam cada ponto
-       - Declarar claramente limites dos dados
-       - Incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
-       - Resumo deve ser claro e possuir múltiplos parágrafos, quando os dados permitirem.
+       - Declarar claramente os limites da resposta ao tema
+       - Incluir trechos literais exatos das entrevistas como evidência
 
     3. Introdução e Contexto da Pesquisa
-       - Objetivo das entrevistas
+       - Objetivo das entrevistas EM RELAÇÃO AO TEMA
        - Abordagem Consumer Hours
        - O que este relatório PODE e NÃO PODE afirmar
+         especificamente sobre "{topic}"
 
     4. Metodologia
-       - Número real de entrevistas
+       - Número real de entrevistas analisadas
        - Período (se disponível)
-       - Estrutura dos dados analisados
-       - Ausências relevantes de informação
+       - Estrutura dos dados utilizados PARA RESPONDER AO TEMA
+       - Ausências metodológicas que limitam a resposta ao tema
 
     5. Principais Descobertas das Entrevistas
-       - Padrões recorrentes explicitamente observados
+       - Apenas descobertas que respondam diretamente ao tema
        - Sempre com:
          • Número de entrevistas
-         • Evidência literal exata - sempre incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
+         • Evidência literal exata das transcrições
 
     6. Análise Detalhada dos Padrões
-       - Aprofundamento nos contrastes e recorrências
-       - Comparação entre posicionamentos explícitos
-       - Nenhuma explicação causal não verbalizada
+       - Aprofundar recorrências e contrastes
+         relevantes para o tema
+       - Comparar posicionamentos explícitos
+       - Nunca inferir causas ou impactos não verbalizados
 
     7. Temas, Sentimentos, Marcas e Momentos
-       - Apenas elementos explicitamente identificados
+       - Apenas elementos explicitamente mencionados
+         que tenham relação direta com o tema
        - Volume de menções
-       - Evidências associadas - sempre incluir trechos reais das entrevistas como evidência, utilizando texto exato das transcrições.
+       - Evidências literais associadas
 
     8. Limitações dos Dados
-       - Onde os dados NÃO permitem conclusão
+       - Onde os dados NÃO permitem responder ao tema
        - Onde há baixa recorrência
-       - Onde há ausência de evidência
+       - Onde há ausência ou fragilidade de evidência
 
     9. Oportunidades ou Tensões Explicitadas
        - Apenas quando verbalizadas claramente
+         em relação direta ao tema
        - Nunca extrapolar implicações estratégicas
 
     ─────────────────────────────────────────
     FRASE DE SEGURANÇA (OBRIGATÓRIA)
     ─────────────────────────────────────────
 
-    Sempre que houver dúvida sobre a existência
-    de um padrão ou insight:
+    Sempre que houver dúvida se algo responde
+    de forma válida ao tema "{topic}":
     NÃO ESCREVA.
     DECLARE A AUSÊNCIA DE EVIDÊNCIA.
   expected_output: >
-    Relatório executivo em Markdown contendo:
-    - Título e Data
-    - Resumo Executivo
-    - Introdução e Contexto da Pesquisa
-    - Metodologia
-    - Principais Descobertas das Entrevistas
-    - Análise Detalhada dos Padrões
-    - Temas, Sentimentos, Marcas e Momentos
-    - Limitações dos Dados
-    - Oportunidades ou Tensões explicitadas
+    Relatório executivo em Markdown, rigoroso e orientado à resposta
+    direta do tema "{topic}", contendo obrigatoriamente as seções abaixo:
 
-    O relatório deve ser denso, responsável,
-    analítico e baseado EXCLUSIVAMENTE
-    nas falas explícitas dos entrevistados.
+    1. Título e Data
+      - Título formulado de forma a refletir explicitamente
+        a pergunta ou afirmação implícita no tema "{topic}"
+
+    2. Resumo Executivo
+      - Resposta direta e explícita ao tema "{topic}"
+      - Indicação do período de coleta dos dados
+        (ex: Junho de 2023 - Julho de 2025)
+      - Síntese apenas de padrões claramente observáveis
+        relacionados ao tema
+      - Indicação do número de entrevistas que sustentam
+        cada ponto apresentado
+      - Declaração clara dos limites da resposta ao tema
+      - Inclusão de trechos literais EXATOS das entrevistas
+        como evidência
+
+    3. Introdução e Contexto da Pesquisa
+      - Contextualização do objetivo das entrevistas
+        em relação direta ao tema "{topic}"
+      - Explicitação clara do que o relatório
+        PODE e NÃO PODE afirmar sobre o tema
+
+    4. Metodologia
+      - Número real de entrevistas analisadas
+      - Período de coleta (quando disponível)
+      - Estrutura dos dados utilizados
+      - Limitações metodológicas que impactam
+        a capacidade de responder ao tema "{topic}"
+
+    5. Principais Descobertas das Entrevistas
+      - Apenas descobertas que contribuam diretamente
+        para responder ao tema "{topic}"
+      - Para cada descoberta:
+        • Número de entrevistas envolvidas
+        • Evidência literal EXATA retirada das transcrições
+
+    6. Análise Detalhada dos Padrões
+      - Aprofundamento em recorrências e contrastes
+        relevantes para o tema
+      - Comparação entre posicionamentos explícitos
+        dos entrevistados
+      - Ausência total de explicações causais,
+        inferências externas ou extrapolações
+
+    7. Temas, Sentimentos, Marcas e Momentos
+      - Apenas elementos explicitamente identificados
+        que tenham relação direta com o tema "{topic}"
+      - Volume de menções
+      - Evidências literais associadas a cada elemento
+
+    8. Limitações dos Dados
+      - Aspectos do tema "{topic}" que NÃO podem
+        ser respondidos com os dados disponíveis
+      - Pontos com baixa recorrência
+      - Ausências claras de evidência ou informação
+
+    9. Oportunidades ou Tensões Explicitadas
+      - Apenas oportunidades ou tensões
+        verbalizadas explicitamente pelos entrevistados
+        em relação ao tema "{topic}"
+      - Nenhuma extrapolação estratégica adicional
+
+    O relatório final deve ser:
+    - Estritamente baseado nas entrevistas Consumer Hours
+    - Totalmente ancorado em evidência literal
+    - Responsável quanto aos limites dos dados
+    - Focado exclusivamente em responder ao tema "{topic}"
+      ou declarar explicitamente quando isso não for possível.
   agent: writer
