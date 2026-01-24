@@ -43,22 +43,75 @@ synthesis_task:
     - Texto 100% em Português (PT-BR).
     - Nomes próprios, marcas e títulos permanecem no idioma original.
   expected_output: >
-    Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo,
-    sem seções extras, renomeadas ou reordenadas:
+    Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo, sem seções extras, renomeadas ou reordenadas:
+    - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
 
     ## DIRETO AO PONTO
-    - Resposta objetiva em 1–2 parágrafos.
+    - Resposta objetiva em 1-2 parágrafos.
     - Apenas conclusões sustentadas por evidência recorrente.
     - Cada parágrafo deve responder explicitamente à pergunta original, sintetizando padrões observados e grau de confiança das evidências.
 
-    ## COMO CHEGAMOS A ISSO
+    ##COMO CHEGAMOS A ISSO
+
+    Produza a seção “COMO CHEGAMOS A ISSO” seguindo estritamente o formato e as regras abaixo.
+
+    ─────────────────────────────────────────
+    OBJETIVO DA SEÇÃO
+    ─────────────────────────────────────────
+
+    Documentar, de forma transparente e auditável, 
+    quais fontes foram analisadas e qual o período temporal coberto por cada uma.
+
+    Esta seção NÃO deve conter conclusões, análises ou interpretações.
+
+    ─────────────────────────────────────────
+    FORMATO OBRIGATÓRIO
+    ─────────────────────────────────────────
+
     ### Fontes analisadas
-    - Lista completa das fontes utilizadas, com URLs.
+
+    Apresente uma lista completa das fontes utilizadas.
+    Cada fonte DEVE conter:
+
+    - Nome da fonte ou plataforma
+    - Tipo de material analisado
+      (ex.: entrevistas qualitativas, menções espontâneas, vídeos de opinião, discussões em fórum)
+    - Breve descrição do recorte analítico
+    - URL explícita, quando aplicável
+
+    Formato obrigatório por bullet:
+    • [Nome da fonte] (URL) — descrição do tipo de dado e recorte analítico
+
+    Exemplo:
+    • [Reddit](https://…) — discussões espontâneas de usuários sobre sabor e similaridade de marcas
+
+    ─────────────────────────────────────────
 
     ### Período coberto
-      - Período temporal de cada fonte base de dados ou "Período não informado nos relatórios."
-      - Exemplo separado por bullets: "- Web: data-inicio, data-fim"
-      - De preferência, informar o período inicial e final de cada fonte.
+
+    Liste o período temporal correspondente a cada fonte mencionada.
+
+    Regras:
+    - Informar data inicial e final sempre que possível
+    - Caso o período não esteja disponível, não informar nada.
+    - NÃO agrupar fontes distintas em um único período genérico
+
+    REGRA CONDICIONAL OBRIGATÓRIA:
+    - Se TODAS as fontes tiverem o período não informado,
+      ENTÃO: NÃO exibir a seção “### Período coberto”
+
+    Formato obrigatório:
+    • Nome da fonte: data-início - data-fim
+    ou
+    • Nome da fonte: Período não informado nos relatórios
+
+    ─────────────────────────────────────────
+    TOM E LINGUAGEM
+    ─────────────────────────────────────────
+
+    - Linguagem descritiva e objetiva
+    - Sem justificativas metodológicas
+    - Sem avaliação de qualidade das fontes
 
     ## DÁ PARA AFIRMAR
     - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.

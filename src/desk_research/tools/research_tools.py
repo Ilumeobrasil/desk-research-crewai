@@ -445,7 +445,6 @@ def scielo_scraper_tool(query: str, max_results: int = 10) -> str:
         headers = {"User-Agent": "Academic Research Bot", "Accept": "application/json"}
 
         response = requests.get(api_url, params=params, headers=headers, timeout=10)
-        print("AAAAAA",response)
         response.raise_for_status()
 
         data = response.json()
@@ -666,9 +665,6 @@ def google_search_tool(query: str) -> str:
     Returns:
         JSON string com resultados da busca normalizados
     """
-
-    print("=" * 73)
-    print(f"🔧 Tool google_search chamada com query: {query}")
     try:
         conn = http.client.HTTPSConnection("google.serper.dev")
 
@@ -716,7 +712,6 @@ def web_scraper_tool(url: str) -> str:
     Extrai texto de uma página web.
     """
 
-    print(f"🔧 Tool web_scraper chamada com URL: {url}")
     try:
         import trafilatura
 

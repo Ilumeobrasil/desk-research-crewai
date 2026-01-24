@@ -84,25 +84,8 @@ def run_web_research(query: str, max_results: int = 10):
             'current_date': datetime.datetime.now().strftime('%d/%m/%Y')
         }
         
-        crew = WebCrew()
-        
-        #remover
-        print("RODANDO WEB")
-        Console.time("web_research")
-
+        crew = WebCrew() 
         result = crew.crew().kickoff(inputs=inputs)
-        
-        #remover
-        Console.time_end("web_research")
-        make_log({
-            "logName": f"web_research",
-            "content": {
-                "result": result,
-                "query": query,
-                "max_results": max_results,
-                "current_date": datetime.datetime.now().strftime('%d/%m/%Y')
-            }
-        })
         
         export_report(result, query, prefix="web_report", crew_name="web")
         

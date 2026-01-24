@@ -5,9 +5,24 @@ import sys
 import logging
 import traceback
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any
+import markdown2
+import re
+import html as html_module
+import warnings
 
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("crewai.telemetry").setLevel(logging.CRITICAL)
+logging.getLogger("crewai").setLevel(logging.WARNING)
 
+os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+from desk_research.system.research_system import DeskResearchSystem
+from desk_research.constants import MODE_CONFIG, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
+    
 _current_dir = Path(__file__).resolve().parent
 _src_dir = _current_dir / "src"
 
@@ -20,32 +35,9 @@ if (_parent_dir / "src" / "desk_research").exists():
     if str(_parent_src) not in sys.path:
         sys.path.insert(0, str(_parent_src))
 
-# Importações do módulo desk_research com tratamento de erro
-try:
-    # Importar parameter_collectors primeiro para garantir que o módulo seja carregado
-    import desk_research.system.parameter_collectors  # noqa: F401
-    from desk_research.system.research_system import DeskResearchSystem
-    from desk_research.constants import MODE_CONFIG, PERGUNTAS_PADRAO, DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS
-except (ImportError, KeyError) as e:
-    error_msg = (
-        f"❌ Erro ao importar módulos desk_research.\n\n"
-        f"Diretório atual: {_current_dir}\n"
-        f"Diretório src: {_src_dir}\n"
-        f"src existe: {_src_dir.exists()}\n"
-        f"sys.path: {sys.path[:5]}\n\n"
-        f"Erro: {str(e)}\n\n"
-        f"Verifique se o diretório 'src' existe e contém o módulo 'desk_research'."
-    )
-    st.error(error_msg)
-    st.stop()
-
-logging.getLogger("LiteLLM").setLevel(logging.WARNING)
-os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
-os.environ["ANONYMIZED_TELEMETRY"] = "False"
-
 DEFAULT_CHAT_NAME = "Nova Pesquisa"
-DEFAULT_MODE = "integrated"
 MAX_TITLE_LENGTH = 28
+MODO_PESQUISA = "integrated"
 
 st.set_page_config(
     page_title="Desk Research System",
@@ -53,9 +45,41 @@ st.set_page_config(
     layout="wide",
 )
 
-X_QUESTIONS = PERGUNTAS_PADRAO.get("geral", [])
-VIEW_INTERACTIVE_MENU = os.getenv("VIEW_INTERACTIVE_MENU", "FALSE").upper() == "TRUE"
-VIEW_SELECT_INTEGRATED_MENU = os.getenv("VIEW_SELECT_INTEGRATED_MENU", "FALSE").upper() == "TRUE"
+
+def clean_html_content(html: str) -> str:
+    """Remove divs vazios e outros elementos desnecessários do HTML"""
+    if not html:
+        return html
+    
+    while True:
+        new_html = re.sub(
+            r'<div[^>]*>\s*</div>',
+            '',
+            html,
+            flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+        )
+        if new_html == html:
+            break
+        html = new_html
+    
+    html = re.sub(
+        r'<div[^>]*style="[^"]*background-color:\s*transparent[^"]*"[^>]*>\s*</div>',
+        '',
+        html,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    
+    html = re.sub(
+        r'<div[^>]*>\s*(<div[^>]*>\s*</div>\s*)+</div>',
+        '',
+        html,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
+    
+    html = re.sub(r'\n\s*\n\s*\n+', '\n\n', html)
+    
+    return html.strip()
+
 
 def _title_from_text(text: str, max_len: int = MAX_TITLE_LENGTH) -> str:
     """Extrai um título do texto fornecido."""
@@ -63,6 +87,7 @@ def _title_from_text(text: str, max_len: int = MAX_TITLE_LENGTH) -> str:
     if not t:
         return DEFAULT_CHAT_NAME
     return t[:max_len].strip()
+
 
 def _unique_chat_name(base: str) -> str:
     """Gera um nome único para o chat, adicionando número se necessário."""
@@ -73,6 +98,7 @@ def _unique_chat_name(base: str) -> str:
         i += 1
     return name
 
+
 def bump_chat_to_top(chat_name: str) -> None:
     """Move um chat para o topo da lista de ordem."""
     if "chat_order" not in st.session_state:
@@ -80,6 +106,7 @@ def bump_chat_to_top(chat_name: str) -> None:
     if chat_name in st.session_state.chat_order:
         st.session_state.chat_order.remove(chat_name)
     st.session_state.chat_order.insert(0, chat_name)
+
 
 def rename_chat(old: str, new: str) -> bool:
     """Renomeia um chat. Retorna True se bem-sucedido."""
@@ -96,6 +123,7 @@ def rename_chat(old: str, new: str) -> bool:
     st.session_state.active_chat = new
     return True
 
+
 def maybe_autoname_chat(chat_name: str, user_text: str) -> str:
     """Renomeia automaticamente o chat se tiver nome genérico."""
     is_generic = chat_name == DEFAULT_CHAT_NAME or chat_name.startswith("Chat ")
@@ -110,6 +138,7 @@ def maybe_autoname_chat(chat_name: str, user_text: str) -> str:
         return new_name
 
     return chat_name
+
 
 def extract_result_text(result: Any) -> str:
     """Extrai texto formatado dos resultados dos crews."""
@@ -135,59 +164,40 @@ def extract_result_text(result: Any) -> str:
     
     return str(result)
 
-def format_result_for_chat(result: Any, modo: Optional[str] = None) -> str:
-    texto = extract_result_text(result)
-    
-    return texto 
 
-def _prepare_research_params(modo: str, user_text: str, selected_modos: Optional[list] = None) -> Optional[Dict[str, Any]]:
-    """Prepara os parâmetros para execução da pesquisa baseado no modo."""
-    params_map = {
-        "genie": {"pergunta": user_text, "contexto": ""},
-        "youtube": {"topic": user_text},
-        "academic": {"topic": user_text, "max_papers": DEFAULT_MAX_PAPERS},
-        "web": {"query": user_text, "max_results": DEFAULT_MAX_WEB_RESULTS},
-        "x": {"topic": user_text},
-        "consumer_hours": {"topic": user_text},
-        "integrated": {
+def format_result_for_chat(result: Any) -> str:
+    """Formata o resultado para exibição no chat."""
+    return extract_result_text(result)
+
+
+def execute_research(user_text: str, selected_crews: list) -> str:
+    """Executa a pesquisa usando o modo integrated."""
+    try:
+        system = DeskResearchSystem()
+        
+        if not selected_crews:
+            return "❌ Erro: É necessário selecionar pelo menos um agente para executar a pesquisa."
+        
+        params = {
             "topic": user_text,
-            "selected_modos": selected_modos if selected_modos else ['web'],
+            "selected_modos": selected_crews,
             "params": {
                 "max_papers": DEFAULT_MAX_PAPERS,
                 "max_web_results": DEFAULT_MAX_WEB_RESULTS
             }
         }
-    }
-    return params_map.get(modo)
-
-def execute_research(user_text: str, modo_selecionado: Optional[str] = None, selected_modos: Optional[list] = None) -> str:
-    """Executa a pesquisa usando o DeskResearchSystem."""
-    try:
-        system = DeskResearchSystem()
         
-        if not modo_selecionado:
-            if VIEW_SELECT_INTEGRATED_MENU:
-                modo_selecionado = "integrated"
-            else:
-                modo_selecionado = DEFAULT_MODE if not VIEW_INTERACTIVE_MENU else None
-        
-        if not modo_selecionado:
-            return "❌ Erro: Nenhum modo selecionado."
-        
-        params = _prepare_research_params(modo_selecionado, user_text, selected_modos)
-        if params is None:
-            return f"❌ Modo '{modo_selecionado}' não suportado."
-        
-        executor = system._executors.get(modo_selecionado)
+        executor = system._executors.get(MODO_PESQUISA)
         if not executor:
-            return f"❌ Executor para modo '{modo_selecionado}' não encontrado."
+            return f"❌ Executor para modo '{MODO_PESQUISA}' não encontrado."
         
         resultado = executor(**params)
-        return format_result_for_chat(resultado, modo_selecionado)
+        return format_result_for_chat(resultado)
         
     except Exception as e:
         error_msg = f"❌ Erro na execução: {str(e)}\n\n```\n{traceback.format_exc()}\n```"
         return error_msg
+
 
 st.markdown(
     """
@@ -206,7 +216,7 @@ st.markdown(
 
     /* ===== Títulos ===== */
     h1, h2, h3, h4 {
-        color: #0f172a !important;
+        color: #1f77b5 !important;
     }
 
     /* ===== Container do chat ===== */
@@ -218,16 +228,71 @@ st.markdown(
 
     /* ===== Bolhas ===== */
     .bubble {
-        padding: 12px 14px;
-        border-radius: 14px;
-        margin: 10px 0;
+        padding: 20px 20px;
+        border-radius: 11px;
+        margin: 0px 0;
         line-height: 1.5;
         font-size: 15px;
         max-width: 85%;
         border: 1px solid #e5e7eb;
-        white-space: pre-wrap;
-        word-wrap: break-word;
         background-color: #ffffff;
+    }
+    
+    /* ===== Formatação de Markdown dentro das bolhas ===== */
+    .bubble h1, .bubble h2, .bubble h3, .bubble h4 {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #0f172a;
+    }
+    
+    .bubble h2 {
+        font-size: 18px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1px;
+        margin-top: 12px;
+    }
+    
+    .bubble h3 {
+        font-size: 16px;
+    }
+    
+    .bubble h4 {
+        font-size: 15px;
+    }
+    
+    .bubble p {
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+    
+    .bubble ul, .bubble ol {
+        margin-top: 1px;
+        margin-bottom: 1px;
+        padding-left: 20px;
+    }
+    
+    .bubble li {
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+    
+    .bubble strong {
+        font-weight: 600;
+    }
+    
+    .bubble em {
+        font-style: italic;
+    }
+    
+    /* Ocultar divs vazios que possam aparecer */
+    .bubble div:empty,
+    .bubble div[style*="background-color: transparent"]:empty {
+        display: none !important;
+    }
+    
+    .bubble div:has(> div:empty:only-child) {
+        display: none !important;
     }
 
     .user {
@@ -244,7 +309,7 @@ st.markdown(
     .meta {
         font-size: 12px;
         color: #6b7280;
-        margin-bottom: 4px;
+        margin-bottom: 1px;
     }
 
     /* ===== Input fixo ===== */
@@ -263,7 +328,7 @@ st.markdown(
         width: min(900px, 92vw);
         background-color: #ffffff;
         border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        border-radius: 11px;
         padding: 10px 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         pointer-events: auto;
@@ -319,6 +384,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 def _initialize_session_state() -> None:
     """Inicializa o estado da sessão com valores padrão."""
     if "chats" not in st.session_state:
@@ -333,15 +399,6 @@ def _initialize_session_state() -> None:
     if "chat_order" not in st.session_state:
         st.session_state.chat_order = list(st.session_state.chats.keys())
 
-    if "sidebar_section" not in st.session_state:
-        st.session_state.sidebar_section = "chats" 
-
-    if "pending_user_message" not in st.session_state:
-        st.session_state.pending_user_message = ""
-
-    if "pending_mode" not in st.session_state:
-        st.session_state.pending_mode = None
-
     if "pending_research" not in st.session_state:
         st.session_state.pending_research = None
 
@@ -349,9 +406,11 @@ def _initialize_session_state() -> None:
         st.session_state.system = DeskResearchSystem()
     
     if "selected_crews" not in st.session_state:
-        st.session_state.selected_crews = []
+        st.session_state.selected_crews = ['web', 'consumer_hours']
+
 
 _initialize_session_state()
+
 
 def new_chat() -> None:
     """Cria um novo chat."""
@@ -362,66 +421,44 @@ def new_chat() -> None:
     st.session_state.active_chat = name
     bump_chat_to_top(name)
 
+
 with st.sidebar:
-    if st.session_state.sidebar_section == "chats":
-        st.markdown("### Chats")
-        st.button("➕ Novo chat", use_container_width=True, on_click=new_chat)
+    st.markdown("### Chats")
+    st.button("➕ Novo chat", use_container_width=True, on_click=new_chat)
 
-        st.markdown("---")
-        for chat_name in st.session_state.chat_order:
-            is_active = (chat_name == st.session_state.active_chat)
-            label = f"{chat_name}" if is_active else chat_name
+    st.markdown("---")
+    for chat_name in st.session_state.chat_order:
+        is_active = (chat_name == st.session_state.active_chat)
+        label = f"{chat_name}" if is_active else chat_name
 
-            if st.button(label, key=f"chat_{chat_name}", use_container_width=True):
-                st.session_state.active_chat = chat_name
+        if st.button(label, key=f"chat_{chat_name}", use_container_width=True):
+            st.session_state.active_chat = chat_name
 
 active = st.session_state.active_chat
 messages = st.session_state.chats[active]
 
 st.markdown(f"## {active}")
 
-modo_selecionado = None
-selected_crews = []
+st.markdown("---")
+st.markdown("### Desk research (BETA) v.0.0.4")
+st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
 
-if VIEW_INTERACTIVE_MENU:
-    st.markdown("---")
-    modo_selecionado = st.selectbox(
-        "🔧 Escolha o modo de pesquisa:",
-        options=["integrated"] + [k for k in MODE_CONFIG.keys() if k != "integrated"],
-        format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
-        key=f"mode_select_{active}",
-        help="Selecione qual tipo de pesquisa deseja executar"
-    )
-    st.markdown("---")
-elif VIEW_SELECT_INTEGRATED_MENU:
-    # Quando VIEW_SELECT_INTEGRATED_MENU=TRUE e VIEW_INTERACTIVE_MENU=FALSE
-    # Sempre usa o modo integrated e mostra multi-select para escolher agentes
-    modo_selecionado = "integrated"
-    st.markdown("---")
-    st.markdown("### Desk research (BETA) v.0.0.4")
-    st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
-    
-    # Opções disponíveis (excluindo integrated e consumer_hours)
-    modos_disponiveis = [k for k in MODE_CONFIG.keys() if k not in ["integrated"]]
-    
-    selected_crews = st.multiselect(
-        "🤖 Selecione os agentes:",
-        options=modos_disponiveis,
-        default=st.session_state.selected_crews if st.session_state.selected_crews else ['web', 'consumer_hours'],
-        format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
-        key=f"crews_select_{active}",
-        help="Selecione pelo menos um agente para executar a pesquisa integrada"
-    )
-    
-    # Validação: pelo menos um crew deve ser selecionado
-    if not selected_crews:
-        st.warning("⚠️ Por favor, selecione pelo menos um agente para continuar.")
-    
-    st.session_state.selected_crews = selected_crews
-    st.markdown("---")
-else:
-    # Comportamento padrão quando nenhuma das variáveis está ativa
-    modo_selecionado = DEFAULT_MODE
+modos_disponiveis = [k for k in MODE_CONFIG.keys() if k != "integrated"]
+
+selected_crews = st.multiselect(
+    "🤖 Selecione os agentes:",
+    options=modos_disponiveis,
+    default=st.session_state.selected_crews,
+    format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
+    key=f"crews_select_{active}",
+    help="Selecione pelo menos um agente para executar a pesquisa integrada"
+)
+
+if not selected_crews:
+    st.warning("⚠️ Por favor, selecione pelo menos um agente para continuar.")
+
+st.session_state.selected_crews = selected_crews
+st.markdown("---")
 
 st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
 
@@ -433,11 +470,23 @@ for m in messages:
     css_class = "user" if role == "user" else "assistant"
     meta = f'<div class="meta">{who} • {datetime.now().strftime("%H:%M")}</div>'
 
+    try:
+        html_content = markdown2.markdown(
+            content,
+            extras=['fenced-code-blocks', 'tables', 'strike']
+        )
+        html_content = clean_html_content(html_content)
+    except Exception:
+        escaped = html_module.escape(content)
+        html_content = escaped.replace('\n', '<br>')
+
     st.markdown(
         f"""
         <div>
             {meta}
-            <div class="bubble {css_class}">{content}</div>
+            <div class="bubble {css_class}">
+                {html_content}
+            </div>
         </div>
         """,
         unsafe_allow_html=True
@@ -455,30 +504,31 @@ else:
     user_text = ""
     send = False
 
-def process_user_message(message: str, modo: Optional[str] = None, selected_crews: Optional[list] = None) -> None:
+
+def process_user_message(message: str, selected_crews: list) -> None:
     """Processa uma mensagem do usuário e adiciona resposta ao chat."""
     if not message.strip():
         return
     
     active_before = st.session_state.active_chat
     
-    # Determina o modo para execução
-    if VIEW_INTERACTIVE_MENU:
-        modo_para_execucao = modo
-    elif VIEW_SELECT_INTEGRATED_MENU:
-        modo_para_execucao = "integrated"
-    else:
-        modo_para_execucao = None
+    if not selected_crews:
+        st.session_state.chats[active_before].append({
+            "role": "assistant",
+            "content": "❌ Erro: É necessário selecionar pelo menos um agente para executar a pesquisa."
+        })
+        st.rerun()
+        return
     
     st.session_state.chats[active_before].append({"role": "user", "content": message.strip()})
     
     st.session_state.pending_research = {
         "message": message.strip(),
-        "modo": modo_para_execucao,
         "selected_crews": selected_crews,
         "chat_name": active_before
     }
     st.rerun()
+
 
 def execute_pending_research() -> None:
     """Executa uma pesquisa pendente e adiciona a resposta ao chat."""
@@ -490,11 +540,9 @@ def execute_pending_research() -> None:
     
     active_before = pesquisa["chat_name"]
     message = pesquisa["message"]
-    modo_para_execucao = pesquisa["modo"]
     selected_crews = pesquisa.get("selected_crews", [])
     
-    # Validação: se for integrated e não tiver crews selecionados, retorna erro
-    if modo_para_execucao == "integrated" and not selected_crews:
+    if not selected_crews:
         st.session_state.chats[active_before].append({
             "role": "assistant", 
             "content": "❌ Erro: É necessário selecionar pelo menos um agente para executar a pesquisa integrada."
@@ -503,7 +551,7 @@ def execute_pending_research() -> None:
         return
     
     with st.spinner("🔄 Processando pesquisa... Isso pode levar alguns minutos."):
-        resposta = execute_research(message, modo_para_execucao, selected_crews)
+        resposta = execute_research(message, selected_crews)
     
     active_after = maybe_autoname_chat(active_before, message)
     st.session_state.chats[active_after].append({"role": "assistant", "content": resposta})
@@ -511,22 +559,12 @@ def execute_pending_research() -> None:
     bump_chat_to_top(active_after)
     st.rerun()
 
-if st.session_state.pending_user_message.strip():
-    injected = st.session_state.pending_user_message.strip()
-    st.session_state.pending_user_message = ""
-    # Usa o session_state se VIEW_SELECT_INTEGRATED_MENU estiver ativo
-    crews_para_usar = st.session_state.selected_crews if VIEW_SELECT_INTEGRATED_MENU else selected_crews
-    process_user_message(injected, modo_selecionado, crews_para_usar)
 
 if send and user_text.strip():
-    # Usa o session_state se VIEW_SELECT_INTEGRATED_MENU estiver ativo
-    crews_para_usar = st.session_state.selected_crews if VIEW_SELECT_INTEGRATED_MENU else selected_crews
-    # Validação: se for integrated e não tiver crews selecionados, não permite enviar
-    if VIEW_SELECT_INTEGRATED_MENU and modo_selecionado == "integrated" and not crews_para_usar:
+    if not selected_crews:
         st.error("⚠️ Por favor, selecione pelo menos um agente antes de enviar.")
     else:
-        process_user_message(user_text.strip(), modo_selecionado, crews_para_usar)
+        process_user_message(user_text.strip(), selected_crews)
 
 if st.session_state.pending_research:
     execute_pending_research()
-

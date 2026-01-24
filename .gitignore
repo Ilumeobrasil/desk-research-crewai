@@ -50,3 +50,5 @@ Thumbs.db
 
 venv*
 venv_py312*
+
+data/*
