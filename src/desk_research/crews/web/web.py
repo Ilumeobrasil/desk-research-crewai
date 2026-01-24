@@ -1,11 +1,11 @@
 import datetime
-import json
 import time
 
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.research_tools import google_search_tool, web_scraper_tool, url_validator_tool
+from desk_research.utils.console_time import Console
 from desk_research.utils.makelog.makeLog import make_log
 from desk_research.utils.reporting import export_report
 
@@ -22,7 +22,7 @@ class WebCrew:
                 google_search_tool,
                 url_validator_tool
             ],
-            verbose=True
+            verbose=VERBOSE_AGENTS
         )
 
     @agent
@@ -32,24 +32,16 @@ class WebCrew:
             tools=[
                 web_scraper_tool,
             ],
-            verbose=True
-        )
-
-    """ @agent
-    def content_analyzer(self) -> Agent:
-        return Agent(
-            config=self.agents_config['content_analyzer'],
             verbose=VERBOSE_AGENTS,
-            tools=[
-                web_scraper_tool,
-            ]
-        ) """
+        )
 
     @agent
     def web_report_writer(self) -> Agent:
         return Agent(
             config=self.agents_config['web_report_writer'],
-            verbose=VERBOSE_AGENTS
+            verbose=VERBOSE_AGENTS,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
 
     @task
@@ -66,14 +58,6 @@ class WebCrew:
             agent=self.web_researcher_content()
         )
 
-    """ @task
-    def classify_organize_content(self) -> Task:
-        return Task(
-            config=self.tasks_config['classify_organize_content'],
-            context=[self.search_web()],
-            agent=self.content_analyzer()
-        ) """
-
     @task
     def evidence_consolidation_task(self) -> Task:
         return Task(
@@ -88,7 +72,7 @@ class WebCrew:
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=VERBOSE_CREW
+            verbose=VERBOSE_CREW,
         )
 
 def run_web_research(query: str, max_results: int = 10):
@@ -104,20 +88,12 @@ def run_web_research(query: str, max_results: int = 10):
         
         #remover
         print("RODANDO WEB")
-        start_time = time.time()
+        Console.time("web_research")
 
         result = crew.crew().kickoff(inputs=inputs)
         
         #remover
-        end_time = time.time()
-        execution_time = end_time - start_time
-        minutes = int(execution_time // 60)
-        seconds = int(execution_time % 60)
-        if minutes > 0:
-            print(f"TERMINOU WEB - Tempo de execução: {minutes}m {seconds}s")
-        else:
-            print(f"TERMINOU WEB - Tempo de execução: {seconds}s")
-   # Este documento NÃO contém respostas, análises ou conclusões.
+        Console.time_end("web_research")
         make_log({
             "logName": f"web_research",
             "content": {

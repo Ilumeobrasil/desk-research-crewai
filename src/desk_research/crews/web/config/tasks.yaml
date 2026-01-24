@@ -113,41 +113,17 @@ evidence_consolidation_task:
     Documento em markdown com ALTA DENSIDADE de evidências literais,
     organizado da seguinte forma:
 
-    ## 1. Fontes Utilizadas
-
-    Para cada fonte:
-    - Título
-    - URL
-    - Data de publicação (ou "não informada")
-    - Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo)
-
-    ## 2. Evidências Numéricas (Trechos Literais)
-
-    ### Fonte: <Título da fonte>
-    - "64% dos adultos afirmaram não beber em 2025..."
-    - "A abstinência passou de 46% para 64% entre pessoas de 18 a 24 anos..."
-    - "O segmento de cervejas sem álcool cresceu 15% no segundo trimestre de 2025..."
-
-    (Não consolidar números de fontes diferentes)
-
-    ## 3. Evidências Textuais Contextuais
-
-    ### Fonte: <Título da fonte>
-    "Parágrafo completo conforme extraído..."
-
-    ### Fonte: <Outra fonte>
-    "Parágrafo completo conforme extraído..."
-
-    ## 4. Declarações de Atores Relevantes
-
-    ### Nome — Cargo — Organização — Fonte
-    "Declaração literal..."
-
-    (Repetir para cada fala relevante)
-
-    ## 5. Pontos Não Explicitamente Abordados nas Fontes
-
-    - Nenhuma das fontes apresenta dados quantitativos específicos
-      sobre consumo de cerveja alcoólica tradicional por geração Z.
-    - Nenhuma fonte afirma explicitamente se a redução observada
-      é uma tendência permanente ou temporária.
+    ## Nome da Fonte utilizada
+    # URL da fonte
+    # Data de publicação (ou "não informada")
+    # Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo, marketing, etc.)
+    # Conteúdo:
+      - Principais parágrafos e dados relevantes
+      - Traga maior conteúdo possível, mesmo que seja longo.
+      - Números, percentuais, datas, nomes próprios e citações
+    # Conclusão:
+      - Resumo do conteúdo
+      - Conclusão sobre o conteúdo
+      - Recomendações sobre o conteúdo
+      - Sugestões para futuras pesquisas
+      - Sugestões para futuras pesquisas
