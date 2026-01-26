@@ -13,6 +13,8 @@ search_web_urls:
     3. Valide TODAS as URLs usando `url_validator`.
     4. Descarte URLs inacessíveis, bloqueadas ou inválidas.
     5. Descarte URLs do youtube.
+    5. Descarte URLs de sites que não sejam institucionais, mídias, acadêmicas, governamentais ou de pesquisa.
+    6. Descarte URLs de sites de opinião, foque em noticias e fatos.
 
     PROIBIÇÕES ABSOLUTAS:
     - NÃO extrair texto das páginas.
