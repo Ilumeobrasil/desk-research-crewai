@@ -67,7 +67,7 @@ class PaperMetadata(BaseModel):
     )
     
     fonte: str = Field(
-        ..., 
+        default="Fonte não especificada", 
         description="Base de dados de origem (Serper Scholar, arXiv, Semantic Scholar, etc.)"
     )
     

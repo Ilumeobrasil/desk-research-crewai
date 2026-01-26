@@ -45,9 +45,7 @@ def serper_scholar_tool(query: str, num: int= 15) -> str:
         data = response.json()
 
         papers = []
-        for idx, result in enumerate(
-            data.get("organic", [])[:20]
-        ):  # Aumentando para 20
+        for idx, result in enumerate(data.get("organic", [])[:20]): 
             # Tentar encontrar links de PDF
             link = result.get("link", "N/A")
             pdf_link = None
@@ -75,6 +73,16 @@ def serper_scholar_tool(query: str, num: int= 15) -> str:
             }
             papers.append(paper)
 
+        make_log({
+            "logName": query.replace(" ", "_") + "_serper_scholar_tool",
+            "content": json.dumps(
+            {
+                "fonte": "Serper Scholar",
+                "query": query,
+                "total": len(papers),
+                "papers": papers,
+            })
+        })
         return json.dumps(
             {
                 "fonte": "Serper Scholar",
@@ -166,6 +174,16 @@ def semantic_scholar_tool(query: str) -> str:
             }
             papers.append(paper)
 
+        make_log({
+            "logName": query.replace(" ", "_") + "_Semantic_scholar_tool",
+            "content": json.dumps(
+            {
+                "fonte": "Semantic Scholar",
+                "query": query,
+                "total": len(papers),
+                "papers": papers,
+            })
+        })
         return json.dumps(
             {
                 "fonte": "Semantic Scholar",
@@ -593,6 +611,15 @@ def openalex_search_tool(query: str) -> str:
                 # print(f"⚠️ Erro no OpenAlex paper {idx}: {e}")
                 continue
 
+            make_log({
+                "logName": query.replace(" ", "_") + "_openalex_search_tool",
+                "content": json.dumps({
+                    "fonte": "OpenAlex",
+                    "query": query,
+                    "total": len(papers),
+                    "papers": papers,
+                     })
+            })
         return json.dumps(
             {
                 "fonte": "OpenAlex",
@@ -660,7 +687,7 @@ __all__ = [
 ]
 
 @tool("google_search")
-def google_search_tool(query: str) -> str:
+def google_search_tool(query: str, gl: str = 'br') -> str:
     """
     Realiza busca no Google (via Serper) e retorna resultados normalizados
     para fácil consumo por agentes LLM.
@@ -672,10 +699,12 @@ def google_search_tool(query: str) -> str:
         JSON string com resultados da busca normalizados
     """
     try:
-        conn = http.client.HTTPSConnection("google.serper.dev")
-
         url = "https://google.serper.dev/search"
-        payload = {"q": query, "num": 10}
+        payload = {
+            "q": query, 
+            "num": 10,
+            "gl": gl,
+        }
 
         headers = {
             "X-API-KEY": os.getenv("SERPER_API_KEY", ""),
@@ -693,17 +722,24 @@ def google_search_tool(query: str) -> str:
         normalized_output = []
         for idx, item in enumerate(organic_results, start=1):
             title = item.get("title", "Título não disponível")
+            date = item.get("date", "Data não disponível")
             link = item.get("link", "URL não disponível")
             snippet = item.get("snippet", "Resumo não disponível")
 
             normalized_output.append(
-                f"""RESULTADO {idx}
-Título: {title}
-URL: {link}
-Resumo: {snippet}
-"""
+                f"""RESULTADO {idx} | Título: {title} | Data: {date} | URL: {link} | Resumo: {snippet} \n"""
             )
 
+        make_log({
+            "logName": query.replace(" ", "_") + "_google_search_tool",
+            "content": json.dumps({
+                "fonte": "Google",
+                "query": query,
+                "total": len(normalized_output),
+                "results": response.json(),
+                "normalized_output": normalized_output,
+            })
+        })
         return "\n".join(normalized_output)
 
         # return json.dumps(resp.json().get('organic', []), indent=2, ensure_ascii=False)

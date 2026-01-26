@@ -55,6 +55,7 @@
     - Não incluir papers sem relação direta com "{topic}".
     - Não incluir artigos sem PDF acessível.
     - Evitar repetir tentativas idênticas em caso de erro técnico.
+    - So use a proxima ferramenta se a ferramenta anterior falhar tecnicamente.
     - Se uma ferramenta falhar tecnicamente, avançar imediatamente para a próxima.
 
   DOCUMENTAÇÃO OBRIGATÓRIA:

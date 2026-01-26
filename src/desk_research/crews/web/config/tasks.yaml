@@ -35,6 +35,7 @@ extract_web_content:
 
     PROCEDIMENTO OBRIGATÓRIO:
     1. Utilizar `web_scraper_tool` para CADA URL recebida.
+     1.1. passe como parametro: (query, gl), onde gl é o country da busca, default é 'br', só use outra se for especificado no input.
     2. Extrair o conteúdo completo da página.
     3. Preservar linguagem original, números, datas e termos técnicos.
 
@@ -63,7 +64,7 @@ extract_web_content:
     Para cada URL:
     - Título da página
     - URL
-    - Data de publicação (ou "não informada")
+    - Data de publicação
 
     ### Conteúdo extraído
     - Texto bruto extraído
@@ -87,21 +88,33 @@ evidence_consolidation_task:
 
     1. TODO o texto apresentado DEVE ser literal ou quase literal
        (copiado das fontes extraídas).
-
     2. É PROIBIDO:
        - Resumir parágrafos
        - Parafrasear ideias
        - Generalizar informações
        - Criar frases explicativas
        - Unificar dados de fontes diferentes em uma única frase
-
     3. Cada evidência DEVE ser atribuída explicitamente à sua fonte.
-
     4. O agente NÃO pode:
        - Inferir tendências
        - Comparar dados entre fontes
        - Avaliar relevância
        - Reduzir volume para “melhor leitura”
+    5. DEFINIÇÃO DE TEXTO LITERAL:
+      - O conteúdo deve ser copiado palavra por palavra da fonte original,
+        exceto por cortes explícitos com "..."
+      - É PROIBIDO reescrever frases com sinônimos.
+      - É PROIBIDO criar frases introdutórias ou jornalísticas.
+      - Todo parágrafo deve soar como texto publicado, não como resumo.
+    6. CADA evidência deve conter:
+      - No mínimo 1 parágrafo completo da fonte
+      - Preferencialmente 3 ou mais parágrafos consecutivos
+      - Se o parágrafo tiver mais de 3 frases, ele NÃO pode ser reduzido
+    7. SAÍDAS CONSIDERADAS INCORRETAS:
+      - Frases genéricas do tipo “pesquisas indicam…”
+      - Parágrafos com menos de 2 frases
+      - Uso excessivo de reticências
+      - Conteúdo que soe como resumo ou lead jornalístico
 
     ESTRATÉGIA OBRIGATÓRIA DE ALTA DENSIDADE:
 
@@ -111,20 +124,23 @@ evidence_consolidation_task:
     - Repetição de informações ENTRE fontes é PERMITIDA
       (não deduplicar)
   expected_output: >
-    Documento em markdown com ALTA DENSIDADE de evidências literais,
-    organizado da seguinte forma:
+    Documento em markdown contendo exclusivamente evidências textuais
+    extraídas das fontes, SEM QUALQUER seção de conclusão, resumo,
+    interpretação ou recomendação.
 
-    ## Nome da Fonte utilizada
-    # URL da fonte
-    # Data de publicação (ou "não informada")
+    A estrutura deve ser:
+
+    ## Nome da Fonte
+    URL:
+    Data:
+    Tipo da fonte:
     # Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo, marketing, etc.)
-    # Conteúdo:
-      - Principais parágrafos e dados relevantes
-      - Traga maior conteúdo possível, mesmo que seja longo.
-      - Números, percentuais, datas, nomes próprios e citações
+    Conteúdo:
+      - Parágrafo literal 1
+      - Parágrafo literal 2
+      - ...
     # Conclusão:
       - Resumo do conteúdo
       - Conclusão sobre o conteúdo
       - Recomendações sobre o conteúdo
-      - Sugestões para futuras pesquisas
       - Sugestões para futuras pesquisas

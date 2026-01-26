@@ -444,10 +444,10 @@ st.markdown("---")
 st.markdown("### Desk research (BETA) v.0.0.6")
 st.caption("Selecione quais agentes deseja ativar para a pesquisa integrada")
 
-modos_disponiveis = [k for k in MODE_CONFIG.keys() if k != "integrated"]
+modos_disponiveis = [k for k in MODE_CONFIG.keys() if k != "integrated" if k != "x" if k != "genie" if k != "youtube"]
 
 selected_crews = st.multiselect(
-    "🤖 Selecione os agentes:",
+    "Selecione os agentes:",
     options=modos_disponiveis,
     default=st.session_state.selected_crews,
     format_func=lambda x: f"{MODE_CONFIG[x]['emoji']} {MODE_CONFIG[x]['nome']}",
