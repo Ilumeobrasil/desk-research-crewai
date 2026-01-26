@@ -8,6 +8,7 @@ search_web_urls:
 
     PROCEDIMENTO OBRIGATÓRIO:
     1. Realize pelo menos DUAS buscas distintas no Google com variações da query, usando a ferramenta google_search_tool.
+     1.1. passe como parametro: (query, gl), onde gl é o country da busca, default é 'br', só use outra se for especificado no input.
     2. Liste URLs encontradas sem analisar o conteúdo interno.
     3. Valide TODAS as URLs usando `url_validator`.
     4. Descarte URLs inacessíveis, bloqueadas ou inválidas.
@@ -23,9 +24,11 @@ search_web_urls:
 
     Para cada item:
     - URL completa
+    - Data de publicação
     - Status de validação (Válida / Inválida)
     - Tipo aparente da fonte (ex: institucional, governamental, mídia, acadêmica, desconhecida)
 
+#desativada por enquanto
 extract_web_content:
   description: >
     Extrair conteúdo textual bruto das URLs fornecidas.
@@ -35,7 +38,6 @@ extract_web_content:
 
     PROCEDIMENTO OBRIGATÓRIO:
     1. Utilizar `web_scraper_tool` para CADA URL recebida.
-     1.1. passe como parametro: (query, gl), onde gl é o country da busca, default é 'br', só use outra se for especificado no input.
     2. Extrair o conteúdo completo da página.
     3. Preservar linguagem original, números, datas e termos técnicos.
 
@@ -43,15 +45,17 @@ extract_web_content:
     - Copiar o conteúdo completo da página.
     - NÃO reescrever para clareza.
     - NÃO conectar ideias.
-    - Só truncar texto quando excessivamente longo, apos 2000 caracteres,
-      indicando claramente que houve corte.
 
-    MECANISMO DE RE-EXTRAÇÃO:
-    - Se o conteúdo extraído for insuficiente ou muito superficial,
-      registrar explicitamente: "Conteúdo insuficiente".
-    - Nesses casos, realizar UMA nova tentativa de scraping
-      utilizando variação de user-agent ou carregamento alternativo,
-      se disponível na ferramenta.
+    USO DE FERRAMENTA (CONTRATO OBRIGATÓRIO):
+    - O campo "Texto bruto extraído" DEVE conter exclusivamente o texto retornado pelo `web_scraper_tool`.
+    - É PROIBIDO editar, reordenar, resumir, reescrever ou “apresentar” o texto após a extração.
+    - Qualquer modificação textual após o scraping é considerada ERRO.
+
+    FORMATO DO TEXTO EXTRAÍDO:
+    - O texto deve aparecer como um BLOCO CONTÍNUO.
+    - Não adicionar frases introdutórias.
+    - Não adicionar marcadores explicativos.
+    - Não adicionar observações, notas ou comentários.
 
     PROIBIÇÕES ABSOLUTAS:
     - NÃO interpretar dados.
@@ -59,18 +63,16 @@ extract_web_content:
     - NÃO responder à pergunta '{query}'.
   
   expected_output: >
-    Lista em markdown com uma seção por URL.
+    Documento em markdown contendo uma seção por URL.
 
-    Para cada URL:
-    - Título da página
+    Cada seção DEVE conter:
+    - Título da página (extraído da página)
     - URL
     - Data de publicação
 
     ### Conteúdo extraído
-    - Texto bruto extraído
-
-    ### Status do conteúdo
-    - Conteúdo suficiente / Conteúdo insuficiente / Conteúdo ausente
+    BLOCO DE TEXTO CONTÍNUO retornado pelo web_scraper_tool,
+    sem qualquer modificação linguística.
 
 evidence_consolidation_task:
   description: >
@@ -139,8 +141,3 @@ evidence_consolidation_task:
       - Parágrafo literal 1
       - Parágrafo literal 2
       - ...
-    # Conclusão:
-      - Resumo do conteúdo
-      - Conclusão sobre o conteúdo
-      - Recomendações sobre o conteúdo
-      - Sugestões para futuras pesquisas
