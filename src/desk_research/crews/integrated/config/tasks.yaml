@@ -28,6 +28,20 @@ synthesis_task:
     9. Prefira parágrafos mais longos e integrados a múltiplos bullets curtos e isolados.
 
     ============================
+    REGRA GLOBAL DE ANCORAGEM AO TÓPICO (OBRIGATÓRIA)
+    ============================
+
+    - TODO o conteúdo produzido DEVE estar diretamente relacionado ao tema "{topic}".
+    - É PROIBIDO incluir:
+      • fatos, dados, lacunas ou suposições que não impactem a resposta ao tema
+      • descrições gerais do contexto que não alterem a compreensão do tópico
+    - Cada seção deve contribuir explicitamente para:
+      • responder ao tema
+      • qualificar o grau de confiança da resposta
+      • ou explicitar limites que impedem uma resposta mais precisa ao tema
+
+
+    ============================
     REGRAS DE EVIDÊNCIA (CRÍTICO)
     ============================
     - Toda afirmação factual deve conter fonte explícita.
@@ -82,6 +96,14 @@ synthesis_task:
     ============================
     - Texto 100% em Português (PT-BR).
     - Nomes próprios, marcas e títulos permanecem no idioma original.
+
+    ─────────────────────────────────────────
+    TOM E LINGUAGEM
+    ─────────────────────────────────────────
+    - Linguagem descritiva e objetiva
+    - Sem justificativas metodológicas
+    - Sem avaliação de qualidade das fontes
+
   expected_output: >
     Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo, sem seções extras, renomeadas ou reordenadas:
     - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
@@ -99,8 +121,7 @@ synthesis_task:
     OBJETIVO DA SEÇÃO
     ─────────────────────────────────────────
 
-    Documentar, de forma transparente e auditável, 
-    quais fontes foram analisadas e qual o período temporal coberto por cada uma.
+    Documentar quais fontes foram analisadas e qual o período temporal coberto.
 
     Esta seção NÃO deve conter conclusões, análises ou interpretações.
 
@@ -110,54 +131,33 @@ synthesis_task:
 
     ### Fontes analisadas
 
-    Apresente uma lista completa das fontes utilizadas.
-    Cada fonte DEVE conter:
+    Informe exclusivamente o **tipo de material**, a **quantidade** e o **período analisado**, no formato abaixo:
 
-    - Nome da fonte ou plataforma
-    - Tipo de material analisado
-      (ex.: entrevistas qualitativas, menções espontâneas, vídeos de opinião, discussões em fórum)
-    - Breve descrição do recorte analítico
-    - URL explícita, quando aplicável
-    - Em caso de fontes Consumer Hours, incluir quantidade de entrevistados.
-    - Cada bullet deve conter:
-      - [Nome da fonte] (URL) — descrição do tipo de dado e recorte analítico
-      - Exemplo: [Reddit](https://…) — discussões espontâneas de usuários sobre sabor e similaridade de marcas
+    Exemplo de formato:
+    - [quantidade] [tipo de material] publicados/analisados/realizados entre [mês de ano] e [mês de ano];
 
-    ─────────────────────────────────────────
+    Exemplos válidos:
+    - 5 artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
+    - 42 notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
+    - 18 entrevistas em profundidade realizadas entre Junho de 2024 e Outubro de 2024.
 
-    ### Período coberto (apenas se aplicável)
-
-    INSTRUÇÃO CONDICIONAL (CRÍTICA):
-
-    - Esta seção SÓ deve ser incluída se pelo menos UMA das fontes analisadas
-      possuir período temporal explicitamente informado nos relatórios.
-    - Se TODAS as fontes NÃO informarem período temporal,
-      a seção “### Período coberto” NÃO deve ser exibida,
-      nem vazia, nem com texto explicativo.
-
-    Quando exibida, seguir o formato abaixo:
-
-    • Nome da fonte: data-início - data-fim
-
-    Regras:
-    - Data deve ser formatadas em Português (PT-BR) - Ex: Junho de 2025 - Julho de 2025
-    - Informar apenas períodos explicitamente declarados nas fontes
-    - Não criar bullets para fontes sem período informado
-    - Não utilizar expressões como “Período não informado nos relatórios”
+    ⚠️ Regras estritas:
+    - **Cada tipo de fonte de ser separado por uma nova bullet.**
+    - **Não mencionar nomes de fontes, plataformas, instituições ou veículos.**
+    - **Não incluir URLs ou referências externas nesta seção.**
+    - **Não descrever recortes analíticos ou resultados.**
+    - **Não informar data caso a fonte não tenha período temporal explícito e informado.**
+    - **Não informar dados que não sejam o tipo de material, a quantidade e o período analisado.**
+    - A menção específica a fontes ou links é permitida **apenas nos blocos analíticos**, exclusivamente como ilustração de afirmações.
+    - Para materiais do tipo Consumer Hours, a quantidade de entrevistados é obrigatória.
 
     ─────────────────────────────────────────
-    TOM E LINGUAGEM
-    ─────────────────────────────────────────
-
-    - Linguagem descritiva e objetiva
-    - Sem justificativas metodológicas
-    - Sem avaliação de qualidade das fontes
 
     ## DÁ PARA AFIRMAR
     - NÃO reinterpretar dados
     - NÃO transformar menções em preferências
     - NÃO inferir motivação, causalidade ou representatividade
-    - Lista de afirmações objetivas e insights, cada uma com fonte e se possível URL explícita.
+    - Lista de afirmações objetivas e insights, cada uma com fonte e se possível url com hyperlink.
     - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
     - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas como evidência,
       utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
@@ -171,9 +171,7 @@ synthesis_task:
     - Cada bullet deve conter:
       - o fato observado
       - o padrão ou relevância desse fato
-      - a fonte explícita
-    - Fontes listadas que não contribuírem com dados explícitos
-      NÃO devem ser incluídas na seção "Fontes analisadas".
+      - em caso de links, informar a fonte e url com hyperlink
 
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.

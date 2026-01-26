@@ -233,6 +233,28 @@ write_report:
     ➜ declarar explicitamente essa ausência
 
     ─────────────────────────────────────────
+    EXTRAÇÃO DE DATA E PERÍODO (OBRIGATÓRIA)
+    ─────────────────────────────────────────
+
+    Sempre que possível, o relatório DEVE informar
+    o período real das entrevistas analisadas.
+
+    A data da entrevista pode estar presente nos dados
+    em formato textual semelhante a:
+    "(May 28, 2025 - 9:20pm)"
+
+    Regras obrigatórias:
+
+    - Identificar explicitamente as datas disponíveis
+      nos dados analisados
+    - Consolidar o período mínimo e máximo
+      APENAS quando houver evidência clara
+    - NÃO inferir, estimar ou completar datas ausentes
+
+    Caso nenhuma data seja encontrada nos dados:
+    ➜ declarar explicitamente: "Período de coleta não identificado nos dados disponíveis"
+
+    ─────────────────────────────────────────
     DIRETRIZES DE ESCRITA
     ─────────────────────────────────────────
 
@@ -252,7 +274,10 @@ write_report:
          implícita no tema "{topic}"
 
     2. Resumo Executivo
-       - Informar período de coleta (ex: Junho de 2023 - Julho de 2025)
+       - Informar o período real de coleta das entrevistas
+         QUANDO identificado explicitamente nos dados
+       - Caso não haja datas disponíveis:
+         declarar explicitamente a ausência dessa informação
        - Responder diretamente ao tema "{topic}"
        - Sintetizar apenas padrões explícitos relacionados ao tema
        - Indicar quantas entrevistas sustentam cada ponto
@@ -267,7 +292,9 @@ write_report:
 
     4. Metodologia
        - Número real de entrevistas analisadas
-       - Período (se disponível)
+       - Período de coleta:
+         • Consolidado a partir das datas explícitas encontradas nos dados
+         • OU declaração clara de ausência de datas
        - Estrutura dos dados utilizados PARA RESPONDER AO TEMA
        - Ausências metodológicas que limitam a resposta ao tema
 

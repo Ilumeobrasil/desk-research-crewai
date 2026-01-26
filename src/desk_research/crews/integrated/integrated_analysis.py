@@ -68,7 +68,9 @@ class IntegratedCrew:
         return Agent(
             config=self.agents_config['chief_editor_agent'],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
 
     @agent
@@ -76,7 +78,9 @@ class IntegratedCrew:
         return Agent(
             config=self.agents_config['evaluator_agent'],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
+            reasoning=True,
+            max_reasoning_attempts=3 
         )
 
     @task
