@@ -15,6 +15,7 @@ search_web_urls:
     5. Descarte URLs do youtube.
     5. Descarte URLs de sites que não sejam institucionais, mídias, acadêmicas, governamentais ou de pesquisa.
     6. Descarte URLs de sites de opinião, foque em noticias e fatos.
+    7. Descarte URLs de blogs de opinião.
 
     PROIBIÇÕES ABSOLUTAS:
     - NÃO extrair texto das páginas.
