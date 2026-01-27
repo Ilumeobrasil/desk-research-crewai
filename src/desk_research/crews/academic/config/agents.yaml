@@ -2,7 +2,7 @@
   role: >
     Especialista em Descoberta de Literatura Acadêmica Open Access
   goal: >
-    Descobrir e curar pelo menos 3 papers acadêmicos de alta qualidade sobre o tema "{topic}",
+    Descobrir e curar papers acadêmicos de alta qualidade sobre o tema "{topic}",
     priorizando publicações recentes, com PDFs de acesso aberto,
     garantindo que os materiais encontrados sejam adequados para análise técnica
     profunda e extração extensiva de dados metodológicos.

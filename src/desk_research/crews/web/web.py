@@ -27,7 +27,7 @@ class WebCrew:
     def web_report_writer(self) -> Agent:
         return Agent(
             config=self.agents_config['web_report_writer'],
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
             reasoning=True,
             max_reasoning_attempts=3 
         )
@@ -44,6 +44,9 @@ class WebCrew:
         return Task(
             config=self.tasks_config['evidence_consolidation_task'],
             agent=self.web_report_writer(),
+            context=[
+                self.search_web_urls()
+            ]
         )
 
     @crew
@@ -61,12 +64,9 @@ def _extract_content_from_urls(urls: list[str], max_chars: int = 3000) -> str:
     extracted_contents = []
     
     for url in urls:
-        print(f"Extraindo conteúdo de {url}")
         try:
-            # Usar web_scraper_tool diretamente
             result = web_scraper_tool.run(url)
             
-            # Extrair apenas o conteúdo (remover prefixo "CONTEÚDO EXTRAÍDO (url):\n\n")
             if "CONTEÚDO EXTRAÍDO" in result:
                 content = result.split("CONTEÚDO EXTRAÍDO", 1)[1]
                 if ":\n\n" in content:
@@ -74,11 +74,9 @@ def _extract_content_from_urls(urls: list[str], max_chars: int = 3000) -> str:
             else:
                 content = result
             
-            # Limitar a 3000 caracteres
             if len(content) > max_chars:
                 content = content[:max_chars] + "\n[TRUNCADO]"
             
-            # Formatar como markdown
             extracted_contents.append(
                 f"### {url}\n- **URL**: {url}\n- **Conteúdo extraído**:\n{content}\n"
             )
@@ -121,8 +119,6 @@ def run_web_research(query: str, max_results: int = 10):
         if not urls:
             print("⚠️ Nenhuma URL encontrada no resultado da busca")
             return None
-        
-        print(f"📋 Encontradas {len(urls)} URLs. Extraindo conteúdo...")
         
         extracted_content = _extract_content_from_urls(urls, max_chars=3000)
         
