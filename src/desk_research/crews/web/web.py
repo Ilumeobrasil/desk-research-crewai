@@ -23,18 +23,6 @@ class WebCrew:
             verbose=VERBOSE_AGENTS
         )
 
-    """ @agent
-    def web_researcher_content(self) -> Agent:
-        return Agent(
-            config=self.agents_config['web_researcher_content'],
-            tools=[
-                web_scraper_tool,
-            ],
-            verbose=VERBOSE_AGENTS,
-            reasoning=True,
-            max_reasoning_attempts=3 
-        ) """
-
     @agent
     def web_report_writer(self) -> Agent:
         return Agent(
@@ -50,13 +38,6 @@ class WebCrew:
             config=self.tasks_config['search_web_urls'],
             agent=self.web_researcher_url()
         )
-
-    """ @task
-    def extract_web_content(self) -> Task:
-        return Task(
-            config=self.tasks_config['extract_web_content'],
-            agent=self.web_researcher_content()
-        ) """
 
     @task
     def evidence_consolidation_task(self) -> Task:
@@ -163,6 +144,17 @@ def run_web_research(query: str, max_results: int = 10):
         
         final_result = consolidation_crew.kickoff(inputs=inputs)
         
+        make_log({
+            "logName": "web_research",
+            "content": {
+                "result": final_result,
+                "query": query,
+                "max_results": max_results,
+                "urls_found": len(urls),
+                "current_date": datetime.datetime.now().strftime('%d/%m/%Y')
+            }
+        })
+        
         export_report(final_result, query, prefix="web_report", crew_name="web")
         
         Console.time_end("RUN_WEB_RESEARCH")
@@ -170,23 +162,3 @@ def run_web_research(query: str, max_results: int = 10):
     except Exception as e:
         print(f"Error running web research: {e}")
         return None
-
-""" def run_web_research(query: str, max_results: int = 10):
-    try:    
-        inputs = {
-            'query': query,
-            'max_results': max_results,
-            'max_results_extractions': max_results + 5,
-            'current_date': datetime.datetime.now().strftime('%d/%m/%Y')
-        }
-        
-        crew = WebCrew() 
-        result = crew.crew().kickoff(inputs=inputs)
-        
-        export_report(result, query, prefix="web_report", crew_name="web")
-        
-        return result
-    except Exception as e:
-        print(f"Error running web research: {e}")
-        return None
- """

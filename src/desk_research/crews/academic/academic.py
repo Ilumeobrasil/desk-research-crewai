@@ -1,9 +1,8 @@
 ﻿import logging
-from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
+import re
+from desk_research.constants import DEFAULT_MAX_PAPERS, VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.pdf_analyzer import pdf_analyzer_tool
 from desk_research.utils.console_time import Console
-from desk_research.utils.makelog.makeLog import make_log
-from desk_research.utils.reporting import export_report
 from dotenv import load_dotenv
 from datetime import datetime
 import json
@@ -15,14 +14,13 @@ from desk_research.tools.research_tools import (
     serper_scholar_tool,
     openalex_search_tool,
 )
-from desk_research.models.academic_models import AcademicReport, validar_relatorio
+from desk_research.models.academic_models import AcademicReport
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# HTTPX Patch for 401 handling
 _original_send = httpx.Client.send
 
 def patched_send(self, request, *args, **kwargs):
@@ -60,22 +58,8 @@ class AcademicResearchCrew:
                 serper_scholar_tool,
                 openalex_search_tool,
                 semantic_scholar_tool
-                #scielo_tool,
-                #pdf_analyzer_tool
             ],
-            verbose=True,
-            reasoning=True,
-            max_reasoning_attempts=3 
-        )
-    
-    @agent
-    def literature_analyst(self) -> Agent:
-        return Agent(
-            config=self.agents_config['literature_analyst'],
-            tools=[pdf_analyzer_tool],
-            verbose=False,
-            reasoning=True,
-            max_reasoning_attempts=3 
+            verbose=VERBOSE_AGENTS,
         )
     
     @agent
@@ -96,23 +80,13 @@ class AcademicResearchCrew:
         )
     
     @task
-    def analyze_literature_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['analyze_literature_task'],
-            agent=self.literature_analyst(),
-            context=[self.search_papers_task()]
-        )
-    
-    @task
     def synthesize_report_task(self) -> Task:
         return Task(
             config=self.tasks_config['synthesize_report_task'],
             agent=self.academic_synthesizer(),
             context=[
-                self.search_papers_task(),
-                self.analyze_literature_task()
+                self.search_papers_task()
             ],
-            output_pydantic=AcademicReport
         )
     
     @crew
@@ -124,25 +98,12 @@ class AcademicResearchCrew:
             verbose=VERBOSE_CREW
         )
     
-    def run(self, topic: str, max_papers: int = 3) -> dict:
-        #remover
-        Console.time("academic_research")
+    def run(self, topic: str, max_papers: int = DEFAULT_MAX_PAPERS) -> dict:
+        Console.time("ACADEMIC_RESEARCH")
 
         result = self.crew().kickoff(inputs={
             'topic': topic,
             'max_papers': max_papers
-        })
-        
-        #remover
-        Console.time_end("academic_research")
-        make_log({
-            "logName": f"academic_research",
-            "content": {
-                "result": result,
-                "query": topic,
-                "max_papers": max_papers,
-                "current_date": datetime.now().strftime('%d/%m/%Y')
-            }
         })
         
         self._export_report(result, topic)
@@ -153,6 +114,7 @@ class AcademicResearchCrew:
         else:
              md_content = str(result)
 
+        Console.time_end("ACADEMIC_RESEARCH")
         return {
             'result': md_content,
             'original_output': result
@@ -252,30 +214,162 @@ class AcademicResearchCrew:
             import sys
             sys.stderr.write(f"Error exporting report: {e}\n")
 
-def run_academic_research(topic: str, max_papers: int = 10) -> dict:
+def _extract_pdf_urls_from_output(output_text: str) -> list[str]:
+    """Extrai URLs de PDF do output da task search_papers_task"""
+    pdf_urls = []
+    
+    markdown_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
+    markdown_matches = re.findall(markdown_pattern, output_text)
+    for _, url in markdown_matches:
+        if url.startswith('http') and ('.pdf' in url.lower() or 'pdf' in url.lower()):
+            pdf_urls.append(url)
+    
+    url_pattern = r'https?://[^\s\)]+\.pdf[^\s\)]*'
+    direct_urls = re.findall(url_pattern, output_text)
+    pdf_urls.extend(direct_urls)
+    
     try:
-        crew = AcademicResearchCrew()
-        return crew.run(topic=topic, max_papers=max_papers)
-    except Exception as e:
-        print(f"Error running academic research: {e}")
-        return None
+        if '{' in output_text and 'papers' in output_text.lower():
+            json_match = re.search(r'\{.*"papers".*\}', output_text, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group())
+                papers = data.get('papers', [])
+                for paper in papers:
+                    pdf_url = paper.get('pdf_url') or paper.get('url')
+                    if pdf_url and pdf_url.startswith('http'):
+                        pdf_urls.append(pdf_url)
+    except:
+        pass
+    
+    pdf_label_pattern = r'(?:URL do PDF|PDF|pdf_url|url)[:\s]+(https?://[^\s\n]+)'
+    label_matches = re.findall(pdf_label_pattern, output_text, re.IGNORECASE)
+    pdf_urls.extend(label_matches)
+    
+    seen = set()
+    unique_urls = []
+    for url in pdf_urls:
+        if url not in seen:
+            seen.add(url)
+            unique_urls.append(url)
+    
+    return unique_urls
 
-""" def run_academic_research(topic: str, max_papers: int = 10) -> dict:
-    try:
-        inputs = {
-            'topic': topic,
-            'max_papers': max_papers
+def _extract_content_from_pdfs(pdf_urls: list[str], max_chars: int = 3000) -> str:
+    """Extrai conteúdo de cada PDF e retorna em formato estruturado"""
+    extracted_contents = []
+
+    make_log({
+        "logName": "extracted_pdf_content",
+        "content": {
+            "pdf_urls": pdf_urls,
+            "max_chars": max_chars
         }
+    })
+    
+    for idx, pdf_url in enumerate(pdf_urls, 1):
+        try:
+            result = pdf_analyzer_tool.run(pdf_url)
+            
+            if "CONTEÚDO COMPLETO:" in result:
+                parts = result.split("CONTEÚDO COMPLETO:")
+                if len(parts) > 1:
+                    content = parts[1].split("FIM DA ANÁLISE")[0].strip()
+                else:
+                    content = result
+            else:
+                content = result
+            
+            if len(content) > max_chars:
+                content = content[:max_chars] + "\n[TRUNCADO]"
+            
+            extracted_contents.append(
+                f"### Paper {idx}\n- **URL do PDF**: {pdf_url}\n- **Conteúdo extraído**:\n{content}\n"
+            )
+        except Exception as e:
+            continue
+    
+    return "\n".join(extracted_contents)
 
-        crew = AcademicResearchCrew()
-        result = crew.crew().kickoff(inputs=inputs)
+def run_academic_research(topic: str, max_papers: int = 3) -> dict:
+    Console.time("ACADEMIC_RESEARCH")
+    
+    crew_instance = AcademicResearchCrew()
+    
+    search_task = crew_instance.search_papers_task()
+    search_crew = Crew(
+        agents=[crew_instance.academic_researcher()],
+        tasks=[search_task],
+        process=Process.sequential,
+        verbose=VERBOSE_CREW
+    )
+    
+    search_result = search_crew.kickoff(inputs={
+        'topic': topic,
+        'max_papers': max_papers
+    })
+    
+    search_output = str(search_result)
+    if hasattr(search_result, 'raw'):
+        search_output = search_result.raw
+    elif hasattr(search_result, 'tasks_output') and search_result.tasks_output:
+        search_output = search_result.tasks_output[0].raw
+    
+    pdf_urls = _extract_pdf_urls_from_output(search_output)
+    
+    if not pdf_urls:
+        pdf_content = ""
+    else:
+        pdf_content = _extract_content_from_pdfs(pdf_urls, max_chars=4000)
         
-        export_report(result, topic, prefix="academic_report", crew_name="academic")
+    synthesize_task = crew_instance.synthesize_report_task()
+    
+    modified_synthesize_task = Task(
+        description=f"{synthesize_task.description}\n\n=== CONTEÚDO EXTRAÍDO DOS PDFs ===\n\n{pdf_content}\n\n=== RESULTADO DA BUSCA DE PAPERS ===\n\n{search_output}",
+        agent=synthesize_task.agent,
+        expected_output=synthesize_task.expected_output
+    )
+    
+    synthesize_crew = Crew(
+        agents=[crew_instance.academic_synthesizer()],
+        tasks=[modified_synthesize_task],
+        process=Process.sequential,
+        verbose=VERBOSE_CREW
+    )
+    
+    result = synthesize_crew.kickoff(inputs={
+        'topic': topic,
+        'max_papers': max_papers
+    })
+    
+    try:
+        from desk_research.utils.reporting import export_report as shared_export_report
+        
+        content = ""
+        if hasattr(result, 'pydantic') and result.pydantic:
+            content = crew_instance._convert_pydantic_to_markdown(result.pydantic, original_topic=topic)
+        elif hasattr(result, 'raw'):
+            content = result.raw
+        else:
+            try:
+                content = crew_instance._convert_pydantic_to_markdown(result, original_topic=topic)
+            except:
+                content = str(result)
 
-        return result
+        shared_export_report(content, topic, prefix="academic_report", crew_name="academic")
     except Exception as e:
-        print(f"Error running academic research: {e}")
-        return None
- """
+        logger.error(f"Error exporting report: {e}")
+    
+    md_content = ""
+    if hasattr(result, 'pydantic') and result.pydantic:
+         md_content = crew_instance._convert_pydantic_to_markdown(result.pydantic, original_topic=topic)
+    else:
+         md_content = str(result)
+    
+    Console.time_end("ACADEMIC_RESEARCH")
+    return {
+        'result': md_content,
+        'original_output': result
+    }
+
 AcademicCrew = AcademicResearchCrew
 

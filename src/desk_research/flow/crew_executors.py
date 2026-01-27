@@ -1,4 +1,5 @@
 from typing import Any
+from desk_research.constants import DEFAULT_MAX_PAPERS
 from desk_research.crews.genie.genie import run_genie_analysis
 from desk_research.crews.youtube.youtube import run_youtube_analysis
 from desk_research.crews.academic.academic import run_academic_research
@@ -21,7 +22,7 @@ class CrewExecutor:
 
 class AcademicCrewExecutor(CrewExecutor):
     @staticmethod
-    def run(topic: str, max_papers: int = 5) -> Any:
+    def run(topic: str, max_papers: int = DEFAULT_MAX_PAPERS) -> Any:
         safe_print(f"\n🎓 Running Academic Crew...")
         return CrewExecutor.execute_with_error_handling(
             "Academic Crew",

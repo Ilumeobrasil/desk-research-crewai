@@ -16,12 +16,16 @@
 
     ETAPA 1 — BUSCA PRIMÁRIA (OBRIGATÓRIA):
       - Utilizar EXCLUSIVAMENTE a ferramenta `serper_scholar_tool`.
+      - Parâmetros obrigatórios:
+        - query: string do topic "{topic}"
+        - num: {max_papers}
+        - gl: country da busca (br, us, etc.), default é 'br', só use outra se for especificado no input.
       - Executar NO MÍNIMO 3 queries diferentes, variando:
         - termos principais
         - sinônimos técnicos
         - abordagens metodológicas
       - Parâmetros obrigatórios:
-        - query: string gerada via query engineering
+        - query: string do topic "{topic}"
         - num: {max_papers}
       - Priorizar resultados com:
         - ano >= 2020
@@ -77,66 +81,6 @@
        - URL
        - Motivo do descarte
        
-analyze_literature_task:
-  description: >
-    Analisar de forma INDIVIDUAL, CRÍTICA e EXAUSTIVA cada paper acadêmico recebido,
-    utilizando exclusivamente seus PDFs completos por meio da ferramenta
-    pdf_analyzer.
-
-    CONTEXTO:
-    Esta tarefa tem como objetivo extrair o máximo de informação técnica possível,
-    preservando integralmente a complexidade, os dados e as nuances metodológicas
-    de cada paper. Nenhuma forma de resumo superficial é aceitável.
-
-    PROCESSO OBRIGATÓRIO:
-    1. Para cada paper recebido, verificar se a URL aponta para um PDF direto
-       (ex: termina em ".pdf" ou contém "/pdf/").
-    2. Executar a ferramenta:
-       pdf_analyzer(url=URL_REAL_DO_PAPER) para cada paper recebido.
-    3. Ler TODO o conteúdo extraído com atenção máxima.
-    4. Extrair e documentar detalhes técnicos completos: metodologia, métricas,
-       números, parâmetros, resultados quantitativos, limitações e contribuições.
-    5. Gerar a referência ABNT COMPLETA antes de qualquer análise textual.
-    6. Se um paper não puder ser acessado (erro 403, 404, paywall, etc.):
-    - Documentar o erro específico (ex: "403 Forbidden", "404 Not Found", "Paywall")
-    - Prosseguir imediatamente com os demais papers
-    - NÃO interromper o fluxo por causa de um único paper inacessível
-
-    RESTRIÇÕES CRÍTICAS (ZERO TOLERÂNCIA):
-    - É PROIBIDO usar reticências ("...") ou truncar texto.
-    - É PROIBIDO resumir seções complexas.
-    - Cada paper deve conter no mínimo 1500 palavras de análise.
-    - URLs fictícias ou de exemplo são estritamente proibidas.
-
-  expected_output: >
-    Para CADA paper analisado, produzir uma seção completa em Markdown contendo:
-
-    0. REFERÊNCIA ABNT COMPLETA
-
-    1. Introdução e Contexto
-      (4–6 parágrafos densos, explicando motivação e problema específico)
-
-    2. Fundamentação Teórica
-      (4–5 parágrafos técnicos, com teorias, autores e fórmulas quando aplicável)
-
-    3. Metodologia Detalhada
-      (6–8 parágrafos técnicos descrevendo passo a passo experimental)
-
-    4. Resultados Quantitativos e Qualitativos
-      (5–7 parágrafos com números exatos, métricas, p-values quando disponíveis)
-
-    5. Discussão e Interpretação
-      (4–5 parágrafos críticos sobre impacto e significado dos resultados)
-
-    6. Contribuições Originais
-      (3–4 parágrafos detalhando o que o paper acrescenta à área)
-
-    7. Limitações e Trabalhos Futuros
-      (3–4 parágrafos honestos e tecnicamente fundamentados)
-
-    8. Avaliação Crítica do Analista
-      (2–3 parágrafos avaliando rigor científico e confiabilidade)
-
 synthesize_report_task:
   description: >
     Produzir um relatório acadêmico completo e formal a partir das análises
@@ -146,7 +90,7 @@ synthesize_report_task:
     CONTEXTO:
     Este relatório será utilizado posteriormente por outros sistemas para
     sumarização e reinterpretação. Portanto, a preservação integral do conteúdo
-    original é obrigatória.
+    original é obrigatória. Porem se nao houver papers enviados, enviar um relatório vazio.
 
     PROCESSO OBRIGATÓRIO:
     1. Utilizar o texto completo gerado pelo Analista de Literatura.
@@ -168,7 +112,7 @@ synthesize_report_task:
   expected_output: >
     Objeto AcademicReport contendo obrigatoriamente:
 
-    - tema (texto exato do tópico pesquisado)
+    - tema: "{topic}"
     - introducao_geral (texto extenso e contextualizado)
     - papers (lista completa com análises profundas de cada paper)
     - analise_comparativa_completa (cruzamento detalhado entre os papers)

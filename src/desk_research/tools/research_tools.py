@@ -6,23 +6,16 @@ import time
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus, urljoin
 import re
-import http.client
-
-from desk_research.utils.makelog.makeLog import make_log
-
 
 @tool("serper_scholar_search")
-def serper_scholar_tool(query: str, num: int= 15) -> str:
+def serper_scholar_tool(query: str, num: int= 15, gl: str = 'br') -> str:
     """
     Busca papers acadêmicos no Google Scholar via API Serper
-
-    Esta ferramenta DEVE ser usada PRIMEIRO em qualquer pesquisa acadêmica.
-    Protocolo obrigatório: serper_scholar_search → outras ferramentas
 
     Args:
         query: Termo de busca acadêmico
         num: Número de resultados buscados
-
+        gl: country da busca (br, us, etc.)
     Returns:
         JSON string com papers encontrados
     """
@@ -35,7 +28,7 @@ def serper_scholar_tool(query: str, num: int= 15) -> str:
             "q": query,
             "yearLow": 2018,
             "sort": "relevance",
-            "num": num
+            "num": num,
         })
         headers = {"X-API-KEY": api_key, "Content-Type": "application/json"}
 
@@ -46,21 +39,18 @@ def serper_scholar_tool(query: str, num: int= 15) -> str:
 
         papers = []
         for idx, result in enumerate(data.get("organic", [])[:20]): 
-            # Tentar encontrar links de PDF
             link = result.get("link", "N/A")
             pdf_link = None
-            if link and link.lower().endswith(".pdf"):
-                pdf_link = link
 
-            # Serper as vezes coloca link do PDF em fields específicos ou no snippet
-            # Se não tiver PDF explícito, o próprio link pode ser um gateway.
+            if(result.get("pdfUrl")):
+                pdf_link = result.get("pdfUrl")
+            elif(link and link.lower().endswith(".pdf")):
+                pdf_link = link
 
             paper = {
                 "titulo": result.get("title", "N/A"),
                 "autores": [result.get("publication_info", {}).get("summary", "N/A")],
-                "ano": _extract_year(
-                    result.get("publication_info", {}).get("summary", "")
-                ),
+                "ano": result.get("year", ''),
                 "instituicao": None,
                 "resumo": result.get("snippet", "N/A"),
                 "citacoes": int(
@@ -73,16 +63,6 @@ def serper_scholar_tool(query: str, num: int= 15) -> str:
             }
             papers.append(paper)
 
-        make_log({
-            "logName": query.replace(" ", "_") + "_serper_scholar_tool",
-            "content": json.dumps(
-            {
-                "fonte": "Serper Scholar",
-                "query": query,
-                "total": len(papers),
-                "papers": papers,
-            })
-        })
         return json.dumps(
             {
                 "fonte": "Serper Scholar",
@@ -118,7 +98,6 @@ def semantic_scholar_tool(query: str) -> str:
             "fields": "title,authors,year,abstract,citationCount,url,venue,openAccessPdf",
         }
 
-        # Implementar Backoff para 429 (Rate Limit)
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -126,10 +105,7 @@ def semantic_scholar_tool(query: str) -> str:
 
                 if response.status_code == 429:
                     if attempt < max_retries - 1:
-                        wait_time = (attempt + 1) * 5  # 5s, 10s...
-                        print(
-                            f"⚠️ Semantic Scholar 429 (Rate Limit). Aguardando {wait_time}s..."
-                        )
+                        wait_time = (attempt + 1) * 5  
                         time.sleep(wait_time)
                         continue
                     else:
@@ -141,10 +117,9 @@ def semantic_scholar_tool(query: str) -> str:
                         )
 
                 response.raise_for_status()
-                break  # Sucesso
+                break
 
             except requests.exceptions.RequestException as e:
-                # Se for o último attempt ou erro não-HTTP
                 if attempt == max_retries - 1:
                     raise e
 
@@ -155,7 +130,6 @@ def semantic_scholar_tool(query: str) -> str:
             if not paper_data:
                 continue
 
-            # Safely handle authors
             authors_raw = paper_data.get("authors") or []
             authors = [a.get("name") for a in authors_raw if a and a.get("name")]
 
@@ -163,7 +137,7 @@ def semantic_scholar_tool(query: str) -> str:
                 "titulo": paper_data.get("title", "N/A"),
                 "autores": authors,
                 "ano": paper_data.get("year"),
-                "instituicao": None,  # Semantic Scholar não fornece diretamente
+                "instituicao": None, 
                 "resumo": (paper_data.get("abstract") or "Resumo não disponível")[:500],
                 "citacoes": paper_data.get("citationCount") or 0,
                 "url": paper_data.get("url")
@@ -174,16 +148,6 @@ def semantic_scholar_tool(query: str) -> str:
             }
             papers.append(paper)
 
-        make_log({
-            "logName": query.replace(" ", "_") + "_Semantic_scholar_tool",
-            "content": json.dumps(
-            {
-                "fonte": "Semantic Scholar",
-                "query": query,
-                "total": len(papers),
-                "papers": papers,
-            })
-        })
         return json.dumps(
             {
                 "fonte": "Semantic Scholar",
@@ -201,71 +165,10 @@ def semantic_scholar_tool(query: str) -> str:
         )
 
 
-@tool("scielo_tool")
-def scielo_tool(query: str) -> str:
-    """
-    Busca papers no SciELO_tool
-
-    Args:
-        query: Termo de busca
-
-    Returns:
-        JSON string com papers encontrados
-    """
-    try:
-        query_clean = query.strip()
-
-        url = "https://api.scielo.org/article/"
-        params = {
-            "q": query_clean,
-            "lang": "pt",
-            "size": 20,
-        }
-
-        response = requests.get(url, params=params, timeout=15)
-        response.raise_for_status()
-
-        data = response.json()
-
-        papers = []
-
-        for idx, item in enumerate(data.get("results", [])):
-            paper = {
-                "titulo": item.get("title"),
-                "autores": item.get("authors", []),
-                "ano": item.get("publication_year"),
-                "instituicao": None,
-                "resumo": item.get("abstract"),
-                "citacoes": None,
-                "url": item.get("url"),
-                "fonte": "SciELO",
-                "periodico": item.get("journal"),
-                "pdf_url": item.get("pdf"),
-                "posicao": idx + 1,
-            }
-            papers.append(paper)
-
-        return json.dumps(
-            {
-                "fonte": "SciELO",
-                "query": query,
-                "total": len(papers),
-                "papers": papers,
-            },
-            indent=2,
-            ensure_ascii=False,
-        )
-
-    except Exception as e:
-        return json.dumps({"error": f"Erro no SciELO: {str(e)}", "papers": []})
-
-
 @tool("google_scholar_search")
 def google_scholar_tool(query: str) -> str:
     """
     Busca no Google Scholar via scraping (fallback)
-
-    USO: Apenas como Ãºltimo recurso se Serper Scholar falhar
 
     Args:
         query: Termo de busca
@@ -276,17 +179,7 @@ def google_scholar_tool(query: str) -> str:
     try:
         from scholarly import scholarly
 
-        # Tenta usar proxy generator se disponível, senão falha graciosamente
-        # EVITAR HANG: Configurar timeout curto ou desabilitar proxy se for interativo
-        print(
-            "⚠️ Tentando Google Scholar (scholarly)... isso pode demorar ou falhar com CAPTCHA."
-        )
-
-        # Hack para evitar interação manual do scholarly
-        # Se falhar conexão com TOR ou Proxies, ele pode tentar lançar browser.
-        # Vamos tentar um search direto protegendo contra KeyboardInterrupt/Hang
         try:
-            # Timeout simulado não é fácil com scholarly síncrono, mas vamos tentar encapsular
             search_query = scholarly.search_pubs(query)
         except KeyboardInterrupt:
             return json.dumps(
@@ -296,21 +189,18 @@ def google_scholar_tool(query: str) -> str:
         papers = []
         for idx in range(10):
             try:
-                # Proteção extra para o next() que pode triggar o Selenium
                 result = next(search_query)
 
-                # Lógica para priorizar PDF
                 pub_url = result.get("pub_url", "N/A")
                 eprint_url = result.get("eprint_url", "N/A")
 
-                # Se eprint terminar em pdf, usa ele. Se não, usa pub_url se existir
                 final_url = pub_url
                 pdf_url = None
                 if eprint_url and eprint_url.lower().endswith(".pdf"):
                     final_url = eprint_url
                     pdf_url = eprint_url
                 elif eprint_url and "pdf" in eprint_url.lower():
-                    final_url = eprint_url  # Tentativa
+                    final_url = eprint_url 
 
                 paper = {
                     "titulo": result.get("bib", {}).get("title", "N/A"),
@@ -328,7 +218,6 @@ def google_scholar_tool(query: str) -> str:
             except StopIteration:
                 break
             except Exception as e:
-                print(f"Erro ao processar paper {idx+1}: {str(e)}")
                 continue
 
         return json.dumps(
@@ -352,12 +241,9 @@ def researchgate_scraper_tool(query: str, max_results: int = 10) -> str:
 
     Busca papers no ResearchGate e extrai metadados completos.
 
-    NOVO: Implementado para atender requisito AMBEV de
-    "scraping customizado para portais acadÃªmicos (ResearchGate, Scielo, etc.)"
-
     Args:
         query: Termo de busca
-        max_results: NÃºmero mÃ¡ximo de resultados (padrÃ£o 10)
+        max_results: Número máximo de resultados (padrão 10)
 
     Returns:
         String JSON com lista de papers encontrados
@@ -412,7 +298,6 @@ def researchgate_scraper_tool(query: str, max_results: int = 10) -> str:
                     "posicao": idx + 1,
                 }
 
-                # Tentar extrair citaÃ§Ãµes
                 citations_elem = article.find(text=re.compile(r"Citations"))
                 if citations_elem:
                     match = re.search(r"(\d+)", citations_elem)
@@ -420,7 +305,7 @@ def researchgate_scraper_tool(query: str, max_results: int = 10) -> str:
                         paper["citacoes"] = int(match.group(1))
 
                 papers.append(paper)
-                time.sleep(0.5)  # Delay anti-bot
+                time.sleep(0.5) 
 
             except Exception as e:
                 continue
@@ -440,83 +325,10 @@ def researchgate_scraper_tool(query: str, max_results: int = 10) -> str:
         return json.dumps({"error": f"Erro ResearchGate: {str(e)}", "papers": []})
 
 
-@tool("scielo_scraper")
-def scielo_scraper_tool(query: str, max_results: int = 10) -> str:
-    """
-    Scraper para Scielo
-
-    Busca papers no Scielo usando API pública.
-
-    Args:
-        query: Termo de busca
-        max_results: Número máximo de resultados (padrão 10)
-
-    Returns:
-        String JSON com lista de papers encontrados
-    """
-    try:
-        api_url = "https://search.scielo.org/"
-
-        "https://search.scielo.org/?fb=&q=cerveja&lang=pt&count=15&from=1&output=site&sort=&format=summary&page=1&where="
-        params = {
-            "q": query, 
-            "lang": "pt", 
-            "count": max_results,
-            "from": 1,
-            "output": "json"
-        }
-
-        headers = {"User-Agent": "Academic Research Bot", "Accept": "application/json"}
-
-        response = requests.get(api_url, params=params, headers=headers, timeout=10)
-        response.raise_for_status()
-
-        data = response.json()
-
-        papers = []
-        results = data.get("response", {}).get("docs", [])
-
-        for idx, doc in enumerate(results[:max_results]):
-            paper = {
-                "titulo": doc.get("ti_en")
-                or doc.get("ti_pt")
-                or doc.get("ti_es", "N/A"),
-                "autores": doc.get("au", []),
-                "ano": int(doc.get("da", "").split("-")[0]) if doc.get("da") else None,
-                "instituicao": doc.get("in", [None])[0] if doc.get("in") else None,
-                "resumo": (
-                    doc.get("ab_en") or doc.get("ab_pt") or doc.get("ab_es", "N/A")
-                )[:500],
-                "citacoes": 0,
-                "url": f"https://www.scielo.br/j/{doc.get('id', '')}",
-                "fonte": "Scielo API",
-                "idioma": doc.get("la", ["pt"])[0],
-                "revista": doc.get("ta", "N/A"),
-                "posicao": idx + 1,
-            }
-            papers.append(paper)
-
-        return json.dumps(
-            {"fonte": "Scielo", "query": query, "total": len(papers), "papers": papers},
-            indent=2,
-            ensure_ascii=False,
-        )
-
-    except Exception as e:
-        return json.dumps({"error": f"Erro Scielo: {str(e)}", "papers": []})
-
-
-# =============================================================================
-# 9. OPENALEX SEARCH TOOL (NOVO) ⭐
-# =============================================================================
-
 @tool("openalex_search")
 def openalex_search_tool(query: str) -> str:
     """
-    Busca papers no OpenAlex (Base acadêmica aberta e gratuita)
-
-    Fonte robusta e gratuita com mais de 250M de trabalhos.
-    Excelente para metadados e links de PDF (Open Access).
+    Busca papers no OpenAlex
 
     Args:
         query: Termo de busca
@@ -525,12 +337,11 @@ def openalex_search_tool(query: str) -> str:
         JSON string com papers encontrados
     """
     try:
-        # Codificar query
         url = "https://api.openalex.org/works"
 
         params = {
             "search": query,
-            "per-page": 20,  # Aumentado para aumentar chance de achar PDFs
+            "per-page": 20,
             "sort": "relevance_score:desc",
         }
 
@@ -548,9 +359,7 @@ def openalex_search_tool(query: str) -> str:
         papers = []
         for idx, work in enumerate(results):
             try:
-                # Extrair autores
                 authors = []
-                # Proteção extra: authorships pode ser None
                 authorships = work.get("authorships") or []
                 for authorship in authorships:
                     if not authorship:
@@ -561,9 +370,7 @@ def openalex_search_tool(query: str) -> str:
                         if author_name:
                             authors.append(author_name)
 
-                # Extrair PDF URL
                 pdf_url = None
-                # Proteção extra: open_access pode ser None
                 open_access = work.get("open_access")
                 if (
                     open_access
@@ -573,21 +380,15 @@ def openalex_search_tool(query: str) -> str:
                     best_oa = work.get("best_oa_location")
                     if best_oa and isinstance(best_oa, dict):
                         pdf_url = best_oa.get("pdf_url")
-                        # REMOVIDO FALLBACK PARA LANDING PAGE
-                        # O objetivo é PDF direto. Se não tiver, melhor deixar vazio para o agente saber.
 
-                # Extrair Abstract
                 abstract_text = "Resumo detalhado disponível no link."
 
-                # Se não tiver PDF url, pular esse resultado?
-                # O prompt diz "Encontrar NO MINIMO 3 papers... com PDFs acessíveis".
-                # Vamos priorizar resultados com PDF.
                 if not pdf_url:
-                    continue  # Pular se não tiver PDF direto (OpenAlex é grande, podemos ser seletivos)
+                    continue
 
                 paper = {
                     "titulo": work.get("display_name", "N/A"),
-                    "autores": authors[:5],  # Limitar a 5 para não poluir
+                    "autores": authors[:5],
                     "ano": work.get("publication_year"),
                     "instituicao": (
                         (work.get("institutions") or [{}])[0].get("display_name")
@@ -596,7 +397,7 @@ def openalex_search_tool(query: str) -> str:
                     ),
                     "resumo": abstract_text,
                     "citacoes": work.get("cited_by_count", 0),
-                    "url": pdf_url,  # URL principal AGORA É O PDF
+                    "url": pdf_url,
                     "pdf_url": pdf_url,
                     "fonte": "OpenAlex",
                     "revista": (work.get("primary_location") or {})
@@ -607,19 +408,8 @@ def openalex_search_tool(query: str) -> str:
                 papers.append(paper)
 
             except Exception as e:
-                # Log error but continue
-                # print(f"⚠️ Erro no OpenAlex paper {idx}: {e}")
                 continue
 
-            make_log({
-                "logName": query.replace(" ", "_") + "_openalex_search_tool",
-                "content": json.dumps({
-                    "fonte": "OpenAlex",
-                    "query": query,
-                    "total": len(papers),
-                    "papers": papers,
-                     })
-            })
         return json.dumps(
             {
                 "fonte": "OpenAlex",
@@ -634,22 +424,13 @@ def openalex_search_tool(query: str) -> str:
     except Exception as e:
         return json.dumps({"error": f"Erro no OpenAlex: {str(e)}", "papers": []})
 
-
-# =============================================================================
-# 8. URL VALIDATOR TOOL
-# =============================================================================
-
-
 @tool("url_validator")
 def url_validator_tool(url: str) -> str:
     """
     Valida se uma URL está acessível e retorna o status.
 
-    Use esta ferramenta OBRIGATORIAMENTE para validar TODAS as URLs encontradas
-    antes de incluí-las como fontes confiáveis. URLs inacessíveis devem ser descartadas.
-
     Args:
-        url: URL para validar (ex: https://example.com/article)
+        url: URL para validar
 
     Returns:
         Status da URL indicando se está acessível (200) ou não
@@ -663,17 +444,6 @@ def url_validator_tool(url: str) -> str:
             return f"URL retornou status {response.status_code}: {url}"
     except Exception as e:
         return f"âŒ URL inacessÃ­vel: {url}\nErro: {str(e)}"
-
-
-# =============================================================================
-# FUNÃ‡Ã•ES AUXILIARES
-# =============================================================================
-
-
-def _extract_year(text: str) -> int:
-    """Extrai ano de um texto"""
-    match = re.search(r"\b(19|20)\d{2}\b", text)
-    return int(match.group()) if match else None
 
 __all__ = [
     "serper_scholar_tool",
@@ -703,7 +473,6 @@ def google_search_tool(query: str, gl: str = 'br') -> str:
         payload = {
             "q": query, 
             "num": 10,
-            "gl": gl,
         }
 
         headers = {
@@ -730,21 +499,9 @@ def google_search_tool(query: str, gl: str = 'br') -> str:
                 f"""RESULTADO {idx} | Título: {title} | Data: {date} | URL: {link} | Resumo: {snippet} \n"""
             )
 
-        make_log({
-            "logName": query.replace(" ", "_") + "_google_search_tool",
-            "content": json.dumps({
-                "fonte": "Google",
-                "query": query,
-                "total": len(normalized_output),
-                "results": response.json(),
-                "normalized_output": normalized_output,
-            })
-        })
         return "\n".join(normalized_output)
 
-        # return json.dumps(resp.json().get('organic', []), indent=2, ensure_ascii=False)
     except Exception as e:
-        print(f"❌ Erro na busca Google (Serper): {query} - {str(e)}")
         return f"❌ Erro na busca Google (Serper): {str(e)}"
 
 
@@ -757,12 +514,10 @@ def web_scraper_tool(url: str) -> str:
     try:
         import trafilatura
 
-        # 1. Download
         downloaded = trafilatura.fetch_url(url)
         if downloaded is None:
             return f"⚠️ Erro: Não foi possível baixar o conteúdo de {url} (Trafilatura fetch failed)."
 
-        # 2. Extract
         result = trafilatura.extract(
             downloaded, include_comments=False, include_tables=True, no_fallback=False
         )
@@ -770,10 +525,7 @@ def web_scraper_tool(url: str) -> str:
         if not result:
             return f"⚠️ Aviso: Nenhum conteúdo extraído de {url}. A página pode usar JS pesado ou bloquear bots."
 
-        # 3. Metadados opcionais (se trafilatura extrair)
-        # Trafilatura metadata extraction is separate, but extract() returns main text.
-
-        return f"CONTEÚDO EXTRAÍDO ({url}):\n\n{result[:12000]}"  # Aumentando limite pois trafilatura é limpo
+        return f"CONTEÚDO EXTRAÍDO ({url}):\n\n{result[:12000]}" 
 
     except ImportError:
         return "❌ Erro Crítico: Biblioteca 'trafilatura' não instalada. Adicione ao pyproject.toml."
@@ -781,5 +533,4 @@ def web_scraper_tool(url: str) -> str:
         return f"❌ Erro ao processar URL {url}: {e}"
 
 
-# Atualizar exports
 __all__.extend(["google_search_tool", "web_scraper_tool"])

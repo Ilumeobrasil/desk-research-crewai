@@ -16,7 +16,7 @@ from desk_research.flow.crew_executors import (
 from desk_research.crews.integrated.integrated_analysis import IntegratedCrew
 from desk_research.utils.reporting import export_report
 from desk_research.utils.logging_utils import safe_print
-from desk_research.constants import MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW
+from desk_research.constants import DEFAULT_MAX_PAPERS, MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW
 
 
 class DeskResearchFlow(Flow[DeskResearchState]):
@@ -45,7 +45,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         if "academic" in self.state.selected_crews:
             result = AcademicCrewExecutor.run(
                 topic=self.state.topic,
-                max_papers=self.state.params.get('max_papers', 5)
+                max_papers=self.state.params.get('max_papers', DEFAULT_MAX_PAPERS)
             )
             self.state.results["academic"] = result
             return "completed"
