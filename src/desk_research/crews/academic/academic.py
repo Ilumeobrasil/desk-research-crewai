@@ -258,14 +258,6 @@ def _extract_content_from_pdfs(pdf_urls: list[str], max_chars: int = 3000) -> st
     """Extrai conteúdo de cada PDF e retorna em formato estruturado"""
     extracted_contents = []
 
-    make_log({
-        "logName": "extracted_pdf_content",
-        "content": {
-            "pdf_urls": pdf_urls,
-            "max_chars": max_chars
-        }
-    })
-    
     for idx, pdf_url in enumerate(pdf_urls, 1):
         try:
             result = pdf_analyzer_tool.run(pdf_url)

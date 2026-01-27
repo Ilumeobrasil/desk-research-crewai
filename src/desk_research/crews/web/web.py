@@ -144,17 +144,6 @@ def run_web_research(query: str, max_results: int = 10):
         
         final_result = consolidation_crew.kickoff(inputs=inputs)
         
-        make_log({
-            "logName": "web_research",
-            "content": {
-                "result": final_result,
-                "query": query,
-                "max_results": max_results,
-                "urls_found": len(urls),
-                "current_date": datetime.datetime.now().strftime('%d/%m/%Y')
-            }
-        })
-        
         export_report(final_result, query, prefix="web_report", crew_name="web")
         
         Console.time_end("RUN_WEB_RESEARCH")
