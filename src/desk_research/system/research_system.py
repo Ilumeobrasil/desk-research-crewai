@@ -20,6 +20,7 @@ from desk_research.crews.academic.academic import run_academic_research
 from desk_research.crews.web.web import run_web_research
 from desk_research.crews.x.twitter_x_crew import run_twitter_social_listening
 from desk_research.crews.consumer_hours.consumer_hours import run_consumer_hours_analysis
+from desk_research.utils.console_time import Console
 
 class DeskResearchSystem:
     def __init__(self):
@@ -129,11 +130,8 @@ class DeskResearchSystem:
                 print(f"❌ Executor para modo '{modo}' não encontrado.")
                 continue
 
-            start_time = time.time()
+            Console.time("DESK_RESEARCH_SYSTEM")
             result = executor(**params)
-            end_time = time.time()
-
-            execution_time = end_time - start_time
 
             print("\n")
             print("=" * 73)
@@ -143,7 +141,7 @@ class DeskResearchSystem:
             print("\n")
             print(f"📋 Modo: {MODE_CONFIG[modo]['emoji']} {MODE_CONFIG[modo]['nome']}")
             print(f"🤖 Modelo utilizado: {os.getenv('MODEL')}")
-            #print(f"🕒 Tempo de execução: {time.strftime("%H:%M:%S", time.gmtime(execution_time))}")
+            Console.time_end("DESK_RESEARCH_SYSTEM")
             
             print("\n")
             if params:
@@ -227,10 +225,6 @@ class DeskResearchSystem:
             return {"erro": str(e)}
 
     def executar_integrated(self, topic: str, selected_modos: list, params: dict) -> Dict[str, Any]:
-        print(f"\n🧠 Iniciando Pesquisa Integrada (FLOW)...")
-        print(f"Tema: {topic}")
-        print(f"Modos: {selected_modos}\n")
-        
         try:
             flow = DeskResearchFlow()
             inputs = {

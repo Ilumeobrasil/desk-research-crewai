@@ -5,7 +5,6 @@ from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.research_tools import google_search_tool, web_scraper_tool, url_validator_tool
 from desk_research.utils.console_time import Console
 from desk_research.utils.extract_urls_from_markdown import extract_urls_from_markdown
-from desk_research.utils.makelog.makeLog import make_log
 from desk_research.utils.reporting import export_report
 
 @CrewBase

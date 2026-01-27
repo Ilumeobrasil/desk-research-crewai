@@ -23,7 +23,6 @@ class CrewExecutor:
 class AcademicCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str, max_papers: int = DEFAULT_MAX_PAPERS) -> Any:
-        safe_print(f"\n🎓 Running Academic Crew...")
         return CrewExecutor.execute_with_error_handling(
             "Academic Crew",
             run_academic_research,
@@ -35,7 +34,6 @@ class AcademicCrewExecutor(CrewExecutor):
 class WebCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str, max_results: int = 5) -> Any:
-        safe_print(f"\n🌐 Running Web Crew...")
         return CrewExecutor.execute_with_error_handling(
             "Web Crew",
             run_web_research,
@@ -47,7 +45,6 @@ class WebCrewExecutor(CrewExecutor):
 class XCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str) -> Any:
-        safe_print(f"\n🐦 Running X Crew...")
         return CrewExecutor.execute_with_error_handling(
             "X Crew",
             run_twitter_social_listening,
@@ -58,7 +55,6 @@ class XCrewExecutor(CrewExecutor):
 class GenieCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str) -> Any:
-        safe_print(f"\n🧞 Running Genie...")
         return CrewExecutor.execute_with_error_handling(
             "Genie Crew",
             run_genie_analysis,
@@ -69,7 +65,6 @@ class GenieCrewExecutor(CrewExecutor):
 class YouTubeCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str) -> Any:
-        safe_print(f"\n📺 Running YouTube Crew...")
         return CrewExecutor.execute_with_error_handling(
             "YouTube Crew",
             run_youtube_analysis,
@@ -80,7 +75,6 @@ class YouTubeCrewExecutor(CrewExecutor):
 class ConsumerHoursCrewExecutor(CrewExecutor):
     @staticmethod
     def run(topic: str) -> Any:
-        safe_print(f"\n⏳ Running Consumer Hours Crew...")
         return CrewExecutor.execute_with_error_handling(
             "Consumer Hours",
             run_consumer_hours_analysis,

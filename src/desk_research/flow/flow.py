@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Any
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from crewai import Crew
-from crewai.flow.flow import Flow, start, listen, and_, or_, router
+from crewai.flow.flow import Flow, start, listen, or_, router
 
 from desk_research.flow.state import DeskResearchState
 from desk_research.flow.crew_executors import (
@@ -14,9 +15,10 @@ from desk_research.flow.crew_executors import (
     ConsumerHoursCrewExecutor
 )
 from desk_research.crews.integrated.integrated_analysis import IntegratedCrew
+from desk_research.utils.console_time import Console
 from desk_research.utils.reporting import export_report
 from desk_research.utils.logging_utils import safe_print
-from desk_research.constants import DEFAULT_MAX_PAPERS, MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW
+from desk_research.constants import DEFAULT_MAX_PAPERS, MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW, IS_ACTIVE_ANALYSIS_INTEGRATED
 
 
 class DeskResearchFlow(Flow[DeskResearchState]):
@@ -30,7 +32,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             self.state.selected_crews = self.inputs.get('selected_crews', self.state.selected_crews)
             self.state.params = self.inputs.get('params', self.state.params)
 
-        safe_print(f"📌 Tópico no State: {self.state.topic}")
+        safe_print(f"📌 Tópico: {self.state.topic}")
 
         if not self.state.topic:
             safe_print("⚠️  AVISO: Tópico vazio! Verifique os inputs.")
@@ -41,83 +43,93 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         return "initialized"
 
     @listen(initialize_research)
-    def run_academic(self):
+    def run_all_crews_parallel(self):
+        """Executa todos os crews selecionados em paralelo"""
+        
+        # Preparar tasks para execução paralela
+        tasks = []
+        
         if "academic" in self.state.selected_crews:
-            result = AcademicCrewExecutor.run(
-                topic=self.state.topic,
-                max_papers=self.state.params.get('max_papers', DEFAULT_MAX_PAPERS)
-            )
-            self.state.results["academic"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping Academic")
-            return "skipped"
-
-    @listen(initialize_research)
-    def run_web(self):
+            tasks.append(("academic", self._run_academic_parallel))
+        
         if "web" in self.state.selected_crews:
-            result = WebCrewExecutor.run(
-                topic=self.state.topic,
-                max_results=self.state.params.get('max_web_results', 5)
-            )
-            self.state.results["web"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping Web")
-            return "skipped"
-
-    @listen(initialize_research)
-    def run_x(self):
+            tasks.append(("web", self._run_web_parallel))
+        
         if "x" in self.state.selected_crews:
-            result = XCrewExecutor.run(topic=self.state.topic)
-            self.state.results["x"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping X")
-            return "skipped"
-
-    @listen(initialize_research)
-    def run_genie(self):
+            tasks.append(("x", self._run_x_parallel))
+        
         if "genie" in self.state.selected_crews:
-            result = GenieCrewExecutor.run(topic=self.state.topic)
-            self.state.results["genie"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping Genie")
-            return "skipped"
-            
-    @listen(initialize_research)
-    def run_youtube(self):
+            tasks.append(("genie", self._run_genie_parallel))
+        
         if "youtube" in self.state.selected_crews:
-            result = YouTubeCrewExecutor.run(topic=self.state.topic)
-            self.state.results["youtube"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping YouTube")
-            return "skipped"
-
-    @listen(initialize_research)
-    def run_consumer_hours(self):
+            tasks.append(("youtube", self._run_youtube_parallel))
+        
         if "consumer_hours" in self.state.selected_crews:
-            result = ConsumerHoursCrewExecutor.run(topic=self.state.topic)
-            self.state.results["consumer_hours"] = result
-            return "completed"
-        else:
-            safe_print("⏭️ Skipping Consumer Hours")
-            return "skipped"
+            tasks.append(("consumer_hours", self._run_consumer_hours_parallel))
+        
+        if not tasks:
+            return "no_crews"
+        
+        # Executar em paralelo
+        with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
+            future_to_crew = {
+                executor.submit(func): crew_name 
+                for crew_name, func in tasks
+            }
+            
+            for future in as_completed(future_to_crew):
+                crew_name = future_to_crew[future]
+                try:
+                    result = future.result()
+                    self.state.results[crew_name] = result
+                except Exception as e:
+                    safe_print(f"❌ Erro no {crew_name.upper()}: {e}")
+                    self.state.results[crew_name] = f"Erro: {str(e)}"
+        
+        return "all_completed"
+    
+    def _run_academic_parallel(self):
+        """Executa o crew acadêmico"""
+        return AcademicCrewExecutor.run(
+            topic=self.state.topic,
+            max_papers=self.state.params.get('max_papers', DEFAULT_MAX_PAPERS)
+        )
+    
+    def _run_web_parallel(self):
+        """Executa o crew web"""
+        return WebCrewExecutor.run(
+            topic=self.state.topic,
+            max_results=self.state.params.get('max_web_results', 5)
+        )
+    
+    def _run_x_parallel(self):
+        """Executa o crew X (Twitter)"""
+        return XCrewExecutor.run(topic=self.state.topic)
+    
+    def _run_genie_parallel(self):
+        """Executa o crew Genie"""
+        return GenieCrewExecutor.run(topic=self.state.topic)
+    
+    def _run_youtube_parallel(self):
+        """Executa o crew YouTube"""
+        return YouTubeCrewExecutor.run(topic=self.state.topic)
+    
+    def _run_consumer_hours_parallel(self):
+        """Executa o crew Consumer Hours"""
+        return ConsumerHoursCrewExecutor.run(topic=self.state.topic)
 
-    @listen(or_(and_(run_academic, run_web, run_x, run_genie, run_youtube, run_consumer_hours), "retry_synthesis"))
+    @listen(or_(run_all_crews_parallel, "retry_synthesis"))
     def synthesize_report(self):
-        # Evitar execuções múltiplas - verificar se já foi executado
+        if not self.state.results:
+            return "no_reports"
+        
         if hasattr(self, '_synthesis_executed') and self._synthesis_executed:
             return "already_executed"
         
-        safe_print(f"\n✍️ SÍNTESE FINAL (Tentativa {self.state.retry_count + 1})")
-        
+        Console.time("SYNTHESIS_REPORT")
         all_reports_text = self._build_reports_text()
         
         if not all_reports_text.strip():
-            safe_print("⚠️ Nenhum relatório gerado para síntese.")
             return "no_reports"
 
         self._synthesis_executed = True
@@ -125,7 +137,11 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         master_result = self._run_synthesis_crew(all_reports_text)
         self.state.final_report = str(master_result)
         
-        return "report_generated"
+        Console.time_end("SYNTHESIS_REPORT")
+        if IS_ACTIVE_ANALYSIS_INTEGRATED:
+            return "report_generated"
+        else:
+            return "report_generated_direct"
 
     def _build_reports_text(self) -> str:
         results_buffer = []
@@ -136,6 +152,18 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             )
         return "\n".join(results_buffer)
 
+    @router(synthesize_report)
+    def route_after_synthesis(self):
+        """Roteia após síntese: avaliação ou exportação direta"""
+        if not IS_ACTIVE_ANALYSIS_INTEGRATED:
+            return "direct_export"
+        return "evaluate"
+
+    @listen("direct_export")
+    def export_directly(self):
+        """Exporta o relatório diretamente sem avaliação quando IS_ACTIVE_ANALYSIS_INTEGRATED = False"""
+        return self._export_final()
+        
     @staticmethod
     def _extract_content(result: Any) -> str:
         if isinstance(result, dict):
@@ -166,17 +194,10 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             'date': datetime.now().strftime('%d/%m/%Y')
         }
 
-        """ make_log({
-            "logName": f"run_synthesis_crew{datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}",
-            "content": inputs
-        }) """
-
         return crew_runner.kickoff(inputs=inputs)
 
-    @listen(synthesize_report)
+    @listen("evaluate")
     def evaluate_report(self):
-        safe_print("\n⚖️ AVALIANDO QUALIDADE (Self-Refine)...")
-        
         integ_crew = IntegratedCrew()
         task = integ_crew.evaluation_task()
         qa_crew = Crew(
@@ -192,25 +213,15 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             "reports_context": reports_context
         }
 
-        """ make_log({
-            "logName": f"evaluate_report{datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}",
-            "content": inputs
-        }) """
-
         qa_result = qa_crew.kickoff(inputs=inputs)
         
         review = qa_result.pydantic or qa_result
         score, feedback = self._extract_review_data(review)
 
-        safe_print(f"📊 Nota: {score}/100")
-        safe_print(f"📝 Feedback: {feedback}")
-        
         if score >= MIN_APPROVAL_SCORE:
-            safe_print("✅ Relatório APROVADO!")
             self.state.feedback = ""
             return "approved"
         else:
-            safe_print("❌ Relatório REPROVADO. Solicitando melhorias...")
             self.state.feedback = feedback
             self.state.retry_count += 1
             return "rejected"
@@ -224,7 +235,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
     @router(evaluate_report)
     def flow_control(self):
         if self.state.retry_count > MAX_RETRY_COUNT:
-            safe_print("⚠️ Limite de retries atingido.")
             return "max_retries"
         
         if self.state.feedback:
@@ -238,7 +248,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @listen("max_retries")
     def finalize_forced(self):
-        safe_print("⚠️ Finalizando com versão 'Best Effort'.")
         return self._export_final()
 
     @listen("no_reports")
@@ -248,14 +257,10 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @listen("rejected")
     def retry_synthesis(self):
-        safe_print(f"🔄 Preparando retry (tentativa {self.state.retry_count})...")
-        # Resetar flag para permitir nova execução
         self._synthesis_executed = False
         return "retry_synthesis"
 
     def _export_final(self):
-        safe_print("\n📚 MONTANDO RELATÓRIO COMPLETO...")
-        
         try:
             master_report = self.state.final_report
             if not master_report:

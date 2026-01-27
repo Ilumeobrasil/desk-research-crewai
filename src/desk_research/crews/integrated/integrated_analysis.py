@@ -5,7 +5,6 @@ import logging
 from typing import Callable, Dict, Any, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from desk_research.utils.makelog.makeLog import make_log
 from pydantic import BaseModel, Field
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
@@ -54,12 +53,10 @@ class QualityReview(BaseModel):
     approved: bool = Field(default=False, description="Se a nota for >= 80, aprovado. Caso contrário, reprovado.")
     
     class Config:
-        # Garantir que o modelo seja totalmente resolvido
         frozen = False
 
 @CrewBase
 class IntegratedCrew:
-
     agents: List[Agent]
     tasks: List[Task]
 
@@ -67,7 +64,7 @@ class IntegratedCrew:
     def chief_editor_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['chief_editor_agent'],
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
             allow_delegation=False,
             reasoning=True,
             max_reasoning_attempts=3 
@@ -174,15 +171,6 @@ def run_integrated_research(topic: str, selected_modos: List[str], params: Dict[
             'date': datetime.now().strftime('%d/%m/%Y'),
             'instruction': ""
         }
-        """ make_log({
-            "logName": "integrated_analysis",
-            "content": {
-                'topic': topic,
-                'reports_context': all_reports_text,
-                'date': datetime.now().strftime('%d/%m/%Y'),
-                'instruction': ""
-            }
-        }) """
 
         crew_instance = IntegratedCrew()
         master_result = crew_instance.crew().kickoff(inputs=inputs)
