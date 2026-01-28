@@ -12,7 +12,6 @@ def _safe_print_patch(*args, **kwargs):
 
 builtins.print = _safe_print_patch
 
-
 def safe_print(msg: str) -> None:
     try:
         if hasattr(sys, '__stdout__') and sys.__stdout__:

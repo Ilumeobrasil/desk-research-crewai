@@ -19,21 +19,14 @@ headers = {
     "Content-Type": "application/json",
 }
 
-# 1) Lista (SEM query params) — evita 422
 resp = requests.get(f"{BASE_URL}/api/application/datasets", headers=headers, timeout=60)
-print("LIST status:", resp.status_code)
 if resp.status_code != 200:
-    print(resp.text)
     raise SystemExit(1)
 
 data = resp.json()
 for it in data.get("items", []):
     if it.get("name") == DATASET:
-        print("Já existe:", it)
         raise SystemExit(0)
 
-# 2) Cria
 payload = {"name": DATASET, "model": MODEL}
 resp2 = requests.post(f"{BASE_URL}/api/application/datasets", headers=headers, json=payload, timeout=60)
-print("CREATE status:", resp2.status_code)
-print(resp2.text)

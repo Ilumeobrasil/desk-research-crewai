@@ -9,17 +9,14 @@ import os
 import sys
 from pathlib import Path
 
-# Configurar variáveis de ambiente para WeasyPrint (GTK no macOS)
-if sys.platform == "darwin":  # macOS
+if sys.platform == "darwin":  
     homebrew_lib = "/opt/homebrew/lib"
     if os.path.exists(homebrew_lib):
-        # Configurar PKG_CONFIG_PATH para encontrar bibliotecas GTK
         pkg_config_path = os.path.join(homebrew_lib, "pkgconfig")
         if pkg_config_path not in os.environ.get("PKG_CONFIG_PATH", ""):
             current_pkg = os.environ.get("PKG_CONFIG_PATH", "")
             os.environ["PKG_CONFIG_PATH"] = f"{pkg_config_path}:{current_pkg}" if current_pkg else pkg_config_path
         
-        # Configurar DYLD_LIBRARY_PATH para carregar bibliotecas GTK
         if homebrew_lib not in os.environ.get("DYLD_LIBRARY_PATH", ""):
             current_dyld = os.environ.get("DYLD_LIBRARY_PATH", "")
             os.environ["DYLD_LIBRARY_PATH"] = f"{homebrew_lib}:{current_dyld}" if current_dyld else homebrew_lib
@@ -55,35 +52,30 @@ def markdown_to_pdf(
     """
     
     try:
-        # Validar arquivo de entrada
         md_file = Path(markdown_path)
         if not md_file.exists():
             raise FileNotFoundError(f"Arquivo não encontrado: {markdown_path}")
         
-        # Definir caminho de saída
         if pdf_path is None:
             pdf_path = md_file.with_suffix('.pdf')
         else:
             pdf_path = Path(pdf_path)
         
-        # Ler Markdown
         logger.info(f"📄 Lendo Markdown: {md_file}")
         with open(md_file, 'r', encoding='utf-8') as f:
             markdown_content = f.read()
         
-        # Converter Markdown → HTML
         html_content = markdown2.markdown(
             markdown_content,
             extras=[
-                'tables',           # Suporte a tabelas
-                'fenced-code-blocks',  # Blocos de código
-                'strike',           # Texto tachado
-                'task_list',        # Listas de tarefas
-                'header-ids'        # IDs em cabeçalhos
+                'tables',           
+                'fenced-code-blocks',  
+                'strike',           
+                'task_list',        
+                'header-ids'        
             ]
         )
         
-        # CSS para formatação profissional
         default_css = """
         @page {
             size: A4;
@@ -250,10 +242,8 @@ def markdown_to_pdf(
         }
         """
         
-        # Usar CSS customizado se fornecido
         css_final = css_custom if css_custom else default_css
         
-        # Metadata do documento
         metadata_html = f"""
         <div class="metadata">
             <strong>Documento:</strong> {title}<br>
@@ -263,7 +253,6 @@ def markdown_to_pdf(
         </div>
         """
         
-        # HTML completo
         full_html = f"""
         <!DOCTYPE html>
         <html lang="pt-BR">
@@ -278,7 +267,6 @@ def markdown_to_pdf(
         </html>
         """
         
-        # Gerar PDF
         logger.info(f"📑 Gerando PDF: {pdf_path}")
         HTML(string=full_html).write_pdf(
             pdf_path,
@@ -331,7 +319,6 @@ def export_academic_report_to_pdf(markdown_path: str) -> dict:
 
 
 if __name__ == "__main__":
-    # Teste standalone
     import sys
     
     if len(sys.argv) > 1:

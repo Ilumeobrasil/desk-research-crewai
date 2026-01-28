@@ -152,15 +152,11 @@ def export_report(result: any, topic: str, prefix: str = "report", crew_name: Cr
         logger.info(f"✅ PDF gerado: {pdf_path}")
         
     except Exception as e:
-        logger.warning(f"⚠️ Erro ao gerar PDF com WeasyPrint (provavelmente falta GTK): {e}")
-        logger.info("🔄 Tentando fallback para FPDF (geração simplificada)...")
-        
         try:
             pdf = AcademicPDF()
             pdf.add_page()
             pdf.set_auto_page_break(auto=True, margin=15)
             
-            # Limpeza prévia de caracteres globais
             replacements = {
                 '•': '*', '→': '->', '✓': '[v]', '✅': '[OK]', '❌': '[X]',
                 '’': "'", '‘': "'", '“': '"', '”': '"', '–': '-', '—': '-',

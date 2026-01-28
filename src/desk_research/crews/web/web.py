@@ -104,13 +104,13 @@ def _extract_content_from_urls(urls: list[str], max_chars: int = 3000) -> str:
                 f"### {url}\n- **URL**: {url}\n{date_section}- **Conteúdo extraído**:\n{content}\n"
             )
         except Exception as e:
-            print(f"⚠️ Erro ao extrair conteúdo de {url}: {e}")
             continue
 
     return "\n".join(extracted_contents)
 
 def run_web_research(query: str, max_results: int = 10):
     Console.time("RUN_WEB_RESEARCH")
+    
     try:    
         inputs = {
             'query': query,
@@ -140,7 +140,6 @@ def run_web_research(query: str, max_results: int = 10):
         urls = extract_urls_from_markdown(search_output)
         
         if not urls:
-            print("⚠️ Nenhuma URL encontrada no resultado da busca")
             return None
         
         extracted_content = _extract_content_from_urls(urls, max_chars=3000)
@@ -168,5 +167,5 @@ def run_web_research(query: str, max_results: int = 10):
         Console.time_end("RUN_WEB_RESEARCH")
         return final_result
     except Exception as e:
-        print(f"Error running web research: {e}")
+        import traceback
         return None
