@@ -95,6 +95,27 @@ synthesis_task:
     - Texto 100% em Português (PT-BR).
     - Nomes próprios, marcas e títulos permanecem no idioma original.
 
+    ============================
+    REGRA DE PRIORIZAÇÃO GEOGRÁFICA (OBRIGATÓRIA)
+    ============================
+
+    - O Brasil é o referencial analítico primário de TODA a síntese.
+    - Afirmações devem SEMPRE começar avaliando evidências referentes ao Brasil.
+
+    - Evidências de outros países:
+      • NÃO podem ser apresentadas como conclusão direta
+      • NÃO podem ser descritas sem contextualização explícita ao Brasil
+
+    - Dados internacionais SÓ podem ser incluídos quando:
+      1. Forem explicitamente usados para evidenciar lacunas no contexto brasileiro
+      2. Forem apresentados como contraste metodológico ou cultural
+      3. Forem descritos como indícios exploratórios, nunca como generalização para o Brasil
+
+    - Sempre que uma evidência internacional for citada, o texto DEVE:
+      • Declarar explicitamente a inexistência, escassez ou limitação de dados brasileiros equivalentes
+      • Indicar claramente que a observação se refere a outro país
+      • Evitar qualquer inferência direta de transferência para o Brasil
+
     ─────────────────────────────────────────
     TOM E LINGUAGEM
     ─────────────────────────────────────────
@@ -139,14 +160,16 @@ synthesis_task:
     - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
     - XY Trechos de entrevistas Consumer Hours retiradas do RAG do Asimov.
 
-    ⚠️ Regras estritas:
+    ## REGRAS ESTRITAS:
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
+    - **Todas as fontes vindas de "web", se enquadram como "notícias e estudos".**
     - **Cada tipo de fonte de ser separado por uma nova bullet.**
     - **Não mencionar nomes de fontes, plataformas, instituições ou veículos.**
     - **Não incluir URLs ou referências externas nesta seção.**
     - **Não descrever recortes analíticos ou resultados.**
     - **Não informar data caso a fonte não tenha período temporal explícito e informado.**
     - **Não informar dados que não sejam o tipo de material, a quantidade e o período analisado.**
+    - **Se dentro do relatório fornecido, houver aviso de indisponibilidade de conteúdo, não cite nas fontes.**
     - A menção específica a fontes ou links é permitida **apenas nos blocos analíticos**, exclusivamente como ilustração de afirmações.
     - Para materiais do tipo Consumer Hours, a quantidade de entrevistados é obrigatória.
 
@@ -170,9 +193,9 @@ synthesis_task:
     - Cada bullet deve conter:
       - o fato observado
       - o padrão ou relevância desse fato
-      - em caso de links, informar a fonte e url com hyperlink
-        - exemplo: [nome do site](url)
-        - exemplo: [nome do academic](url)
+      - em caso de links, informar a fonte e url com hyperlink, precisa ser um link clicável e direto.
+        - exemplo: [nome do site](https://www.site.com)
+        - exemplo: [nome do academic](https://www.academic.com/pdf/paper.pdf)
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
         - exemplo: Consumer Hours (trecho da entrevista)
 
@@ -210,7 +233,6 @@ synthesis_task:
       - Utilizar linguagem descritiva e analítica.
       - Evitar verbos normativos como “precisar”, “dever”, “é necessário”, “exige”.
       - Formular implicações como possíveis leituras, não como direcionamentos.
-
 
 evaluation_task:
   description: >

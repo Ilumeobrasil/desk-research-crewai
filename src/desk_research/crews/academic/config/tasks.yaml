@@ -67,6 +67,9 @@
     - Registrar limitações encontradas (ex: escassez de papers recentes).
 
   expected_output: >
+    Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo, sem seções extras, renomeadas ou reordenadas:
+    - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
+
     Lista estruturada com DOIS grupos:
 
     1. PAPERS ACEITOS:
@@ -96,11 +99,12 @@ synthesize_report_task:
     PROCESSO OBRIGATÓRIO:
     1. Utilizar o texto completo gerado pelo Analista de Literatura.
     2. NÃO resumir, condensar ou reescrever análises técnicas extensas.
-    3. Para cada paper, extrair o resumo/abstract COMPLETO (mínimo 100 caracteres):
+    3. Para cada paper, extrair o resumo/abstract COMPLETO (mínimo 1000 caracteres):
       - Buscar o resumo no texto analisado pelo Analista de Literatura
       - Se não encontrar explicitamente, usar a seção "Introdução e Contexto" como base
       - NUNCA usar textos genéricos ou placeholders como "Resumo disponível no link"
       - O resumo deve ser informativo e descrever o conteúdo real do paper
+      - O resumo deve ser denso e informativo, não deve ser um resumo superficial.
     4. Organizar o conteúdo em uma estrutura acadêmica clara e coerente.
     5. Garantir consistência entre autores, anos, métodos e conclusões.
     6. Documentar explicitamente limitações, lacunas e dificuldades encontradas.

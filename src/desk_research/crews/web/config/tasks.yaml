@@ -132,12 +132,13 @@ evidence_consolidation_task:
     Documento em markdown contendo exclusivamente evidências textuais
     extraídas das fontes, SEM QUALQUER seção de conclusão, resumo,
     interpretação ou recomendação.
+    - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
 
     A estrutura deve ser:
 
     ## Nome da Fonte
-    #URL:
-    #Data de Publicação:
+    # URL:
+    # Data de Publicação:
       - obrigatoriamente deve ser a data da publicação da noticia, o contexto recebido sempre retorna o campo "Data de Publicação"
     # Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo, marketing, etc.)
     Conteúdo:
