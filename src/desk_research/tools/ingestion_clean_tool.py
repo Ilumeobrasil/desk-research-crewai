@@ -106,42 +106,32 @@ def _clean_interview_text(text: str) -> str:
     
     t = text.strip()
     
-    # Normalizar espaços múltiplos
     t = re.sub(r'\s+', ' ', t)
     
-    # Remover formatação markdown residual
     t = re.sub(r'\*\*(.*?)\*\*', r'\1', t)
     t = re.sub(r'\*(.*?)\*', r'\1', t)
     t = re.sub(r'`(.*?)`', r'\1', t)
     
-    # Normalizar aspas inteligentes
     t = t.replace('"', '"').replace('"', '"')
     t = t.replace(''', "'").replace(''', "'")
     
-    # Normalizar traços especiais
     t = t.replace('—', '-').replace('–', '-')
     
-    # Remover caracteres especiais quebrados
     t = t.replace('�', '')
     t = re.sub(r'\?{2,}', '?', t)
     
-    # Remover linhas vazias excessivas (manter no máximo 2 consecutivas)
     t = re.sub(r'\n{3,}', '\n\n', t)
     
-    # Remover pontuação repetida excessiva
     t = re.sub(r'!{3,}', '!', t)
     t = re.sub(r'\?{3,}', '?', t)
     t = re.sub(r'\.{3,}', '...', t)
     
-    # Remover timestamps (formato: (00:00:01 - 00:00:21))
     t = re.sub(r'\([0-9:]+ - [0-9:]+\)\s*', '', t)
     
-    # Normalizar variações de escrita comuns
     t = t.replace('nao', 'não')
     t = t.replace('voce', 'você')
     t = t.replace('pra', 'para')
     
-    # Limpeza final
     t = t.strip()
     t = re.sub(r' {2,}', ' ', t)
     

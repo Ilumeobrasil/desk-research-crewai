@@ -10,7 +10,6 @@ from crewai.project import CrewBase, agent, crew, task
 
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.rag_search_tool import rag_search_tool
-from desk_research.tools.rag_treatment_tool import rag_treatment_tool
 from desk_research.utils.reporting import export_report
 
 import logging
@@ -65,14 +64,6 @@ class ConsumerCrew:
         )
     
     @agent
-    def treater(self) -> Agent:
-        return Agent(
-            config=self.agents_config["treater"],
-            tools=[rag_treatment_tool],
-            verbose=VERBOSE_AGENTS,
-        )
-    
-    @agent
     def writer(self) -> Agent:
         return Agent(
             config=self.agents_config["writer"],
@@ -90,21 +81,12 @@ class ConsumerCrew:
         )
     
     @task
-    def treat(self) -> Task:
-        return Task(
-            config=self.tasks_config["treat"],
-            agent=self.treater(),
-            output_key="treated_data",
-            context=[self.search_rag()],
-        )
-    
-    @task
     def write(self) -> Task:
         return Task(
             config=self.tasks_config["write_report"],
             agent=self.writer(),
             output_key="report_markdown",
-            context=[self.treat()],
+            context=[self.search_rag()],
         )
 
     @crew

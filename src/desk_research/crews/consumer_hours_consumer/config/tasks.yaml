@@ -3,13 +3,12 @@ search_rag:
     Busque informações no RAG do Asimov sobre as entrevistas Consumer Hours processadas.
     
     Use a ferramenta rag_search_tool para fazer perguntas sobre:
-    - Marcas mencionadas nas entrevistas relacionadas ao tema "{topic}"
-    - Temas principais discutidos relacionados ao tema "{topic}"
+    - O que dá pra afirmar sobre o tema "{topic}"
+    - O que não fica claro ou está ausente sobre "{topic}"
+    - Dados parciais que permitem suposições sobre "{topic}"
     - Sentimentos expressos sobre "{topic}"
-    - Momentos de consumo mencionados relacionados a "{topic}"
+    - padrões e tendências identificáveis sobre "{topic}"
     - Evidências e citações literais sobre "{topic}"
-    - Padrões e tendências identificáveis sobre "{topic}"
-    - Ausências e lacunas de informação sobre "{topic}"
     
     Faça múltiplas consultas ao RAG para consolidar informações sobre o tema "{topic}".
     Seja exaustivo na busca para garantir que todos os dados relevantes sejam coletados.
@@ -24,11 +23,13 @@ search_rag:
     
     Você DEVE:
     - Incluir TODOS os snippets (trechos reais) retornados em cada busca
+    - CONTAR e INFORMAR o número total de snippets coletados em todas as buscas
     - NUNCA parafrasear ou resumir os snippets - preserve o texto EXATO
     - NUNCA referenciar snippets por número (ex: "Snippet 1", "Snippet 2")
     - Use diretamente o CONTEÚDO do snippet (a citação real da entrevista)
     - Associar cada citação (conteúdo do snippet) à informação que ela suporta
     - No seu resumo consolidado, inclua os trechos literais das entrevistas (o texto real, não referências)
+    - Informar explicitamente a quantidade total de snippets (trechos) analisados
     
     Use os seguintes parâmetros para a ferramenta:
     - model: {model}
@@ -40,69 +41,19 @@ search_rag:
     - O que não fica claro ou está ausente sobre "{topic}"
     - Dados parciais que permitem suposições sobre "{topic}"
     - Para cada afirmação, inclua o trecho EXATO da entrevista que a suporta
+    - A quantidade total de snippets (trechos) analisados em todas as buscas realizadas
   expected_output: >
     Um resumo estruturado contendo todas as respostas do RAG especificamente sobre "{topic}":
-    - Marcas mencionadas em relação a "{topic}" (com trechos EXATOS das entrevistas)
-    - Temas relacionados a "{topic}" (com trechos EXATOS das entrevistas)
+    - O que dá pra afirmar sobre "{topic}" (com trechos EXATOS das entrevistas)
+    - O que não fica claro ou está ausente sobre "{topic}" (com trechos EXATOS das entrevistas)
+    - Dados parciais que permitem suposições sobre "{topic}" (com trechos EXATOS das entrevistas)
     - Sentimentos expressos sobre "{topic}" (com trechos EXATOS das entrevistas)
-    - Momentos de consumo relacionados a "{topic}" (com trechos EXATOS das entrevistas)
-    - Evidências literais sobre "{topic}" (trechos EXATOS, nunca paráfrases)
-    - Padrões identificados sobre "{topic}" (com trechos EXATOS que os demonstram)
-    - Lacunas e ausências de informação sobre "{topic}"
-    - Classificação do que pode ser afirmado vs. o que não fica claro sobre "{topic}"
-    - Para cada item acima, o trecho da entrevista que contém a informação
+    - Padrões e tendências identificáveis sobre "{topic}" (com trechos EXATOS das entrevistas)
+    - Evidências e citações literais sobre "{topic}" (com trechos EXATOS das entrevistas)
+    - Para cada item acima, o trecho real da entrevista que contém a informação
+    - A quantidade total de snippets (trechos de entrevistas) analisados
   agent: rag_searcher
 
-treat:
-  description: >
-    Trate e estruture os dados retornados pelo rag_searcher usando a ferramenta rag_treatment_tool.
-    
-    Use EXCLUSIVAMENTE o resultado da task anterior (search_rag) que está disponível no contexto.
-    NÃO invente ou suponha dados que não estejam no resultado do search_rag.
-    
-    Passe esse resultado completo para a ferramenta rag_treatment_tool com:
-    - rag_search_result: o resultado completo da task search_rag (disponível no contexto)
-    - topic: {topic}
-    
-    O tratamento deve:
-    - Consolidar informações de múltiplas respostas do RAG
-    - Organizar por temas, marcas, sentimentos, momentos
-    - Estruturar evidências literais EXATAS (preservar texto real, nunca parafrasear)
-    - PRESERVAR os snippets (trechos reais das entrevistas) retornados pelo RAG
-    - Associar cada afirmação ao snippet exato que a suporta
-    - Classificar informações em três categorias:
-      1. DÁ PARA AFIRMAR: evidências claras e suficientes com citações literais EXATAS dos snippets
-      2. NÃO FICA CLARO: ausência de dados ou informações contraditórias
-      3. ALGUMAS SUPOSIÇÕES: inferências baseadas em dados parciais (marcar claramente como suposição)
-    - Identificar implicações e significados ("ISSO SIGNIFICA QUE...")
-    - Preparar dados para o relatório executivo
-    
-    CRÍTICO - PRESERVAÇÃO DE SNIPPETS:
-    A ferramenta rag_treatment_tool extrai os snippets (trechos reais) do resultado do RAG.
-    Você DEVE garantir que:
-    - Todos os snippets sejam preservados no resultado tratado
-    - Cada snippet seja associado à informação que ele suporta
-    - Os snippets sejam estruturados de forma que o writer possa acessá-los facilmente
-    - NUNCA parafrasear snippets - use o texto exato retornado
-    - NUNCA referenciar snippets por número - use o CONTEÚDO (citação real) diretamente
-    - Estruture as citações pelo seu conteúdo textual, não por referências numéricas
-    
-    IMPORTANTE: Se não houver dados suficientes sobre algum aspecto do tema, declare explicitamente a ausência.
-    Não crie informações que não estejam no resultado do search_rag.
-    
-    Retorne dados estruturados e organizados que serão usados pelo writer.
-  expected_output: >
-    Dados tratados e estruturados contendo:
-    - Resumo consolidado por tema
-    - Lista de marcas com evidências (cada uma com o snippet exato que a suporta)
-    - Distribuição de sentimentos (com snippets exatos)
-    - Momentos de consumo organizados (com snippets exatos)
-    - Evidências literais EXATAS por categoria (snippets preservados integralmente)
-    - Classificação: DÁ PARA AFIRMAR / NÃO FICA CLARO / ALGUMAS SUPOSIÇÕES
-    - Implicações e significados identificados
-    - Declarações explícitas sobre ausência de dados quando aplicável
-    - Estrutura de snippets: cada afirmação deve ter associado o trecho exato da entrevista
-  agent: treater
 
 write_report:
   description: >
@@ -125,6 +76,7 @@ write_report:
     - NUNCA referenciar snippets por número (ex: "conforme Snippet 1", "segundo Snippet 2")
     - Use diretamente o CONTEÚDO da citação (o trecho real da entrevista) nas suas afirmações
     - Formato: apresente a citação diretamente, não como referência a um snippet numerado
+    - OBRIGATÓRIO: Sempre mencionar a quantidade total de snippets (trechos) analisados
 
     O relatório DEVE:
     - Responder diretamente ao tema "{topic}"
@@ -134,12 +86,13 @@ write_report:
     - Ser escrito em português (PT-BR)
     - Usar linguagem executiva, clara e precisa
     - Distinguir claramente entre afirmações, suposições e ausências
+    - SEMPRE mencionar a quantidade total de snippets (trechos de entrevistas) analisados
 
     ESTRUTURA OBRIGATÓRIA:
     1. Título (refletindo o tema "{topic}")
-    2. Resumo Executivo (resposta direta ao tema, síntese de padrões)
+    2. Resumo Executivo (resposta direta ao tema, síntese de padrões, OBRIGATORIAMENTE mencione a quantidade total de trechos analisados de entrevistas (snippets))
     3. Introdução e Contexto da Pesquisa
-    4. Metodologia (número de entrevistas, estrutura dos dados)
+    4. Metodologia (número de entrevistas, estrutura dos dados, quantidade total de snippets analisados)
     5. O QUE DÁ PARA AFIRMAR (com evidências literais e citações EXATAS dos snippets)
     6. O QUE NÃO FICA CLARO (ausências, contradições, dados insuficientes)
     7. ALGUMAS SUPOSIÇÕES (inferências baseadas em dados parciais - marcar claramente)
@@ -160,9 +113,12 @@ write_report:
     - NÃO invente dados que não estejam no treated_data (que vem do search_rag)
     - Se não houver dados sobre algum aspecto, declare: "Não há dados suficientes nas entrevistas para..."
     - Formato de citação: use aspas e apresente o trecho literal diretamente: "citação exata do snippet"
+    - OBRIGATÓRIO: O relatório deve sempre informar a quantidade total de snippets (trechos) analisados, preferencialmente no Resumo Executivo e na seção de Metodologia
   expected_output: >
     Relatório executivo em Markdown, rigoroso e orientado à resposta direta do tema "{topic}",
     contendo obrigatoriamente todas as seções listadas acima, com clara distinção entre
     o que pode ser afirmado, o que não fica claro, suposições e implicações.
     Todas as citações devem ser trechos EXATOS dos snippets, nunca paráfrases.
+    O relatório DEVE sempre mencionar a quantidade total de snippets (trechos de entrevistas) analisados,
+    preferencialmente no Resumo Executivo e na seção de Metodologia.
   agent: writer

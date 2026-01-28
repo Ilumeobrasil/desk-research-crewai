@@ -66,7 +66,7 @@ class RAGSearchTool(BaseTool):
 
             prompt_template = (
                 "Baseado nas informações abaixo, responda a pergunta. "
-                "Traga o trecho da entrevista que contém a informação."
+                "Traga o trecho real da entrevista que contém a afirmação."
                 "Se não souber, diga que não tem informação suficiente.\n\n"
                 "Informações: {context}\n\n"
                 "Pergunta: {query}\n\n"

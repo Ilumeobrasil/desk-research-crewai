@@ -138,7 +138,7 @@ synthesis_task:
     - X artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
     - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
     - Z entrevistas em profundidade realizadas entre Junho de 2024 e Outubro de 2024.
-    - Trechos de entrevistas Consumer Hours retiradas do RAG do Asimov.
+    - XY Trechos de entrevistas Consumer Hours retiradas do RAG do Asimov.
 
     ⚠️ Regras estritas:
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
