@@ -18,7 +18,7 @@ from desk_research.crews.integrated.integrated_analysis import IntegratedCrew
 from desk_research.utils.console_time import Console
 from desk_research.utils.reporting import export_report
 from desk_research.utils.logging_utils import safe_print
-from desk_research.constants import DEFAULT_MAX_PAPERS, MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW, IS_ACTIVE_ANALYSIS_INTEGRATED
+from desk_research.constants import DEFAULT_MAX_PAPERS, DEFAULT_MAX_WEB_RESULTS, MIN_APPROVAL_SCORE, MAX_RETRY_COUNT, DEFAULT_TOPIC, VERBOSE_CREW, IS_ACTIVE_ANALYSIS_INTEGRATED
 
 
 class DeskResearchFlow(Flow[DeskResearchState]):
@@ -43,7 +43,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
     def run_all_crews_parallel(self):
         """Executa todos os crews selecionados em paralelo"""
         
-        # Preparar tasks para execução paralela
         tasks = []
         
         if "academic" in self.state.selected_crews:
@@ -96,7 +95,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         """Executa o crew web"""
         result = WebCrewExecutor.run(
             topic=self.state.topic,
-            max_results=self.state.params.get('max_web_results', 5)
+            max_results=self.state.params.get('max_web_results', DEFAULT_MAX_WEB_RESULTS)
         )
         return result
     
@@ -116,7 +115,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         """Executa o crew Consumer Hours"""
         return ConsumerHoursCrewExecutor.run(topic=self.state.topic)
 
-    @listen(or_(run_all_crews_parallel, "retry_synthesis"))
+    @listen(or_(run_all_crews_parallel))
     def synthesize_report(self):
         if not self.state.results:
             return "no_reports"
@@ -153,7 +152,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @listen("direct_export")
     def export_directly(self):
-        """Exporta o relatório diretamente sem avaliação quando IS_ACTIVE_ANALYSIS_INTEGRATED = False"""
+        """Exporta o relatório"""
         return self._export_final()
         
     @staticmethod

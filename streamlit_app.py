@@ -380,6 +380,35 @@ st.markdown(
         justify-content: flex-start !important;
         align-items: flex-end !important;
     }
+
+    /* ===== Tooltip para citações Consumer Hours ===== */
+    .bubble .tooltip {
+        position: relative;
+        cursor: help;
+        text-decoration: underline;
+        color: #0066cc;
+    }
+    
+    .bubble .tooltip-text {
+        visibility: hidden;
+        position: absolute;
+        background: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        top: 100%;
+        left: 0;
+        white-space: normal;
+        width: 300px;
+        z-index: 1000;
+        font-size: 0.9em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        margin-top: 5px;
+    }
+    
+    .bubble .tooltip:hover .tooltip-text {
+        visibility: visible;
+    }
     </style>
     """,
     unsafe_allow_html=True

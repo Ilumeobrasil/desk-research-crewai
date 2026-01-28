@@ -158,7 +158,7 @@ synthesis_task:
     Exemplos válidos: (APENAS EXEMPLOS DE FORMATO)
     - X artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
     - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
-    - XY Trechos de entrevistas Consumer Hours retiradas do RAG do Asimov.
+    - XY Trechos de entrevistas Consumer Hours.
 
     ## REGRAS ESTRITAS:
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
@@ -198,7 +198,11 @@ synthesis_task:
         - exemplo: ([nome do site](https://www.site.com))
         - exemplo: ([nome do site academico](https://www.academic.com/pdf/paper.pdf))
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
-        - exemplo: ([Consumer Hours](trecho da entrevista))
+        - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024)</span></span>
+        - O formato deve usar tags HTML span com classes tooltip e tooltip-text:
+          - O texto visível deve estar dentro de: <span class="tooltip">(Citação)</span>
+          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível)</span>
+          - O tooltip-text deve estar aninhado dentro do tooltip
 
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
