@@ -193,11 +193,12 @@ synthesis_task:
     - Cada bullet deve conter:
       - o fato observado
       - o padrão ou relevância desse fato
-      - em caso de links, informar a fonte e url com hyperlink, precisa ser um link clicável e direto.
-        - exemplo: [nome do site](https://www.site.com)
-        - exemplo: [nome do academic](https://www.academic.com/pdf/paper.pdf)
+      - em caso de links, informar a fonte e url com hyperlink, precisa ser um link clicável e direto, dentro de parênteses após ponto final.
+      - Não tem que ser no formato "Fonte: xxxx". Pode ser só um hyperlink curto direto para a fonte, e entre parênteses após o ponto final. Para ter menos texto.
+        - exemplo: ([nome do site](https://www.site.com))
+        - exemplo: ([nome do site academico](https://www.academic.com/pdf/paper.pdf))
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
-        - exemplo: Consumer Hours (trecho da entrevista)
+        - exemplo: ([Consumer Hours](trecho da entrevista))
 
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
