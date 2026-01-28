@@ -172,11 +172,11 @@ synthesis_task:
       - o fato observado
       - o padrão ou relevância desse fato
       - em caso de links, informar a fonte e url com hyperlink
-        - exemplo: [siteX](url)
-        - exemplo: [academicX](url)
+        - exemplo: [nome do site](url)
+        - exemplo: [nome do academic](url)
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
         - exemplo: Consumer Hours (trecho da entrevista)
-        
+
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
     - Cada item DEVE indicar explicitamente:

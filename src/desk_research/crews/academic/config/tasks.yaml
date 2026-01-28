@@ -111,7 +111,9 @@ synthesize_report_task:
     - Se algum campo não puder ser preenchido, usar null ou deixar vazio.
     
   expected_output: >
-    Objeto AcademicReport contendo obrigatoriamente:
+    Se não houver papers, enviar um relatório vazio.
+
+    Mas se houver papers, enviar um objeto AcademicReport contendo obrigatoriamente:
 
     - tema: "{topic}"
     - introducao_geral (texto extenso e contextualizado)

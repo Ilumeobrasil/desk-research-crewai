@@ -32,10 +32,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
             self.state.selected_crews = self.inputs.get('selected_crews', self.state.selected_crews)
             self.state.params = self.inputs.get('params', self.state.params)
 
-        safe_print(f"📌 Tópico: {self.state.topic}")
-
         if not self.state.topic:
-            safe_print("⚠️  AVISO: Tópico vazio! Verifique os inputs.")
             self.state.topic = DEFAULT_TOPIC
 
         self.state.results = {}
@@ -70,7 +67,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         if not tasks:
             return "no_crews"
         
-        # Executar em paralelo
         with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
             future_to_crew = {
                 executor.submit(func): crew_name 
@@ -83,24 +79,26 @@ class DeskResearchFlow(Flow[DeskResearchState]):
                     result = future.result()
                     self.state.results[crew_name] = result
                 except Exception as e:
-                    safe_print(f"❌ Erro no {crew_name.upper()}: {e}")
+                    import traceback
                     self.state.results[crew_name] = f"Erro: {str(e)}"
         
         return "all_completed"
     
     def _run_academic_parallel(self):
         """Executa o crew acadêmico"""
-        return AcademicCrewExecutor.run(
+        result = AcademicCrewExecutor.run(
             topic=self.state.topic,
             max_papers=self.state.params.get('max_papers', DEFAULT_MAX_PAPERS)
         )
+        return result
     
     def _run_web_parallel(self):
         """Executa o crew web"""
-        return WebCrewExecutor.run(
+        result = WebCrewExecutor.run(
             topic=self.state.topic,
             max_results=self.state.params.get('max_web_results', 5)
         )
+        return result
     
     def _run_x_parallel(self):
         """Executa o crew X (Twitter)"""
@@ -156,7 +154,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
     @listen("direct_export")
     def export_directly(self):
         """Exporta o relatório diretamente sem avaliação quando IS_ACTIVE_ANALYSIS_INTEGRATED = False"""
-        print("export_directly", self.state.final_report)
         return self._export_final()
         
     @staticmethod
@@ -200,7 +197,6 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         try:
             master_report = self.state.final_report
             if not master_report:
-                safe_print("⚠️  AVISO: Relatório vazio. Nada a exportar.")
                 return ""
 
             export_report(master_report, self.state.topic, prefix="integrated_master", crew_name="integrated_analysis")
