@@ -226,12 +226,14 @@ class DeskResearchSystem:
 
     def executar_integrated(self, topic: str, selected_modos: list, params: dict) -> Dict[str, Any]:
         try:
-            flow = DeskResearchFlow()
             inputs = {
                 "topic": topic,
                 "selected_crews": selected_modos,
                 "params": params
             }
+
+            flow = DeskResearchFlow()
+            #flow.plot()
             final_result = flow.kickoff(inputs=inputs)
          
             return {

@@ -138,10 +138,7 @@ class DeskResearchFlow(Flow[DeskResearchState]):
         self.state.final_report = str(master_result)
         
         Console.time_end("SYNTHESIS_REPORT")
-        if IS_ACTIVE_ANALYSIS_INTEGRATED:
-            return "report_generated"
-        else:
-            return "report_generated_direct"
+        return "direct_export"
 
     def _build_reports_text(self) -> str:
         results_buffer = []
@@ -154,14 +151,12 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
     @router(synthesize_report)
     def route_after_synthesis(self):
-        """Roteia após síntese: avaliação ou exportação direta"""
-        if not IS_ACTIVE_ANALYSIS_INTEGRATED:
-            return "direct_export"
-        return "evaluate"
+        return "direct_export"
 
     @listen("direct_export")
     def export_directly(self):
         """Exporta o relatório diretamente sem avaliação quando IS_ACTIVE_ANALYSIS_INTEGRATED = False"""
+        print("export_directly", self.state.final_report)
         return self._export_final()
         
     @staticmethod
@@ -196,69 +191,10 @@ class DeskResearchFlow(Flow[DeskResearchState]):
 
         return crew_runner.kickoff(inputs=inputs)
 
-    @listen("evaluate")
-    def evaluate_report(self):
-        integ_crew = IntegratedCrew()
-        task = integ_crew.evaluation_task()
-        qa_crew = Crew(
-            agents=[integ_crew.evaluator_agent()],
-            tasks=[task],
-            verbose=VERBOSE_CREW
-        )
-        
-        reports_context = self._build_reports_text()
-        
-        inputs = {
-            "report_content": self.state.final_report,
-            "reports_context": reports_context
-        }
-
-        qa_result = qa_crew.kickoff(inputs=inputs)
-        
-        review = qa_result.pydantic or qa_result
-        score, feedback = self._extract_review_data(review)
-
-        if score >= MIN_APPROVAL_SCORE:
-            self.state.feedback = ""
-            return "approved"
-        else:
-            self.state.feedback = feedback
-            self.state.retry_count += 1
-            return "rejected"
-
     @staticmethod
     def _extract_review_data(review: Any) -> tuple[int, str]:
-        if hasattr(review, 'score'):
-            return review.score, review.feedback
         return 100, "Approved (Fallback)"
 
-    @router(evaluate_report)
-    def flow_control(self):
-        if self.state.retry_count > MAX_RETRY_COUNT:
-            return "max_retries"
-        
-        if self.state.feedback:
-            return "retry_synthesis"
-        
-        return "approved"
-
-    @listen("approved")
-    def finalize_approved(self):
-        return self._export_final()
-
-    @listen("max_retries")
-    def finalize_forced(self):
-        return self._export_final()
-
-    @listen("no_reports")
-    def handle_no_reports(self):
-        safe_print("❌ Não é possível gerar relatório sem dados dos crews.")
-        return "error"
-
-    @listen("rejected")
-    def retry_synthesis(self):
-        self._synthesis_executed = False
-        return "retry_synthesis"
 
     def _export_final(self):
         try:
