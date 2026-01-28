@@ -1,7 +1,4 @@
-import json
 import os
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -15,8 +12,6 @@ from desk_research.utils.reporting import export_report
 import logging
 
 logger = logging.getLogger(__name__)
-
-PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 DEFAULT_MODEL = "openai/gpt-4o"
 DEFAULT_TEMPERATURE = 0.3
