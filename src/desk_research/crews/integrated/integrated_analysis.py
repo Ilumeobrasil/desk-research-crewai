@@ -10,7 +10,7 @@ from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
 
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
-from desk_research.crews.consumer_hours.consumer_hours import run_consumer_hours_analysis
+from desk_research.crews.consumer_hours_consumer.consumer_hours import run_consumer_hours_analysis
 from desk_research.crews.genie.genie import run_genie_analysis
 from desk_research.crews.youtube.youtube import run_youtube_analysis
 from desk_research.crews.academic.academic import run_academic_research

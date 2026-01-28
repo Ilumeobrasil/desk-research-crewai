@@ -168,7 +168,20 @@ class RAG:
             msg = result_json["choices"][0].get("message") or {}
             content = msg.get("content")
 
-        return {"ok": True, "uuid": uuid, "done": done, "status_payload": status_payload, "result_json": result_json, "content": content}
+        # Extrai snippets e usage do resultado
+        snippets = result_json.get("snippets", [])
+        usage = result_json.get("usage", {})
+
+        return {
+            "ok": True,
+            "uuid": uuid,
+            "done": done,
+            "status_payload": status_payload,
+            "result_json": result_json,
+            "content": content,
+            "snippets": snippets,
+            "usage": usage,
+        }
 
 
 def get_rag_from_env() -> RAG:

@@ -1,0 +1,34 @@
+ingest:
+  description: >
+    Leia os arquivos .docx em {ingest_input_dir} (recursivo), extraia o texto integral,
+    aplique limpeza rigorosa removendo artefatos e resquícios desnecessários,
+    escreva arquivos .json em {ingest_output_dir} e envie o texto limpo para o Asimov em chunks.
+    
+    Use a ferramenta ingest_clean_folder_tool com:
+    - input_dir: {ingest_input_dir}
+    - output_dir: {ingest_output_dir}
+
+    IMPORTANTE: Esta ferramenta extrai, limpa, gera JSONs e envia o texto limpo para o Asimov.
+
+    A limpeza inclui:
+    - Remoção de artefatos de formatação (markdown, caracteres especiais)
+    - Normalização de espaços e quebras de linha
+    - Remoção de pontuação repetida excessiva
+    - Normalização de aspas e traços
+    - Preservação de timestamps e estrutura de diálogos
+
+    O envio ao Asimov:
+    - Divide o texto limpo em chunks de até 3500 caracteres
+    - Envia cada chunk com key no formato: uuid#chunk_01of30
+    - O texto é enviado diretamente sem tratamento semântico adicional
+
+    Retorne um resumo com contagem de arquivos processados, estatísticas de upload ao Asimov e avisos.
+  expected_output: >
+    Um resumo textual contendo:
+    - input_dir e output_dir efetivos
+    - quantidade de arquivos lidos
+    - quantidade de json escritos
+    - quantidade de arquivos com texto limpo com sucesso
+    - estatísticas de upload ao Asimov (chunks tentados, chunks enviados)
+    - lista curta de avisos (se houver)
+  agent: ingestor

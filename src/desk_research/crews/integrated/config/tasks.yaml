@@ -136,12 +136,14 @@ synthesis_task:
     Exemplo de formato:
     - [quantidade] [tipo de material] publicados/analisados/realizados entre [mês de ano] e [mês de ano];
 
-    Exemplos válidos:
-    - 5 artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
-    - 42 notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
-    - 18 entrevistas em profundidade realizadas entre Junho de 2024 e Outubro de 2024.
+    Exemplos válidos: (APENAS EXEMPLOS DE FORMATO)
+    - X artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
+    - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
+    - Z entrevistas em profundidade realizadas entre Junho de 2024 e Outubro de 2024.
+    - Trechos de entrevistas Consumer Hours retiradas do RAG do Asimov.
 
     ⚠️ Regras estritas:
+    - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
     - **Cada tipo de fonte de ser separado por uma nova bullet.**
     - **Não mencionar nomes de fontes, plataformas, instituições ou veículos.**
     - **Não incluir URLs ou referências externas nesta seção.**
