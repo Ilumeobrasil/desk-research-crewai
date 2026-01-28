@@ -40,7 +40,6 @@ synthesis_task:
       • qualificar o grau de confiança da resposta
       • ou explicitar limites que impedem uma resposta mais precisa ao tema
 
-
     ============================
     REGRAS DE EVIDÊNCIA (CRÍTICO)
     ============================
@@ -89,7 +88,6 @@ synthesis_task:
     - o tipo de dado (qualitativo ou quantitativo)
 
     Afirmações sem qualificador de escopo devem ser omitidas.
-
 
     ============================
     IDIOMA
@@ -174,7 +172,11 @@ synthesis_task:
       - o fato observado
       - o padrão ou relevância desse fato
       - em caso de links, informar a fonte e url com hyperlink
-
+        - exemplo: [siteX](url)
+        - exemplo: [academicX](url)
+      - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
+        - exemplo: Consumer Hours (trecho da entrevista)
+        
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
     - Cada item DEVE indicar explicitamente:
