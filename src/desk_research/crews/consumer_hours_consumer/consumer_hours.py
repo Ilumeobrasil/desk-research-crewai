@@ -70,9 +70,9 @@ class ConsumerCrew:
 
 def _get_task_inputs(topic: str) -> dict[str, Any]:
     return {
-        "model": os.getenv("MODEL", DEFAULT_MODEL),
-        "temperature": float(os.getenv("TEMPERATURE", str(DEFAULT_TEMPERATURE))),
-        "max_tokens": int(os.getenv("MAX_TOKENS", str(DEFAULT_MAX_TOKENS))),
+        "model": os.getenv("ASIMOV_DATASET_MODEL", DEFAULT_MODEL),
+        "temperature": float(str(DEFAULT_TEMPERATURE)),
+        "max_tokens": int(str(DEFAULT_MAX_TOKENS)),
         "topic": topic,
     }
 
