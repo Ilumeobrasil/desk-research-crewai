@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 import logging
 
@@ -6,7 +7,7 @@ from typing import Callable, Dict, Any, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pydantic import BaseModel, Field
-from crewai import Agent, Task, Crew, Process
+from crewai import LLM, Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
 
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
@@ -17,6 +18,9 @@ from desk_research.crews.academic.academic import run_academic_research
 from desk_research.crews.web.web import run_web_research
 from desk_research.crews.x.twitter_x_crew import run_twitter_social_listening
 from desk_research.utils.reporting import export_report
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -60,14 +64,22 @@ class IntegratedCrew:
     agents: List[Agent]
     tasks: List[Task]
 
+    llm = LLM(
+        model=os.getenv("MODEL"),
+        temperature=0.8,
+        base_url=os.getenv("OPENAI_API_BASE"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
     @agent
     def chief_editor_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['chief_editor_agent'],
+            config=self.agents_config["chief_editor_agent"],
             verbose=VERBOSE_AGENTS,
             allow_delegation=False,
             reasoning=True,
-            max_reasoning_attempts=3 
+            max_reasoning_attempts=3,
+            llm=self.llm
         )
 
     @agent
