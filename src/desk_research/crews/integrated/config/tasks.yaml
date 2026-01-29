@@ -200,10 +200,10 @@ synthesis_task:
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
         - iniciar a afirmação deixando claro que são entrevistas Consumer Hours, usando expressões como "Algumas entrevistas em profundidade com consumidores apontam que..." ou "Entrevistas Consumer Hours indicam que..."
         - não informar nomes de consumidores, apenas o trecho da entrevista.
-        - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024)</span></span>
+        - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024, Mulher, 47 anos, GO)</span></span>
         - O formato deve usar tags HTML span com classes tooltip e tooltip-text:
           - O texto visível deve estar dentro de: <span class="tooltip">(Citação)</span>
-          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível)</span>
+          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível, [gênero, idade, estado] se disponível)</span>
           - O tooltip-text deve estar aninhado dentro do tooltip
 
     ## NÃO FICA CLARO
