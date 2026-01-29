@@ -158,7 +158,7 @@ synthesis_task:
     Exemplos válidos: (APENAS EXEMPLOS DE FORMATO)
     - X artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
     - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
-    - XY Trechos de entrevistas Consumer Hours.
+    - XY entrevistas em profundidade com consumidores.
 
     ## REGRAS ESTRITAS:
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
@@ -199,6 +199,7 @@ synthesis_task:
         - exemplo: ([nome do site academico](https://www.academic.com/pdf/paper.pdf))
       - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
         - iniciar a afirmação deixando claro que são entrevistas Consumer Hours, usando expressões como "Algumas entrevistas em profundidade com consumidores apontam que..." ou "Entrevistas Consumer Hours indicam que..."
+        - não informar nomes de consumidores, apenas o trecho da entrevista.
         - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024)</span></span>
         - O formato deve usar tags HTML span com classes tooltip e tooltip-text:
           - O texto visível deve estar dentro de: <span class="tooltip">(Citação)</span>
@@ -220,11 +221,42 @@ synthesis_task:
       “não há dados suficientes”, “não fica claro”, “não é possível afirmar”
       sem explicitar exatamente O QUE falta ou entra em conflito.
 
-
     ## ALGUMAS SUPOSIÇÕES
-    - Hipóteses plausíveis não comprovadas, sempre com base observacional indicada.
-    - Cada suposição deve indicar explicitamente qual dado, tendência ou trecho das fontes observadas deu origem à hipótese.
-    - Suposições sem ancoragem observacional clara devem ser omitidas.
+
+    - Hipóteses plausíveis, **não comprovadas**, derivadas exclusivamente
+      de fatos observáveis previamente documentados.
+
+    - Nenhuma suposição pode ser apresentada sem:
+      - evidência empírica explícita
+      - fonte claramente identificada
+      - distinção inequívoca entre dado observado e hipótese proposta
+
+    - Não inferir causalidade, intencionalidade ou representatividade.
+      As suposições devem ser leituras possíveis, não explicações definitivas.
+
+    - Cada bullet deve conter obrigatoriamente:
+
+      1. **Fatos observados que sustentam a suposição**
+        - Devem seguir exatamente as mesmas regras do bloco **DÁ PARA AFIRMAR**
+        - Incluir fonte e hyperlink quando aplicável
+        - Para entrevistas Consumer Hours:
+          - incluir trecho exato da transcrição como evidência
+          - usar o mesmo formato de tooltip HTML
+
+      2. **Padrão ou recorrência observada**
+        - O que se repete, se acumula ou se destaca nos dados
+        - Sem interpretação causal
+
+      3. **Suposição derivada (explicitamente marcada como hipótese)**
+        - Deve deixar claro que se trata de uma leitura possível
+        - Usar expressões como:
+          - “Uma hipótese plausível, a partir desses dados, é que…”
+          - “Esses achados permitem levantar a suposição de que…”
+        - Não utilizar linguagem conclusiva ou prescritiva
+
+    - Suposições que não possam ser diretamente rastreadas
+      aos dados apresentados devem ser omitidas.
+
 
     ## ISSO SIGNIFICA QUE…
       - Apresente um resumo analítico neutro da resposta à pergunta.
