@@ -9,6 +9,7 @@ from crewai.project import CrewBase, agent, crew, task
 
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.ingestion_clean_tool import ingest_clean_folder_tool
+from desk_research.tools.extract_insights_tool import extract_insights_tool
 
 import logging
 
@@ -19,13 +20,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DATA_DIR = PROJECT_ROOT / "data"
 INPUT_RAW_DIR = DATA_DIR / "input_raw"
 OUTPUT_INGESTOR_DIR = DATA_DIR / "output_ingestor"
+OUTPUT_EXTRACTOR_DIR = DATA_DIR / "output_extractor"
 
 load_dotenv()
 
 @dataclass(frozen=True)
 class Paths:
     input_dir: str
-    output_dir: str
+    ingestor_output_dir: str
+    extractor_output_dir: str
 
 
 @dataclass(frozen=True)
@@ -35,12 +38,14 @@ class Settings:
 
 def get_settings() -> Settings:
     input_dir = os.getenv("INGESTOR_INPUT_DIR") or str(INPUT_RAW_DIR)
-    output_dir = os.getenv("INGESTOR_OUTPUT_DIR") or str(OUTPUT_INGESTOR_DIR)
+    ingestor_output_dir = os.getenv("INGESTOR_OUTPUT_DIR") or str(OUTPUT_INGESTOR_DIR)
+    extractor_output_dir = os.getenv("EXTRACTOR_OUTPUT_DIR") or str(OUTPUT_EXTRACTOR_DIR)
 
     return Settings(
         paths=Paths(
             input_dir=input_dir,
-            output_dir=output_dir
+            ingestor_output_dir=ingestor_output_dir,
+            extractor_output_dir=extractor_output_dir
         ),
     )
 
@@ -64,12 +69,29 @@ class IngestorCrew:
             verbose=VERBOSE_AGENTS,
         )
 
+    @agent
+    def extractor(self) -> Agent:
+        return Agent(
+            config=self.agents_config["extractor"],
+            tools=[extract_insights_tool],
+            verbose=VERBOSE_AGENTS,
+        )
+
     @task
     def ingest(self) -> Task:
         return Task(
             config=self.tasks_config["ingest"],
             agent=self.ingestor(),
             output_key="ingestion_result"
+        )
+
+    @task
+    def extract_insights(self) -> Task:
+        return Task(
+            config=self.tasks_config["extract_insights"],
+            agent=self.extractor(),
+            output_key="extraction_result",
+            context=[self.ingest()],
         )
 
     @crew
@@ -85,7 +107,9 @@ class IngestorCrew:
 def _get_task_inputs(settings: Settings) -> dict[str, Any]:
     return {
         "ingest_input_dir": settings.paths.input_dir,
-        "ingest_output_dir": settings.paths.output_dir,
+        "ingest_output_dir": settings.paths.ingestor_output_dir,
+        "ingestor_output_dir": settings.paths.ingestor_output_dir,
+        "extractor_output_dir": settings.paths.extractor_output_dir,
     }
 
 
@@ -93,7 +117,8 @@ def run_consumer_hours_ingestion() -> dict[str, Any]:
     settings = get_settings()
 
     _ensure_directory(settings.paths.input_dir)
-    _ensure_directory(settings.paths.output_dir)
+    _ensure_directory(settings.paths.ingestor_output_dir)
+    _ensure_directory(settings.paths.extractor_output_dir)
 
     crew_instance = IngestorCrew()
     crew = crew_instance.crew()
@@ -105,5 +130,6 @@ def run_consumer_hours_ingestion() -> dict[str, Any]:
         "ok": True,
         "result": str(result),
         "input_dir": settings.paths.input_dir,
-        "output_dir": settings.paths.output_dir,
+        "ingestor_output_dir": settings.paths.ingestor_output_dir,
+        "extractor_output_dir": settings.paths.extractor_output_dir,
     }

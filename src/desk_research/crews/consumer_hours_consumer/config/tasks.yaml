@@ -66,16 +66,31 @@ write_report:
     Use os dados consolidados do treated_data que contém informações estruturadas
     do RAG sobre as entrevistas Consumer Hours. Os dados vêm do resultado do search_rag.
 
-    CRÍTICO - USO DE SNIPPETS EXATOS:
+    CRÍTICO - USO DE SNIPPETS EXATOS COM DATA E QUOTA:
     O treated_data contém snippets (trechos EXATOS das entrevistas) que foram extraídos pelo RAG.
+    Cada snippet contém informações estruturadas incluindo:
+    - Citação literal do participante
+    - Informações demográficas (quota): nome, idade, região, classe social
+    - Data da entrevista (dataEntrevista)
+    - Marcas mencionadas
+    - Pergunta que gerou a resposta
+    - Insight extraído
+    
     Você DEVE:
     - Usar os snippets EXATOS nas citações, nunca parafrasear ou resumir
     - Para cada afirmação na seção "DÁ PARA AFIRMAR", inclua o snippet exato que a suporta
+    - OBRIGATÓRIO: Sempre incluir a DATA DA ENTREVISTA (dataEntrevista) quando apresentar uma citação
+    - OBRIGATÓRIO: Sempre incluir as INFORMAÇÕES DEMOGRÁFICAS (quota) quando apresentar uma citação:
+      * Nome do participante
+      * Idade
+      * Região/Estado
+      * Classe social
     - Preservar a linguagem original do entrevistado
     - Se um snippet estiver no treated_data, use-o literalmente nas citações
     - NUNCA referenciar snippets por número (ex: "conforme Snippet 1", "segundo Snippet 2")
     - Use diretamente o CONTEÚDO da citação (o trecho real da entrevista) nas suas afirmações
-    - Formato: apresente a citação diretamente, não como referência a um snippet numerado
+    - Formato de citação: apresente a citação diretamente com data e quota, não como referência a um snippet numerado
+      Exemplo: "citação exata" (Participante: Nome, Idade, Região, Classe Social - Data: YYYY-MM-DD)
     - OBRIGATÓRIO: Sempre mencionar a quantidade total de snippets (trechos) analisados
 
     O relatório DEVE:
@@ -106,19 +121,32 @@ write_report:
     REGRAS DE EVIDÊNCIA:
     - Toda afirmação na seção "DÁ PARA AFIRMAR" deve ter pelo menos uma citação literal EXATA de um snippet
     - Use o texto EXATO do snippet, nunca parafraseie ou resuma
+    - OBRIGATÓRIO: Toda citação DEVE incluir a DATA DA ENTREVISTA (dataEntrevista do snippet)
+    - OBRIGATÓRIO: Toda citação DEVE incluir as INFORMAÇÕES DEMOGRÁFICAS (quota do snippet):
+      * Nome do participante
+      * Idade
+      * Região/Estado
+      * Classe social
     - NUNCA referencie snippets por número - use diretamente o CONTEÚDO da citação
-    - Apresente a citação como trecho real da entrevista, não como referência a "Snippet X"
+    - Apresente a citação como trecho real da entrevista com data e quota, não como referência a "Snippet X"
+    - Formato de citação obrigatório: "citação exata do snippet" (Participante: Nome, Idade anos, Região, Classe Social - Data: YYYY-MM-DD)
     - Se faltar evidência, declare explicitamente na seção "NÃO FICA CLARO"
     - Suposições devem ser claramente marcadas como tal na seção "ALGUMAS SUPOSIÇÕES"
     - NÃO invente dados que não estejam no treated_data (que vem do search_rag)
     - Se não houver dados sobre algum aspecto, declare: "Não há dados suficientes nas entrevistas para..."
-    - Formato de citação: use aspas e apresente o trecho literal diretamente: "citação exata do snippet"
     - OBRIGATÓRIO: O relatório deve sempre informar a quantidade total de snippets (trechos) analisados, preferencialmente no Resumo Executivo e na seção de Metodologia
   expected_output: >
     Relatório executivo em Markdown, rigoroso e orientado à resposta direta do tema "{topic}",
     contendo obrigatoriamente todas as seções listadas acima, com clara distinção entre
     o que pode ser afirmado, o que não fica claro, suposições e implicações.
     Todas as citações devem ser trechos EXATOS dos snippets, nunca paráfrases.
+    OBRIGATÓRIO: Toda citação DEVE incluir a DATA DA ENTREVISTA e as INFORMAÇÕES DEMOGRÁFICAS (quota):
+    - Nome do participante
+    - Idade
+    - Região/Estado
+    - Classe social
+    - Data da entrevista (formato: YYYY-MM-DD)
+    Formato de citação: "citação exata" (Participante: Nome, Idade anos, Região, Classe Social - Data: YYYY-MM-DD)
     O relatório DEVE sempre mencionar a quantidade total de snippets (trechos de entrevistas) analisados,
     preferencialmente no Resumo Executivo e na seção de Metodologia.
   agent: writer

@@ -2,13 +2,13 @@ ingest:
   description: >
     Leia os arquivos .docx em {ingest_input_dir} (recursivo), extraia o texto integral,
     aplique limpeza rigorosa removendo artefatos e resquícios desnecessários,
-    escreva arquivos .json em {ingest_output_dir} e envie o texto limpo para o Asimov em chunks.
+    e escreva arquivos .json em {ingest_output_dir}.
     
     Use a ferramenta ingest_clean_folder_tool com:
     - input_dir: {ingest_input_dir}
     - output_dir: {ingest_output_dir}
 
-    IMPORTANTE: Esta ferramenta extrai, limpa, gera JSONs e envia o texto limpo para o Asimov.
+    IMPORTANTE: Esta ferramenta extrai, limpa e gera JSONs estruturados.
 
     A limpeza inclui:
     - Remoção de artefatos de formatação (markdown, caracteres especiais)
@@ -17,18 +17,62 @@ ingest:
     - Normalização de aspas e traços
     - Preservação de timestamps e estrutura de diálogos
 
-    O envio ao Asimov:
-    - Divide o texto limpo em chunks de até 3500 caracteres
-    - Envia cada chunk com key no formato: uuid#chunk_01of30
-    - O texto é enviado diretamente sem tratamento semântico adicional
-
-    Retorne um resumo com contagem de arquivos processados, estatísticas de upload ao Asimov e avisos.
+    Retorne um resumo com contagem de arquivos processados e avisos.
   expected_output: >
     Um resumo textual contendo:
     - input_dir e output_dir efetivos
     - quantidade de arquivos lidos
     - quantidade de json escritos
     - quantidade de arquivos com texto limpo com sucesso
-    - estatísticas de upload ao Asimov (chunks tentados, chunks enviados)
     - lista curta de avisos (se houver)
   agent: ingestor
+
+extract_insights:
+  description: >
+    Processe todos os arquivos JSON em {ingestor_output_dir} (gerados pelo ingestor)
+    para extrair pontos importantes de cada entrevista baseados em citações literais.
+    
+    Use a ferramenta extract_insights_tool com:
+    - ingestor_output_dir: {ingestor_output_dir}
+    - extractor_output_dir: {extractor_output_dir}
+    
+    A ferramenta irá executar em duas etapas:
+    
+    ETAPA 1 - Extração de Insights:
+    1. Ler cada JSON do ingestor em {ingestor_output_dir}
+    2. Analisar o texto da entrevista usando LLM
+    3. Extrair citações estruturadas com:
+       - Citação literal do entrevistado
+       - Pergunta do entrevistador que gerou a resposta
+       - Informações demográficas (nome, idade, região, classe social) - extraídas pela LLM
+       - Marcas mencionadas na citação
+       - Insight extraído
+    
+    4. Enriquecer o JSON original com campo "extracted_insights"
+    5. Salvar JSON enriquecido em {extractor_output_dir}
+    
+    ETAPA 2 - Envio para Asimov:
+    1. Ler todos os JSONs de {extractor_output_dir}
+    2. Para cada JSON, enviar insights para o Asimov em chunks:
+       - Chunk 1: Metadados do arquivo
+       - Chunks 2+: Citações individuais no formato especificado
+    3. Atualizar JSON com informações de upload ao Asimov
+    
+    IMPORTANTE:
+    - Preserve todos os dados originais do JSON
+    - Adicione apenas o campo "extracted_insights"
+    - Mantenha a estrutura UUID do arquivo original
+    - Processe todos os arquivos, mesmo que alguns falhem
+    - Cada citação deve ter pergunta, quota, marcaMencionada e insight
+    - Não reprocesse arquivos que já foram enviados ao Asimov com sucesso
+    
+  expected_output: >
+    Um resumo textual contendo:
+    - ingestor_output_dir e extractor_output_dir efetivos
+    - quantidade de arquivos JSON encontrados no ingestor
+    - quantidade de arquivos processados com sucesso
+    - quantidade de arquivos gerados em output_extractor
+    - estatísticas de upload ao Asimov (chunks tentados, chunks enviados)
+    - lista curta de avisos (se houver)
+    - estatísticas de processamento
+  agent: extractor
