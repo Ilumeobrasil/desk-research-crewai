@@ -9,12 +9,6 @@ synthesis_task:
     - Cada parágrafo deve integrar múltiplas evidências, explicitar padrões observáveis e reduzir ambiguidades, mantendo rastreabilidade às fontes..
 
     ============================
-    ENTRADAS DA TAREFA
-    ============================
-    - Relatórios brutos consolidados no bloco abaixo:
-      {reports_context}
-
-    ============================
     PROCESSO OBRIGATÓRIO
     ============================
     1. Leia integralmente todos os relatórios fornecidos.
@@ -65,19 +59,28 @@ synthesis_task:
       SÓ PODEM ser feitas se houver fonte quantitativa representativa explícita.
 
     ============================
-    RESTRIÇÃO LEXICAL (CRÍTICA):
+    RESTRIÇÃO LEXICAL AMPLIADA (CRÍTICA)
     ============================
 
-    É PROIBIDO utilizar termos como:
-    - "preferida"
-    - "líder"
-    - "predominante"
-    - "domina"
-    - "principal escolha"
+    É PROIBIDO utilizar termos ou construções que impliquem interpretação,
+    avaliação ou causalidade, incluindo (mas não se limitando a):
 
-    a menos que:
-    - a fonte citada seja quantitativa
-    - a base amostral e o recorte populacional estejam explícitos na fonte
+    - tendência
+    - movimento
+    - mudança cultural
+    - explicado por
+    - atribuído a
+    - impulsionado por
+    - reflexo de
+    - resultado de
+    - oportunidade
+    - impacto
+    - significativo
+    - relevante
+    - indica que (quando seguido de explicação causal)
+
+    Caso algum desses termos seja necessário, a frase DEVE ser reescrita
+    em formato puramente descritivo ou removida.
 
     ============================
     REGRA DE ESCOPO (OBRIGATÓRIA):
@@ -123,6 +126,24 @@ synthesis_task:
     - Sem justificativas metodológicas
     - Sem avaliação de qualidade das fontes
 
+    ============================
+    AUTO-CHECAGEM OBRIGATÓRIA (NÃO EXIBIR)
+    ============================
+
+    Antes de produzir a resposta final, você DEVE verificar internamente:
+    1. Se cada parágrafo pode ser lido sem responder "por quê?"
+    2. Se toda afirmação factual possui fonte explícita existente nos relatórios fornecidos.
+    3. Se termos avaliativos ou narrativos foram usados
+    4. Se alguma evidência internacional foi tratada como conclusão
+
+    Qualquer falha exige reescrita antes da entrega.
+
+    ============================
+    ENTRADAS DA TAREFA
+    ============================
+    - Relatórios brutos consolidados no bloco abaixo:
+      {reports_context}
+
   expected_output: >
     Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo, sem seções extras, renomeadas ou reordenadas:
     - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
@@ -163,10 +184,11 @@ synthesis_task:
     ## REGRAS ESTRITAS:
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
     - **Todas as fontes vindas de "web", se enquadram como "notícias e estudos".**
-    - **Cada tipo de fonte de ser separado por uma nova bullet.**
+    - **Todas as fontes vindas de "academic", se enquadram como "artigos acadêmicos".**
+    - **Todos os termos "snippets", são traduzidos para "entrevistas em profundidade".**
+    - **Todos os termos "Consumer hours", são traduzidos para "entrevistas em profundidade".**
     - **Não mencionar nomes de fontes, plataformas, instituições ou veículos.**
     - **Não incluir URLs ou referências externas nesta seção.**
-    - **Não descrever recortes analíticos ou resultados.**
     - **Não informar data caso a fonte não tenha período temporal explícito e informado.**
     - **Não informar dados que não sejam o tipo de material, a quantidade e o período analisado.**
     - **Se dentro do relatório fornecido, houver aviso de indisponibilidade de conteúdo, não cite nas fontes.**

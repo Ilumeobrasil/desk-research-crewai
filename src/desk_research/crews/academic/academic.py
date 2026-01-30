@@ -75,7 +75,7 @@ class AcademicResearchCrew:
                 openalex_search_tool,
                 semantic_scholar_tool
             ],
-            verbose=True,
+            verbose=VERBOSE_AGENTS,
             llm=self.llm_researcher,
         )
     
