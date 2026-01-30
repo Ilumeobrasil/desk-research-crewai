@@ -47,9 +47,9 @@ synthesis_task:
     - As fontes devem existir literalmente em {reports_context}.
     - Não invente, complete ou presuma dados ausentes.
     - Afirmações sem fonte não devem ser incluídas.
-    - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas
+    - Para fontes Entrevistas em profundidade: sempre incluir trechos reais das entrevistas
       como evidência, utilizando texto real das transcrições.
-    - Evidências qualitativas (ex.: Consumer Hours) NÃO PODEM ser usadas
+    - Evidências qualitativas (ex.: Entrevistas em profundidade) NÃO PODEM ser usadas
       para afirmar:
       • preferência populacional
       • liderança de mercado
@@ -171,7 +171,7 @@ synthesis_task:
     - **Não informar dados que não sejam o tipo de material, a quantidade e o período analisado.**
     - **Se dentro do relatório fornecido, houver aviso de indisponibilidade de conteúdo, não cite nas fontes.**
     - A menção específica a fontes ou links é permitida **apenas nos blocos analíticos**, exclusivamente como ilustração de afirmações.
-    - Para materiais do tipo Consumer Hours, a quantidade de entrevistados é obrigatória.
+    - Para materiais do tipo Entrevistas em profundidade, a quantidade de entrevistados é obrigatória.
 
     ─────────────────────────────────────────
 
@@ -181,7 +181,7 @@ synthesis_task:
     - NÃO inferir motivação, causalidade ou representatividade
     - Lista de afirmações objetivas e insights, cada uma com fonte e se possível url com hyperlink.
     - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
-    - Para fontes Consumer Hours: sempre incluir trechos reais das entrevistas como evidência,
+    - Para fontes Entrevistas em profundidade: sempre incluir trechos reais das entrevistas como evidência,
       utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
     - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
     - Esta seção deve conter apenas fatos observáveis ou estatísticos explicitamente declarados nas fontes.
@@ -197,14 +197,15 @@ synthesis_task:
       - Não tem que ser no formato "Fonte: xxxx". Pode ser só um hyperlink curto direto para a fonte, e entre parênteses após o ponto final. Para ter menos texto.
         - exemplo: ([nome do site](https://www.site.com))
         - exemplo: ([nome do site academico](https://www.academic.com/pdf/paper.pdf))
-      - em caso de entrevistas Consumer Hours, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
-        - iniciar a afirmação deixando claro que são entrevistas Consumer Hours, usando expressões como "Algumas entrevistas em profundidade com consumidores apontam que..." ou "Entrevistas Consumer Hours indicam que..."
+      - em caso de Entrevistas em profundidade, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
+        - iniciar a afirmação deixando claro que são Entrevistas em profundidade, usando expressões como "Algumas entrevistas em profundidade com consumidores apontam que..." ou "Entrevistas em profundidade indicam que..."
         - não informar nomes de consumidores, apenas o trecho da entrevista.
         - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024, Mulher, 47 anos, GO)</span></span>
         - O formato deve usar tags HTML span com classes tooltip e tooltip-text:
           - O texto visível deve estar dentro de: <span class="tooltip">(Citação)</span>
-          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível, [gênero, idade, estado] se disponível)</span>
+          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível, [informações de quota: gênero, idade, estado, classe social] apenas se disponíveis)</span>
           - O tooltip-text deve estar aninhado dentro do tooltip
+          - IMPORTANTE: Informar informações de quota (gênero, idade, estado, classe social) APENAS quando estiverem disponíveis no snippet. Se não houver quota disponível, incluir apenas a data (quando disponível) ou apenas o trecho da transcrição.
 
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
@@ -239,7 +240,7 @@ synthesis_task:
       1. **Fatos observados que sustentam a suposição**
         - Devem seguir exatamente as mesmas regras do bloco **DÁ PARA AFIRMAR**
         - Incluir fonte e hyperlink quando aplicável
-        - Para entrevistas Consumer Hours:
+        - Para Entrevistas em profundidade:
           - incluir trecho exato da transcrição como evidência
           - usar o mesmo formato de tooltip HTML
 

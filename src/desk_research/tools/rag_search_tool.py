@@ -80,15 +80,14 @@ class RAGSearchTool(BaseTool):
             
             # Informações demográficas
             if quota:
-                nome = quota.get("nome", "Não informado")
                 idade = quota.get("idade", "Não informado")
                 regiao = quota.get("regiao", "Não informado")
                 classe = quota.get("classeSocial", "Não informado")
-                info += f"Participante: {nome} ({idade}) - {regiao} - Classe {classe}\n"
+                info += f"Participante: {idade} - {regiao} - Classe {classe}\n"
             
-            # Data da entrevista
-            if parsed.get("dataEntrevista"):
-                info += f"Data da entrevista: {parsed.get('dataEntrevista')}\n"
+            # Data da entrevista - SEMPRE incluir (obrigatório)
+            data_entrevista = parsed.get("dataEntrevista", "Não informado")
+            info += f"Data da entrevista: {data_entrevista}\n"
             
             # Marcas mencionadas
             if marcas:
@@ -136,20 +135,20 @@ class RAGSearchTool(BaseTool):
                     "error": "Dataset não fornecido e ASIMOV_DATASET não configurado no ambiente."
                 }, ensure_ascii=False)
 
-            # Prompt melhorado para aproveitar a estrutura dos snippets
             prompt_template = (
                 "Você é um analista especializado em entrevistas qualitativas do Consumer Hours. "
                 "Baseado nas informações estruturadas abaixo (citações de entrevistas com metadados), "
                 "responda a pergunta de forma precisa e detalhada.\n\n"
                 "Cada snippet pode conter:\n"
                 "- Citações literais dos participantes\n"
-                "- Informações demográficas (nome, idade, região, classe social)\n"
+                "- Informações demográficas (idade, região, classe social)\n"
                 "- Marcas mencionadas\n"
                 "- Perguntas que geraram as respostas\n"
                 "- Insights extraídos\n"
-                "- Datas das entrevistas\n\n"
+                "- Data da entrevista (OBRIGATÓRIA - sempre presente)\n\n"
                 "Use essas informações estruturadas para dar uma resposta completa e fundamentada. "
                 "Sempre cite as informações demográficas e marcas quando relevante. "
+                "SEMPRE inclua a data da entrevista quando disponível. "
                 "Se não souber, diga que não tem informação suficiente.\n\n"
                 "Informações estruturadas: {context}\n\n"
                 "Pergunta: {query}\n\n"
@@ -163,7 +162,8 @@ class RAGSearchTool(BaseTool):
                         "Você é um analista especializado em entrevistas qualitativas de Consumer Hours. "
                         "Você analisa citações estruturadas com informações demográficas, marcas mencionadas, "
                         "perguntas e insights para responder perguntas sobre comportamento do consumidor, "
-                        "percepções de marcas, preferências e tendências."
+                        "percepções de marcas, preferências e tendências. "
+                        "SEMPRE inclua a data da entrevista quando disponível nas suas respostas."
                     )
                 },
                 {
@@ -191,7 +191,7 @@ class RAGSearchTool(BaseTool):
                 
                 response_text = (
                     f"RESPOSTA DO RAG:\n{content}\n\n"
-                    f"SNIPPETS USADOS COMO CONTEXTO ({len(snippets)} snippets encontrados):"
+                    f"SNIPPETS USADOS COMO CONTEXTO ({snippets} snippets encontrados):"
                 )
                 
                 for idx, snippet in enumerate(snippets, 1):
