@@ -1,16 +1,36 @@
 import datetime
-from crewai import Agent, Crew, Process, Task
+import os
+from crewai import LLM, Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from dotenv import load_dotenv
 from desk_research.constants import VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.research_tools import google_search_tool, web_scraper_tool, url_validator_tool
 from desk_research.utils.console_time import Console
 from desk_research.utils.extract_urls_from_markdown import extract_urls_from_markdown
 from desk_research.utils.reporting import export_report
 
+load_dotenv()
+
 @CrewBase
 class WebCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
+
+    llm_web_researcher = LLM(
+        model=os.getenv("MODEL"),
+        temperature = 0.0,
+        top_p = 1.0,
+        base_url=os.getenv("OPENAI_API_BASE"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
+    llm_web_report = LLM(
+        model=os.getenv("MODEL"),
+        temperature=0.4,
+        top_p = 1.0,
+        base_url=os.getenv("OPENAI_API_BASE"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
 
     @agent
     def web_researcher_url(self) -> Agent:
@@ -20,7 +40,8 @@ class WebCrew:
                 google_search_tool,
                 url_validator_tool
             ],
-            verbose=VERBOSE_AGENTS
+            verbose=VERBOSE_AGENTS,
+            llm=self.llm_web_researcher,
         )
 
     @agent
@@ -29,7 +50,8 @@ class WebCrew:
             config=self.agents_config['web_report_writer'],
             verbose=VERBOSE_AGENTS,
             reasoning=True,
-            max_reasoning_attempts=3 
+            max_reasoning_attempts=3,
+            llm=self.llm_web_report,
         )
 
     @task
@@ -59,7 +81,7 @@ class WebCrew:
         )
 
 
-def _extract_content_from_urls(urls: list[str], max_chars: int = 3000) -> str:
+def _extract_content_from_urls(urls: list[str], max_chars: int = 4000) -> str:
     """Extrai conteúdo de cada URL e retorna em formato markdown"""
     extracted_contents = []
     
@@ -110,7 +132,7 @@ def _extract_content_from_urls(urls: list[str], max_chars: int = 3000) -> str:
 
 def run_web_research(query: str, max_results: int = 10):
     Console.time("RUN_WEB_RESEARCH")
-    
+
     try:    
         inputs = {
             'query': query,
@@ -142,7 +164,7 @@ def run_web_research(query: str, max_results: int = 10):
         if not urls:
             return None
         
-        extracted_content = _extract_content_from_urls(urls, max_chars=3000)
+        extracted_content = _extract_content_from_urls(urls, max_chars=3500)
     
         consolidation_task = crew_instance.evidence_consolidation_task()
         

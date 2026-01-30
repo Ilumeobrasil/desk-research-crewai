@@ -87,50 +87,83 @@
        
 synthesize_report_task:
   description: >
-    Produzir um relatório acadêmico completo e formal a partir das análises
-    individuais dos papers, organizando grandes volumes de informação técnica
-    sem perda de profundidade, dados ou nuances metodológicas.
+    Consolidar evidências textuais LITERAIS a partir de papers acadêmicos
+    já extraídos (PDFs), preservando ALTA DENSIDADE e GRANDE VOLUME
+    de informação textual, com máxima fidelidade ao texto original.
 
-    CONTEXTO:
-    Este relatório será utilizado posteriormente por outros sistemas para
-    sumarização e reinterpretação. Portanto, a preservação integral do conteúdo
-    original é obrigatória. Porem se nao houver papers enviados, enviar um relatório vazio.
+    ESTA TASK NÃO RESPONDE À PERGUNTA "{topic}".
+    Ela NÃO realiza análise, síntese, interpretação, comparação
+    ou conclusões.
 
-    PROCESSO OBRIGATÓRIO:
-    1. Utilizar o texto completo gerado pelo Analista de Literatura.
-    2. NÃO resumir, condensar ou reescrever análises técnicas extensas.
-    3. Para cada paper, extrair o resumo/abstract COMPLETO (mínimo 1000 caracteres):
-      - Buscar o resumo no texto analisado pelo Analista de Literatura
-      - Se não encontrar explicitamente, usar a seção "Introdução e Contexto" como base
-      - NUNCA usar textos genéricos ou placeholders como "Resumo disponível no link"
-      - O resumo deve ser informativo e descrever o conteúdo real do paper
-      - O resumo deve ser denso e informativo, não deve ser um resumo superficial.
-    4. Organizar o conteúdo em uma estrutura acadêmica clara e coerente.
-    5. Garantir consistência entre autores, anos, métodos e conclusões.
-    6. Documentar explicitamente limitações, lacunas e dificuldades encontradas.
+    O objetivo é gerar uma BASE DE EVIDÊNCIAS EXTENSA,
+    volumosa e auditável, mesmo que o resultado fique longo
+    e repetitivo.
 
-    RESTRIÇÕES CRÍTICAS:
-    - Textos curtos ou superficiais invalidam a tarefa.
-    - Se houver incerteza, optar por manter mais informação, não menos.
-    - Se algum campo não puder ser preenchido, usar null ou deixar vazio.
-    
+    REGRAS ABSOLUTAS (CRÍTICO):
+
+    1. TODO o texto apresentado DEVE ser literal ou quase literal
+       (copiado diretamente do texto extraído dos PDFs).
+    2. É ESTRITAMENTE PROIBIDO:
+       - Resumir
+       - Parafrasear
+       - Reescrever
+       - Generalizar
+       - Criar frases explicativas
+       - Reduzir volume por “boa leitura”
+    3. O agente NÃO pode decidir que “já é suficiente”.
+       O critério é QUANTIDADE, não elegância.
+    4. Cada evidência DEVE ser atribuída explicitamente ao paper.
+    5. Texto que não possa ser localizado no PDF via Ctrl+F
+       é considerado ERRO.
+
+    DEFINIÇÃO DE TEXTO LITERAL:
+    - Copiar palavra por palavra
+    - Manter ordem, pontuação e vocabulário
+    - Cortes só com "..."
+    - Nunca reescrever para clareza
+
+    REGRAS DE VOLUME OBRIGATÓRIO (ESSENCIAL):
+
+    6. PARA CADA PAPER, extrair O MÁXIMO POSSÍVEL de conteúdo relevante.
+    7. MÍNIMOS OBRIGATÓRIOS POR PAPER:
+       - Pelo menos 8 BLOCOS DE EVIDÊNCIA
+       - Cada bloco com:
+         • no mínimo 2 parágrafos completos OU
+         • no mínimo 10 frases consecutivas
+    8. Os blocos DEVEM estar distribuídos ao longo do texto:
+       - início
+       - meio
+       - final
+    9. NÃO interromper a extração após encontrar bons trechos.
+       Continuar até que a maior parte do conteúdo relevante
+       tenha sido copiada.
+
+    ESTRATÉGIA DE EXTRAÇÃO:
+
+    - Priorizar parágrafos completos
+    - Incluir metodologia, resultados, discussão e conclusões
+    - Repetição de informações é PERMITIDA
+    - Não deduplicar
+    - Na dúvida, copiar blocos MAIORES
+
+    O agente deve se comportar como um
+    EXTRATOR AUTOMÁTICO DE TEXTO,
+    não como um analista humano.
+
   expected_output: >
-    Se não houver papers, enviar um relatório vazio.
+    Documento em markdown contendo EXCLUSIVAMENTE evidências textuais
+    extraídas dos papers, SEM QUALQUER seção de análise, resumo
+    ou interpretação.
 
-    Mas se houver papers, enviar um objeto AcademicReport contendo obrigatoriamente:
+    ESTRUTURA OBRIGATÓRIA:
 
-    - tema: "{topic}"
-    - introducao_geral (texto extenso e contextualizado)
-    - papers (lista completa com análises profundas de cada paper)
-    - analise_comparativa_completa (cruzamento detalhado entre os papers)
-    - insights
-    - tendencias_identificadas
-    - gaps_pesquisa
-    - metodologias_predominantes
-    - conclusoes
-    - recomendacoes
-    - limitacoes
+    ## Título do Paper
+    # URL:
+    # Ano de Publicação:
+    # Tipo da Fonte: acadêmica
 
-    Ao final, incluir a seção:
-    "## Referências Bibliográficas"
-    listando Título completo e URL de todos os papers analisados.
+    Conteúdo:
+      - Bloco literal 1 (extenso)
+      - Bloco literal 2 (extenso)
+      - Bloco literal 3 (extenso)
+      - ...

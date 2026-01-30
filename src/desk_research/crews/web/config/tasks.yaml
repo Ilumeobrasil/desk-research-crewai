@@ -31,73 +31,32 @@ search_web_urls:
     - Status de validação (Válida / Inválida)
     - Tipo aparente da fonte (ex: institucional, governamental, mídia, acadêmica, desconhecida)
 
-#desativada por enquanto
-extract_web_content:
-  description: >
-    Extrair conteúdo textual bruto das URLs fornecidas.
-
-    ESTA TASK NÃO RESPONDE À PERGUNTA '{query}'.
-    Ela apenas coleta texto original das fontes.
-
-    PROCEDIMENTO OBRIGATÓRIO:
-    1. Utilizar `web_scraper_tool` para CADA URL recebida.
-    2. Extrair o conteúdo completo da página.
-    3. Preservar linguagem original, números, datas e termos técnicos.
-
-    EXTRAÇÃO (CRÍTICO):
-    - Copiar o conteúdo completo da página.
-    - NÃO reescrever para clareza.
-    - NÃO conectar ideias.
-
-    USO DE FERRAMENTA (CONTRATO OBRIGATÓRIO):
-    - O campo "Texto bruto extraído" DEVE conter exclusivamente o texto retornado pelo `web_scraper_tool`.
-    - É PROIBIDO editar, reordenar, resumir, reescrever ou “apresentar” o texto após a extração.
-    - Qualquer modificação textual após o scraping é considerada ERRO.
-
-    FORMATO DO TEXTO EXTRAÍDO:
-    - O texto deve aparecer como um BLOCO CONTÍNUO.
-    - Não adicionar frases introdutórias.
-    - Não adicionar marcadores explicativos.
-    - Não adicionar observações, notas ou comentários.
-
-    PROIBIÇÕES ABSOLUTAS:
-    - NÃO interpretar dados.
-    - NÃO tirar conclusões.
-    - NÃO responder à pergunta '{query}'.
-  
-  expected_output: >
-    Documento em markdown contendo uma seção por URL.
-
-    Cada seção DEVE conter:
-    - Título da página (extraído da página)
-    - URL
-    - Data de publicação
-
-    ### Conteúdo extraído
-    BLOCO DE TEXTO CONTÍNUO retornado pelo web_scraper_tool,
-    sem qualquer modificação linguística.
 
 evidence_consolidation_task:
   description: >
     Consolidar evidências factuais a partir de conteúdos web já extraídos,
-    preservando ALTA DENSIDADE de informação e máxima fidelidade textual.
+    preservando ALTA DENSIDADE, GRANDE VOLUME de informação
+    e máxima fidelidade textual às fontes originais.
 
-    ESTA TASK NÃO RESPONDE À PERGUNTA '{query}'.
-    Ela NÃO realiza análise, síntese, interpretação ou conclusões.
+    ESTA TASK NÃO RESPONDE À PERGUNTA "{query}".
+    Ela NÃO realiza análise, síntese, interpretação, contextualização
+    ou conclusões.
 
-    O objetivo é criar uma BASE DE EVIDÊNCIAS DENSA,
-    granular e rastreável, que sirva de insumo direto
-    para um relatório analítico posterior.
+    O objetivo é construir uma BASE DE EVIDÊNCIAS EXTENSA,
+    granular, rastreável e auditável, que sirva como insumo direto
+    para relatórios analíticos posteriores, mesmo que o resultado
+    seja longo, repetitivo ou pouco “agradável de ler”.
 
     REGRAS ABSOLUTAS (CRÍTICO):
 
     1. TODO o texto apresentado DEVE ser literal ou quase literal
-       (copiado das fontes extraídas).
-    2. É PROIBIDO:
+       (copiado diretamente das fontes extraídas).
+    2. É ESTRITAMENTE PROIBIDO:
        - Resumir parágrafos
        - Parafrasear ideias
        - Generalizar informações
-       - Criar frases explicativas
+       - Criar frases explicativas ou introdutórias
+       - Reescrever frases com sinônimos
        - Unificar dados de fontes diferentes em uma única frase
     3. Cada evidência DEVE ser atribuída explicitamente à sua fonte.
     4. O agente NÃO pode:
@@ -105,43 +64,51 @@ evidence_consolidation_task:
        - Comparar dados entre fontes
        - Avaliar relevância
        - Reduzir volume para “melhor leitura”
+       - Decidir que “já há informação suficiente”
     5. DEFINIÇÃO DE TEXTO LITERAL:
-      - O conteúdo deve ser copiado palavra por palavra da fonte original,
-        exceto por cortes explícitos com "..."
-      - É PROIBIDO reescrever frases com sinônimos.
-      - É PROIBIDO criar frases introdutórias ou jornalísticas.
-      - Todo parágrafo deve soar como texto publicado, não como resumo.
-    6. CADA evidência deve conter:
-      - No mínimo 1 parágrafo completo da fonte
-      - Preferencialmente 3 ou mais parágrafos consecutivos
-      - Se o parágrafo tiver mais de 3 frases, ele NÃO pode ser reduzido
+       - O conteúdo deve ser copiado palavra por palavra da fonte original
+       - Cortes são permitidos APENAS com "..." explícito
+       - É proibido alterar ordem, vocabulário ou pontuação
+       - Todo parágrafo deve soar como texto publicado, não como resumo
+    6. CADA evidência DEVE conter:
+       - No mínimo 1 parágrafo completo da fonte
+       - Preferencialmente 2 ou mais parágrafos consecutivos
+       - Parágrafos longos NÃO podem ser encurtados
     7. SAÍDAS CONSIDERADAS INCORRETAS:
-      - Frases genéricas do tipo “pesquisas indicam…”
-      - Parágrafos com menos de 2 frases
-      - Uso excessivo de reticências
-      - Conteúdo que soe como resumo ou lead jornalístico
+       - Frases genéricas do tipo “pesquisas indicam…”
+       - Parágrafos isolados com menos de 2 frases
+       - Uso excessivo de reticências
+       - Texto claramente reescrito ou interpretativo
 
     ESTRATÉGIA OBRIGATÓRIA DE ALTA DENSIDADE:
 
     - Priorizar EXTRAÇÃO DE PARÁGRAFOS COMPLETOS
+    - Percorrer o conteúdo sequencialmente (início → fim)
+    - Cobrir diferentes partes do texto (início, meio e final)
     - Manter números, percentuais, datas, nomes próprios e citações
     - Quando necessário cortar texto, usar "..." explicitamente
     - Repetição de informações ENTRE fontes é PERMITIDA
       (não deduplicar)
+    - Na dúvida, incluir MAIS texto, não menos
+
   expected_output: >
-    Documento em markdown contendo exclusivamente evidências textuais
+    Documento em markdown contendo EXCLUSIVAMENTE evidências textuais
     extraídas das fontes, SEM QUALQUER seção de conclusão, resumo,
     interpretação ou recomendação.
-    - Não deve conter vestigios de markdown, como ```markdown, ```, etc. (OBRIGATÓRIO)
 
-    A estrutura deve ser:
+    NÃO utilizar blocos de código nem marcadores de markdown extras
+    (ex: ```markdown, ```).
+
+    A estrutura DEVE ser exatamente:
 
     ## Nome da Fonte
     # URL:
     # Data de Publicação:
-      - obrigatoriamente deve ser a data da publicação da noticia, o contexto recebido sempre retorna o campo "Data de Publicação"
-    # Tipo da fonte (jornalística, institucional, acadêmica, blog opinativo, marketing, etc.)
+      - obrigatoriamente a data original da publicação
+    # Tipo da Fonte (jornalística, institucional, acadêmica, blog, etc.)
+
     Conteúdo:
       - Parágrafo literal 1
       - Parágrafo literal 2
+      - Parágrafo literal 3
       - ...

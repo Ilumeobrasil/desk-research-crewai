@@ -1,4 +1,5 @@
 ﻿import logging
+import os
 import re
 from desk_research.constants import DEFAULT_MAX_PAPERS, VERBOSE_AGENTS, VERBOSE_CREW
 from desk_research.tools.pdf_analyzer import pdf_analyzer_tool
@@ -14,7 +15,6 @@ from desk_research.tools.research_tools import (
     serper_scholar_tool,
     openalex_search_tool,
 )
-from desk_research.models.academic_models import AcademicReport
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -50,6 +50,22 @@ class AcademicResearchCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
+    llm_researcher = LLM(
+        model=os.getenv("MODEL"),
+        temperature = 0.0,
+        top_p = 1.0,
+        base_url=os.getenv("OPENAI_API_BASE"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
+    llm_report = LLM(
+        model=os.getenv("MODEL"),
+        temperature=0.6,
+        top_p = 1.0,
+        base_url=os.getenv("OPENAI_API_BASE"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
     @agent
     def academic_researcher(self) -> Agent:
         return Agent(
@@ -59,7 +75,8 @@ class AcademicResearchCrew:
                 openalex_search_tool,
                 semantic_scholar_tool
             ],
-            verbose=VERBOSE_AGENTS,
+            verbose=True,
+            llm=self.llm_researcher,
         )
     
     @agent
@@ -69,7 +86,8 @@ class AcademicResearchCrew:
             tools=[],
             verbose=VERBOSE_AGENTS,
             reasoning=True,
-            max_reasoning_attempts=3 
+            max_reasoning_attempts=3,
+            llm=self.llm_report,
         )
     
     @task
@@ -307,30 +325,38 @@ def run_academic_research(topic: str, max_papers: int = 3) -> dict:
         search_output = search_result.tasks_output[0].raw
     
     pdf_urls = _extract_pdf_urls_from_output(search_output)
+
+    pdf_urls_sliced = pdf_urls[:DEFAULT_MAX_PAPERS]
     
-    if not pdf_urls:
-        pdf_content = ""
+    if pdf_urls_sliced:
+        pdf_contents = _extract_content_from_pdfs(pdf_urls_sliced, max_chars=30000)
     else:
-        pdf_content = _extract_content_from_pdfs(pdf_urls, max_chars=4000)
-        
+        pdf_contents = []
+
+    extracted_material = {
+        "pdfs": [
+            {
+                "url": url,
+                "content": content
+            }
+            for url, content in zip(pdf_urls_sliced, pdf_contents)
+        ],
+            "search_output": search_output
+    }
+
     synthesize_task = crew_instance.synthesize_report_task()
-    
-    modified_synthesize_task = Task(
-        description=f"{synthesize_task.description}\n\n=== CONTEÚDO EXTRAÍDO DOS PDFs ===\n\n{pdf_content}\n\n=== RESULTADO DA BUSCA DE PAPERS ===\n\n{search_output}",
-        agent=synthesize_task.agent,
-        expected_output=synthesize_task.expected_output
-    )
     
     synthesize_crew = Crew(
         agents=[crew_instance.academic_synthesizer()],
-        tasks=[modified_synthesize_task],
+        tasks=[synthesize_task],
         process=Process.sequential,
         verbose=VERBOSE_CREW
     )
     
     result = synthesize_crew.kickoff(inputs={
-        'topic': topic,
-        'max_papers': max_papers
+        "topic": topic,
+        "max_papers": max_papers,
+        "extracted_material": extracted_material
     })
     
     try:
