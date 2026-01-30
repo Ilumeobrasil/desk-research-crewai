@@ -1,12 +1,45 @@
 synthesis_task:
   description: >
-    Sua tarefa é sintetizar múltiplos relatórios de pesquisa independentes
-    sobre o tema: "{topic}", produzidos por diferentes fontes.
+    Sua tarefa é sintetizar múltiplos relatórios de pesquisa independentes sobre o tema: "{topic}", 
+    produzidos por diferentes fontes. Este relatório será utilizado como insumo estratégico para 
+    tomada de decisão executiva.
 
-    Este relatório será utilizado como insumo estratégico para tomada
-    de decisão executiva. 
-    O valor esperado não está em repetição ou prolixidade, mas em densidade analítica:
-    - Cada parágrafo deve integrar múltiplas evidências, explicitar padrões observáveis e reduzir ambiguidades, mantendo rastreabilidade às fontes..
+    ============================
+    PRINCÍPIO DA DENSIDADE MÁXIMA (CRÍTICO)
+    ============================
+    
+    Este relatório deve EXTRAIR O MÁXIMO das fontes fornecidas, não o mínimo.
+
+    MENTALIDADE CORRETA:
+    - "Tenho 50 páginas de dados → como aproveitar ao máximo?"
+    - NÃO: "Tenho 50 páginas → como resumir em 2 parágrafos?"
+
+    O valor esperado não está em resumo breve ou síntese superficial, mas em DENSIDADE ANALÍTICA:
+    - Cada parágrafo deve integrar múltiplas evidências
+    - Cada parágrafo deve explicitar padrões observáveis com dados específicos
+    - Cada parágrafo deve reduzir ambiguidades mantendo rastreabilidade às fontes
+    - Priorizar PROFUNDIDADE sobre brevidade
+
+    DENSIDADE ESPERADA POR SEÇÃO:
+    - SÍNTESE EXECUTIVA: 3-5 parágrafos densos (mínimo 800 palavras, 4-8 linhas por parágrafo)
+    - DÁ PARA AFIRMAR: 10-15 bullets detalhados (mínimo 1500 palavras, 4-7 linhas por bullet)
+    - NÃO FICA CLARO: 5-8 lacunas bem documentadas (mínimo 500 palavras)
+    - ALGUMAS SUPOSIÇÕES: 5-8 hipóteses fundamentadas (mínimo 800 palavras)
+    - ISSO SIGNIFICA QUE: 3-5 parágrafos analíticos (mínimo 600 palavras)
+
+    REGRA DE OURO DA DENSIDADE:
+    - Se você tem 3 fontes sobre o mesmo ponto → escreva 1 parágrafo integrando as 3
+    - Se você tem 10 menções a um padrão → documente TODAS, não apenas "algumas"
+    - Se você tem dados numéricos → inclua os números específicos, não apenas "aumentou"
+    - Se você tem 20 citações → use múltiplas citações quando o padrão se repetir (mínimo 6-10)
+    - Se você tem 15 fontes disponíveis → todas devem aparecer integradas no texto
+    
+    O relatório só está completo quando:
+    - Todas as fontes disponíveis foram incorporadas
+    - Todos os dados numéricos relevantes foram incluídos
+    - Todos os padrões recorrentes foram documentados com extensão explícita
+    - Todas as divergências foram explicitadas
+    - Múltiplas citações foram usadas quando padrões se repetem
 
     ============================
     PROCESSO OBRIGATÓRIO
@@ -18,8 +51,76 @@ synthesis_task:
     5. Organize os achados seguindo rigorosamente a estrutura exigida.
     6. Sempre que possível, sintetize achados cruzando duas ou mais fontes no mesmo parágrafo, explicitando convergências ou contrastes.
     7. Evite frases meramente descritivas.
-    8. Sempre que um dado for citado, explicite por que ele é relevante para o tema analisado, sem extrapolar além das fontes.
-    9. Prefira parágrafos mais longos e integrados a múltiplos bullets curtos e isolados.
+    8. Sempre que um dado for citado, explicite:
+       - O valor exato (número, percentual, data)
+       - A extensão do padrão (quantas fontes, quantos respondentes)
+       - Por que ele é relevante para o tema analisado
+    9. Prefira parágrafos mais longos e integrados (4-8 linhas) a múltiplos bullets curtos e isolados.
+    10. Documente a AMPLITUDE dos dados: se há 15 fontes, todas devem ser incorporadas.
+
+    ============================
+    REGRA ANTI-COMPRESSÃO (OBRIGATÓRIA)
+    ============================
+    
+    É PROIBIDO:
+    - Comprimir múltiplas evidências em uma única frase genérica
+    - Usar "alguns estudos" quando você tem a lista completa de estudos
+    - Usar "há evidências" sem especificar quantas e quais
+    - Resumir 5 citações diferentes em "entrevistados mencionam que..."
+    - Usar "crescimento" sem incluir o percentual quando ele está disponível
+    - Usar "consumidores" sem especificar quantos, qual perfil, qual período
+    
+    É OBRIGATÓRIO:
+    - Quando houver 3+ fontes sobre o mesmo ponto: listar padrões específicos de cada uma
+    - Quando houver dados numéricos: incluir os números exatos (12%, 340 respondentes, R$ 2,4bi)
+    - Quando houver citações: usar múltiplas citações se o padrão se repetir (mínimo 6-10 citações)
+    - Quando houver divergência: documentar TODAS as posições encontradas, não apenas "há divergência"
+    - Quando houver evolução temporal: incluir dados de múltiplos pontos no tempo
+    - Quando houver segmentação: incluir dados de múltiplos segmentos
+    
+    TESTE DE DENSIDADE:
+    Se ao ler um parágrafo você consegue pensar "mas quais fontes?", "quantos exatamente?", 
+    "qual o percentual?" ou "o que disseram?" → o parágrafo está subdocumentado e deve ser expandido.
+
+    ============================
+    EXEMPLOS DE INTEGRAÇÃO DENSA
+    ============================
+    
+    ❌ EVITAR (resumo genérico superficial):
+    "Há crescimento no consumo de cerveja entre jovens. Entrevistados mencionam preferência 
+    por artesanais."
+    
+    ✅ PREFERIR (síntese densa e ancorada):
+    "Três estudos acadêmicos publicados entre janeiro de 2022 e dezembro de 2024 documentam 
+    aumento no consumo de cerveja entre consumidores de 18-25 anos no Brasil: Estudo A reporta 
+    crescimento de 12,3% em volume per capita (2022-2023, n=2.340 respondentes, margem de erro 
+    2,1%), Estudo B identifica aumento de 8,7% em frequência de consumo semanal (2023-2024, 
+    n=1.890 respondentes), e Estudo C registra expansão de 15,2% em gastos mensais com cerveja 
+    nessa faixa etária, passando de R$ 87 para R$ 100 em média ([Estudo C](https://link.com)). 
+    Esse padrão quantitativo é reforçado por 8 notícias sobre o mercado cervejeiro publicadas 
+    entre março e novembro de 2024, que citam dados de vendas de grandes distribuidoras indicando 
+    crescimento de 18% no segmento premium ([Notícia Exemplo](https://link.com)). Entrevistas em 
+    profundidade com 23 consumidores dessa faixa etária, realizadas entre junho e agosto de 2024, 
+    indicam associação recorrente entre consumo de cerveja artesanal e eventos sociais específicos: 
+    <span class='tooltip'>(Citação)<span class='tooltip-text'>'Final de semana sem cerveja não é 
+    final de semana' (ago/2024, Homem, 23, RJ, Classe C)</span></span>, padrão presente em 18 das 
+    23 entrevistas. Outras citações reforçam a dimensão social: <span class='tooltip'>(Citação)
+    <span class='tooltip-text'>'Cerveja artesanal é pra quando você quer impressionar, não pra 
+    qualquer role' (jul/2024, Homem, 28, SP, Classe B)</span></span> e <span class='tooltip'>
+    (Citação)<span class='tooltip-text'>'A gente escolhe artesanal quando sai com o pessoal que 
+    entende de cerveja' (jun/2024, Mulher, 25, MG, Classe B)</span></span>. Já em cidades do 
+    interior com menos de 100 mil habitantes, apenas 3 dos 8 entrevistados mencionaram 
+    diferenciação por tipo de cerveja, sugerindo padrão mais concentrado em capitais."
+    
+    ANÁLISE DO EXEMPLO BOM:
+    - Integra 3 estudos acadêmicos + 8 notícias + 23 entrevistas (14 fontes)
+    - Inclui dados numéricos específicos (12,3%, 8,7%, 15,2%, R$ 87→R$ 100, n=2.340)
+    - Documenta extensão do padrão (18 de 23 entrevistas)
+    - Usa múltiplas citações (3 citações diretas)
+    - Inclui nuance geográfica (contraste capital vs interior)
+    - Explicita períodos temporais (2022-2023, jun-ago/2024)
+    - Fornece links clicáveis para fontes
+    - Total: 8 linhas densas vs 1 linha genérica
 
     ============================
     REGRA GLOBAL DE ANCORAGEM AO TÓPICO (OBRIGATÓRIA)
@@ -27,12 +128,13 @@ synthesis_task:
 
     - TODO o conteúdo produzido DEVE estar diretamente relacionado ao tema "{topic}".
     - É PROIBIDO incluir:
-      • fatos, dados, lacunas ou suposições que não impactem a resposta ao tema
-      • descrições gerais do contexto que não alterem a compreensão do tópico
+      • Fatos, dados, lacunas ou suposições que não impactem a resposta ao tema
+      • Descrições gerais do contexto que não alterem a compreensão do tópico
+      • Discussões metodológicas sobre as fontes
     - Cada seção deve contribuir explicitamente para:
-      • responder ao tema
-      • qualificar o grau de confiança da resposta
-      • ou explicitar limites que impedem uma resposta mais precisa ao tema
+      • Responder ao tema com máxima densidade
+      • Qualificar o grau de confiança da resposta
+      • Ou explicitar limites que impedem uma resposta mais precisa ao tema
 
     ============================
     REGRAS DE EVIDÊNCIA (CRÍTICO)
@@ -82,15 +184,46 @@ synthesis_task:
     Caso algum desses termos seja necessário, a frase DEVE ser reescrita
     em formato puramente descritivo ou removida.
 
-    ============================
-    REGRA DE ESCOPO (OBRIGATÓRIA):
-    ============================
+    -É PROIBIDO utilizar verbos epistêmicos ou inferenciais para introduzir fatos, incluindo:
+      - “indicar”, “mostrar”, “apontar”, “sugerir”, “revelar”, “demonstrar”.
+    - Substitua por verbos descritivos compatíveis com o tipo de dado:
+      - Quantitativo: “registrou”, “atingiu”, “correspondeu a”, “foi declarado por”
+      - Qualitativo: “foi mencionado”, “apareceu recorrentemente”, “foi verbalizado”
 
-    Toda afirmação deve explicitar claramente:
-    - a quem o dado se refere (ex.: entrevistados, respondentes, adultos 18+)
-    - o tipo de dado (qualitativo ou quantitativo)
-
-    Afirmações sem qualificador de escopo devem ser omitidas.
+    ============================
+    REGRA DE ESCOPO E DETALHAMENTO (OBRIGATÓRIA)
+    ============================
+    
+    Toda afirmação deve explicitar claramente e com máximo detalhe:
+    
+    - A quem o dado se refere:
+      • NÃO: "consumidores"
+      • SIM: "23 consumidores de 25-45 anos entrevistados entre junho e agosto de 2024 
+        em capitais do Sudeste"
+    
+    - O tipo de dado:
+      • NÃO: "dados qualitativos"
+      • SIM: "entrevistas em profundidade com roteiro semi-estruturado, duração média 45min"
+    
+    - A extensão do padrão:
+      • NÃO: "alguns mencionam"
+      • SIM: "18 de 23 entrevistados mencionam" ou "padrão observado em 78% das entrevistas"
+    
+    QUANDO HOUVER DADOS QUANTITATIVOS:
+    - Incluir números absolutos E percentuais quando ambos disponíveis
+    - Incluir período exato de coleta (não "recente", mas "março a maio de 2024")
+    - Incluir tamanho amostral quando informado (n=2.340)
+    - Incluir margem de erro quando informada (±2,1%)
+    - Incluir múltiplos pontos temporais quando houver série histórica
+    
+    QUANDO HOUVER DADOS QUALITATIVOS:
+    - Incluir número exato de entrevistados/respondentes
+    - Incluir período exato de realização
+    - Incluir perfil demográfico quando disponível (idade, gênero, classe, localização)
+    - Incluir MÚLTIPLAS citações quando o padrão se repetir (mínimo 6-10 para padrões fortes)
+    - Incluir frequência do padrão (ex: "mencionado em 15 de 20 entrevistas")
+    
+    Afirmações sem qualificador detalhado de escopo devem ser expandidas ou omitidas.
 
     ============================
     IDIOMA
@@ -101,19 +234,18 @@ synthesis_task:
     ============================
     REGRA DE PRIORIZAÇÃO GEOGRÁFICA (OBRIGATÓRIA)
     ============================
-
+    
     - O Brasil é o referencial analítico primário de TODA a síntese.
     - Afirmações devem SEMPRE começar avaliando evidências referentes ao Brasil.
-
     - Evidências de outros países:
       • NÃO podem ser apresentadas como conclusão direta
       • NÃO podem ser descritas sem contextualização explícita ao Brasil
-
+    
     - Dados internacionais SÓ podem ser incluídos quando:
       1. Forem explicitamente usados para evidenciar lacunas no contexto brasileiro
       2. Forem apresentados como contraste metodológico ou cultural
       3. Forem descritos como indícios exploratórios, nunca como generalização para o Brasil
-
+    
     - Sempre que uma evidência internacional for citada, o texto DEVE:
       • Declarar explicitamente a inexistência, escassez ou limitação de dados brasileiros equivalentes
       • Indicar claramente que a observação se refere a outro país
@@ -135,14 +267,16 @@ synthesis_task:
     2. Se toda afirmação factual possui fonte explícita existente nos relatórios fornecidos.
     3. Se termos avaliativos ou narrativos foram usados
     4. Se alguma evidência internacional foi tratada como conclusão
-
+    5. Revise o texto e garanta que NÃO exista nenhuma ocorrência de: "Consumer Hours", "Asimov", "RAG", "X", "Y", "XY", "[", "]", "(Citação)".
+    6. Na seção “Fontes analisadas”, verifique se TODAS as fontes contêm um período temporal explícito.
+    7. Se qualquer afirmação começar com o nome de uma fonte, a resposta deve ser reescrita antes da entrega.
     Qualquer falha exige reescrita antes da entrega.
 
     ============================
     ENTRADAS DA TAREFA
     ============================
     - Relatórios brutos consolidados no bloco abaixo:
-      {reports_context}
+      "{reports_context}"
 
   expected_output: >
     Relatório em Markdown, seguindo EXATAMENTE a estrutura abaixo, sem seções extras, renomeadas ou reordenadas:
@@ -174,61 +308,138 @@ synthesis_task:
     Informe exclusivamente o **tipo de material**, a **quantidade** e o **período analisado**, no formato abaixo:
 
     Exemplo de formato:
-    - [quantidade] [tipo de material] publicados/analisados/realizados entre [mês de ano] e [mês de ano];
+    - [quantidade] [tipo de material] publicados/analisados/realizados entre [mês e ano] e [mês e ano];
 
     Exemplos válidos: (APENAS EXEMPLOS DE FORMATO)
     - X artigos científicos publicados entre Janeiro de 2022 e Dezembro de 2024;
     - Y notícias e estudos publicados entre Março de 2023 e Novembro de 2024;
-    - XY entrevistas em profundidade com consumidores.
+    - XY entrevistas em profundidade com consumidores entre Janeiro de 2022 e Dezembro de 2024;
+
+    Exemplos inválidos: (APENAS EXEMPLOS DE FORMATO INVÁLIDO)
+    - X artigos acadêmicos publicados sem data específica;
+    - Y notícias e estudos publicados sem data especificada;
+    - XY entrevistas em profundidade realizadas sem data especificada;
 
     ## REGRAS ESTRITAS:
+    - **é estritamente obrigatório trazer a informação das datas.**
     - **Fontes devem ser citadas APENAS caso existam no contexto fornecido.**
     - **Todas as fontes vindas de "web", se enquadram como "notícias e estudos".**
     - **Todas as fontes vindas de "academic", se enquadram como "artigos acadêmicos".**
     - **Todos os termos "snippets", são traduzidos para "entrevistas em profundidade".**
-    - **Todos os termos "Consumer hours", são traduzidos para "entrevistas em profundidade".**
+    - **Todos os termos "Consumer hours" ou "consumer_hours", são traduzidos para "entrevistas em profundidade".**
     - **Não mencionar nomes de fontes, plataformas, instituições ou veículos.**
     - **Não incluir URLs ou referências externas nesta seção.**
-    - **Não informar data caso a fonte não tenha período temporal explícito e informado.**
+    - **A data geralmente ficam nos campos (data de publicação, Ano de Publicação, data de realização, data de coleta, data de entrevista) nos relatórios fornecidos.**
     - **Não informar dados que não sejam o tipo de material, a quantidade e o período analisado.**
     - **Se dentro do relatório fornecido, houver aviso de indisponibilidade de conteúdo, não cite nas fontes.**
     - A menção específica a fontes ou links é permitida **apenas nos blocos analíticos**, exclusivamente como ilustração de afirmações.
     - Para materiais do tipo Entrevistas em profundidade, a quantidade de entrevistados é obrigatória.
+    - É PROIBIDO usar placeholders, colchetes ou variáveis não resolvidas (ex.: "X", "Y", "XY", "[número]", "[quantidade]", "[período]", "[número de snippets]"). Use apenas números reais extraídos do contexto fornecido.
+    - É PROIBIDO mencionar nomes internos de sistemas, produtos, datasets ou pipelines (ex.: "Consumer Hours", "Asimov", "RAG"). Use termos genéricos como "entrevistas", "notícias e estudos", "artigos científicos".
 
-    ─────────────────────────────────────────
+    ──────
 
     ## DÁ PARA AFIRMAR
+    
+    OBJETIVO:
+    Lista de afirmações objetivas, insights e padrões observáveis sustentados por evidências explícitas.
+    
+    DIRETRIZES DE EXTENSÃO (CRÍTICO):
+    - Mínimo esperado: 6-12 bullets detalhados
+    - Cada bullet deve ter 4-10 linhas (NÃO 1-2 linhas)
+    - Mínimo esperado: 1500 palavras nesta seção
+    - Quando houver padrão recorrente: documentar a recorrência explicitamente com números
+    
+    REGRAS ABSOLUTAS:
     - NÃO reinterpretar dados
     - NÃO transformar menções em preferências
     - NÃO inferir motivação, causalidade ou representatividade
-    - Lista de afirmações objetivas e insights, cada uma com fonte e se possível url com hyperlink.
-    - Não inventar dados ou informações. somente trazer fatos e dados relevantes.
-    - Para fontes Entrevistas em profundidade: sempre incluir trechos reais das entrevistas como evidência,
-      utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
-    - Apresentar implicações ou leituras possíveis, sem tom prescritivo.
-    - Esta seção deve conter apenas fatos observáveis ou estatísticos explicitamente declarados nas fontes.
-    - Não incluir interpretações, impactos de mercado ou consequências futuras.
+    - NÃO inventar dados ou informações
+    - Somente trazer fatos e dados relevantes explícitos nas fontes
+    - Esta seção deve conter apenas fatos observáveis ou estatísticos explicitamente declarados nas fontes
+    - Não incluir interpretações, impactos de mercado ou consequências futuras
+    
+    CRUZAMENTO DE FONTES:
     - Ao cruzar fontes, explicitar claramente:
-      - se elas medem o MESMO fenômeno
-      - ou se apenas tratam de temas relacionados
-      - Convergência temática NÃO implica validação mútua.
-    - Cada bullet deve conter:
-      - o fato observado
-      - o padrão ou relevância desse fato
-      - em caso de links, informar a fonte e url com hyperlink, precisa ser um link clicável e direto, dentro de parênteses após ponto final.
-      - Não tem que ser no formato "Fonte: xxxx". Pode ser só um hyperlink curto direto para a fonte, e entre parênteses após o ponto final. Para ter menos texto.
+      • Se elas medem o MESMO fenômeno (validação)
+      • Ou se apenas tratam de temas relacionados (convergência temática)
+    - Convergência temática NÃO implica validação mútua
+    
+    ESTRUTURA OBRIGATÓRIA DE CADA BULLET:
+    
+    1. **Fato observado + especificidade máxima**
+       - Números exatos, datas precisas, quem, onde, quando
+       - Não: "crescimento" → Sim: "crescimento de 18,3% entre jan/2023 e dez/2023"
+    
+    2. **Extensão do padrão**
+       - Quantas fontes sustentam (X de Y fontes)
+       - Qual período cobre (mês/ano a mês/ano)
+       - Qual escopo populacional (n=2.340, 23 entrevistados, etc)
+       - Qual frequência do padrão (mencionado em 18 de 23 entrevistas = 78%)
+    
+    3. **Evidência direta**
+       - Para dados quantitativos: incluir fonte e link clicável
+       - Para entrevistas: incluir MÚLTIPLAS citações quando padrão for recorrente
+       - Formato de link: ([nome do site](https://url.com))
+       - Não usar formato "Fonte: xxxx" - apenas hyperlink entre parênteses após ponto final.
         - exemplo: ([nome do site](https://www.site.com))
         - exemplo: ([nome do site academico](https://www.academic.com/pdf/paper.pdf))
-      - em caso de Entrevistas em profundidade, informar o trecho da entrevista como evidência, utilizando texto exato das transcrições, nunca parafraseando ou resumindo.
-        - iniciar a afirmação deixando claro que são Entrevistas em profundidade, usando expressões como "Algumas entrevistas em profundidade com consumidores apontam que..." ou "Entrevistas em profundidade indicam que..."
-        - não informar nomes de consumidores, apenas o trecho da entrevista.
-        - exemplo: Algumas entrevistas em profundidade com consumidores apontam que beber cerveja em eventos sociais não confere tanto status. <span class="tooltip">(Citação)<span class="tooltip-text">"Hoje a gente não vê a galera mais descolada com cerveja na mão em balada" (agosto de 2024, Mulher, 47 anos, GO)</span></span>
-        - O formato deve usar tags HTML span com classes tooltip e tooltip-text:
-          - O texto visível deve estar dentro de: <span class="tooltip">(Citação)</span>
-          - O trecho da entrevista deve estar dentro de: <span class="tooltip-text">"trecho exato da transcrição" (data se disponível, [informações de quota: gênero, idade, estado, classe social] apenas se disponíveis)</span>
-          - O tooltip-text deve estar aninhado dentro do tooltip
-          - IMPORTANTE: Informar informações de quota (gênero, idade, estado, classe social) APENAS quando estiverem disponíveis no snippet. Se não houver quota disponível, incluir apenas a data (quando disponível) ou apenas o trecho da transcrição.
-
+    
+    4. **Contraste ou nuance (se houver)**
+       - Segmentações (capital vs interior, faixa etária, classe social)
+       - Divergências entre fontes
+       - Limitações de escopo
+    
+    REGRAS ESPECÍFICAS PARA CITAÇÕES (Entrevistas em profundidade):
+    
+    - SEMPRE incluir trechos reais das entrevistas como evidência
+    - Utilizar texto EXATO das transcrições (nunca parafrasear ou resumir)
+    - Quando padrão for recorrente: incluir MÚLTIPLAS citações (mínimo 6-10 para padrões fortes)
+    - Iniciar a afirmação deixando claro que são entrevistas: "Entrevistas em profundidade 
+      com [N] consumidores indicam que..." ou "Entre [N] entrevistados, [X] mencionam que..."
+    - NÃO informar nomes de consumidores, apenas o trecho da entrevista
+    
+    FORMATO DE CITAÇÃO (usar tags HTML):
+    
+    <span class="tooltip">(Citação)<span class="tooltip-text">"trecho exato da transcrição" 
+    (data se disponível, [informações de quota: gênero, idade, estado, classe social] apenas 
+    se disponíveis)</span></span>
+    
+    IMPORTANTE SOBRE QUOTAS:
+    - Informar informações de quota (gênero, idade, estado, classe social) APENAS quando 
+      estiverem disponíveis no snippet
+    - Se não houver quota disponível, incluir apenas a data (quando disponível) ou apenas 
+      o trecho da transcrição
+    
+    EXEMPLO DE BULLET BEM CONSTRUÍDO (6-7 linhas):
+    
+    ✅ DENSO E ANCORADO:
+    "Entrevistas em profundidade com 23 consumidores de 25-45 anos realizadas entre junho e 
+    agosto de 2024 em capitais do Sudeste indicam associação recorrente entre consumo de cerveja 
+    artesanal e contextos de socialização seletiva, mencionada por 18 dos 23 entrevistados (78%). 
+    <span class='tooltip'>(Citação)<span class='tooltip-text'>'Cerveja artesanal é pra quando 
+    você quer impressionar, não pra qualquer role' (jul/2024, Homem, 28, SP, Classe B)</span></span>. 
+    Outras citações reforçam o padrão: <span class='tooltip'>(Citação)<span class='tooltip-text'>
+    'A gente escolhe artesanal quando sai com o pessoal que entende de cerveja' (jun/2024, Mulher, 
+    25, MG, Classe B)</span></span>, <span class='tooltip'>(Citação)<span class='tooltip-text'>
+    'Em bar com amigos é artesanal, em casa é latão mesmo' (ago/2024, Homem, 32, RJ, Classe C)
+    </span></span> e <span class='tooltip'>(Citação)<span class='tooltip-text'>'Pedir artesanal 
+    mostra que você entende, né' (jul/2024, Mulher, 29, SP, Classe B)</span></span>. Esse padrão 
+    é corroborado por pesquisa quantitativa com 1.890 respondentes que registra que 64% dos 
+    consumidores de cerveja artesanal a consomem 'principalmente em contextos sociais com amigos' 
+    ([Pesquisa Comportamento](https://example.com)). Já em cidades do interior do Nordeste com 
+    menos de 100 mil habitantes, apenas 3 de 8 entrevistados mencionaram diferenciação por tipo 
+    de cerveja, sugerindo concentração do padrão em grandes centros urbanos."
+    
+    ❌ EVITAR (superficial, 1-2 linhas):
+    "Consumidores associam cerveja artesanal a socialização. 'Artesanal é pra impressionar' 
+    (Homem, 28, SP)."
+    
+    DIFERENÇA:
+    - Exemplo BOM: 7 linhas, 4 citações, dados quantitativos (78%, n=1.890, 64%), nuance geográfica, 
+      período explícito, link para fonte
+    - Exemplo RUIM: 1 linha, 1 citação genérica, sem dados numéricos, sem extensão do padrão
+    
     ## NÃO FICA CLARO
     - Pontos em que os dados NÃO permitem uma conclusão verificável.
     - Cada item DEVE indicar explicitamente:
@@ -280,7 +491,6 @@ synthesis_task:
     - Suposições que não possam ser diretamente rastreadas
       aos dados apresentados devem ser omitidas.
 
-
     ## ISSO SIGNIFICA QUE…
       - Apresente um resumo analítico neutro da resposta à pergunta.
       - Traduza os achados em leituras possíveis ou implicações conceituais,
@@ -294,6 +504,8 @@ synthesis_task:
       - Utilizar linguagem descritiva e analítica.
       - Evitar verbos normativos como “precisar”, “dever”, “é necessário”, “exige”.
       - Formular implicações como possíveis leituras, não como direcionamentos.
+
+
 
 evaluation_task:
   description: >
